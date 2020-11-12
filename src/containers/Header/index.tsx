@@ -4,7 +4,7 @@ import { connect, MapDispatchToPropsFunction } from 'react-redux';
 import { RouterProps } from 'react-router';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
-import { showLanding } from '../../api';
+// import { showLanding } from '../../api';
 import { LogoIcon } from '../../assets/images/LogoIcon';
 import { IntlProps } from '../../index';
 import {
@@ -21,7 +21,8 @@ import {
     toggleSidebar,
 } from '../../modules';
 import { HeaderToolbar } from '../HeaderToolbar';
-import { NavBar } from '../NavBar';
+// Remove light, dark mode by kroim
+// import { NavBar } from '../NavBar';
 
 interface ReduxProps {
     currentMarket: Market | undefined;
@@ -65,15 +66,17 @@ class Head extends React.Component<Props> {
         return (
             <header className={`pg-header`}>
                 <div className={`pg-container pg-header__content ${tradingCls}`}>
-                    <div
+                    {/* Remove Sidebar by kroim */}
+                    {/* <div
                         className={`pg-sidebar__toggler ${mobileWallet && 'pg-sidebar__toggler-mobile'}`}
                         onClick={this.openSidebar}
                     >
                         <span className="pg-sidebar__toggler-item"/>
                         <span className="pg-sidebar__toggler-item"/>
                         <span className="pg-sidebar__toggler-item"/>
-                    </div>
-                    <div onClick={e => this.redirectToLanding()} className="pg-header__logo">
+                    </div> */}
+                    {/* <div onClick={e => this.redirectToLanding()} className="pg-header__logo"> */}
+                    <div className="pg-header__logo">
                         <div className="pg-logo">
                             <LogoIcon className="pg-logo__img" />
                         </div>
@@ -85,7 +88,7 @@ class Head extends React.Component<Props> {
                     {this.renderMobileWalletNav()}
                     <div className="pg-header__navbar">
                         {this.renderMarketToolbar()}
-                        <NavBar onLinkChange={this.closeMenu}/>
+                        {/* <NavBar onLinkChange={this.closeMenu}/> */}
                     </div>
                 </div>
             </header>
@@ -136,16 +139,16 @@ class Head extends React.Component<Props> {
         );
     };
 
-    private redirectToLanding = () => {
-        this.props.toggleSidebar(false);
-        this.props.history.push(`${showLanding() ? '/' : '/trading'}`);
-    };
-
-    private openSidebar = () => this.props.toggleSidebar(!this.props.sidebarOpened);
+    // Remove Sidebar by kroim
+    // private redirectToLanding = () => {
+    //     this.props.toggleSidebar(false);
+    //     this.props.history.push(`${showLanding() ? '/' : '/trading'}`);
+    // };
+    // private openSidebar = () => this.props.toggleSidebar(!this.props.sidebarOpened);
 
     private backWallets = () => this.props.setMobileWalletUi('');
 
-    private closeMenu = (e: any) => this.props.setMobileWalletUi('');
+    // private closeMenu = (e: any) => this.props.setMobileWalletUi('');
 }
 
 const mapStateToProps = (state: RootState): ReduxProps => ({
