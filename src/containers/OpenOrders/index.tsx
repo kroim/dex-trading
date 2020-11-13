@@ -80,27 +80,49 @@ export class OpenOrdersContainer extends React.Component<Props> {
     }
 
     private renderHeadersKeys = () => {
+        // return [
+        //     'Date',
+        //     'Price',
+        //     'Amount',
+        //     'Total',
+        //     'Filled',
+        //     '',
+        // ];
         return [
             'Date',
+            'Pair',
+            'Type',
+            'Side',
             'Price',
             'Amount',
-            'Total',
             'Filled',
-            '',
+            'Total'
+            // 'Trigger Conditions'
         ];
     };
 
     private renderHeaders = () => {
-        const currentAskUnit = this.props.currentMarket ? ` (${this.props.currentMarket.base_unit.toUpperCase()})` : '';
-        const currentBidUnit = this.props.currentMarket ? ` (${this.props.currentMarket.quote_unit.toUpperCase()})` : '';
+        // const currentAskUnit = this.props.currentMarket ? ` (${this.props.currentMarket.base_unit.toUpperCase()})` : '';
+        // const currentBidUnit = this.props.currentMarket ? ` (${this.props.currentMarket.quote_unit.toUpperCase()})` : '';
 
+        // return [
+        //     this.translate('page.body.trade.header.openOrders.content.date'),
+        //     this.translate('page.body.trade.header.openOrders.content.price').concat(currentBidUnit),
+        //     this.translate('page.body.trade.header.openOrders.content.amount').concat(currentAskUnit),
+        //     this.translate('page.body.trade.header.openOrders.content.total').concat(currentBidUnit),
+        //     this.translate('page.body.trade.header.openOrders.content.filled'),
+        //     '',
+        // ];
         return [
-            this.translate('page.body.trade.header.openOrders.content.date'),
-            this.translate('page.body.trade.header.openOrders.content.price').concat(currentBidUnit),
-            this.translate('page.body.trade.header.openOrders.content.amount').concat(currentAskUnit),
-            this.translate('page.body.trade.header.openOrders.content.total').concat(currentBidUnit),
-            this.translate('page.body.trade.header.openOrders.content.filled'),
-            '',
+            this.translate('custom.openOrders.date'),
+            this.translate('custom.openOrders.pairs'),
+            this.translate('custom.openOrders.type'),
+            this.translate('custom.openOrders.side'),
+            this.translate('custom.openOrders.price'),
+            this.translate('custom.openOrders.amount'),
+            this.translate('custom.openOrders.filled'),
+            this.translate('custom.openOrders.total')
+            // this.translate('custom.openOrders.triggerConditions')
         ];
     };
 
