@@ -7,7 +7,7 @@ import { incrementalOrderBook } from '../../api';
 import { Decimal } from '../../components/Decimal';
 import { GridChildInterface, GridItem } from '../../components/GridItem';
 import {
-    MarketDepthsComponent,
+    // MarketDepthsComponent,
     MarketsComponent,
     OpenOrdersComponent,
     OrderBook,
@@ -99,10 +99,10 @@ const TradingWrapper = props => {
                 i: 3,
                 render: () => <OrderBook size={orderBookComponentResized} />,
             },
-            {
-                i: 4,
-                render: () => <MarketDepthsComponent />,
-            },
+            // {
+            //     i: 4,
+            //     render: () => <MarketDepthsComponent />,
+            // },
             {
                 i: 5,
                 render: () => <OpenOrdersComponent/>,

@@ -5,7 +5,8 @@ import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux';
 import { Route, RouterProps, Switch } from 'react-router';
 import { Redirect, withRouter } from 'react-router-dom';
 import { compose } from 'redux';
-import { minutesUntilAutoLogout, sessionCheckInterval, showLanding } from '../../api';
+// import { minutesUntilAutoLogout, sessionCheckInterval, showLanding } from '../../api';
+import { minutesUntilAutoLogout, sessionCheckInterval } from '../../api';
 import { ExpiredSessionModal } from '../../components';
 import { WalletsFetch } from '../../containers';
 import { toggleColorTheme } from '../../helpers';
@@ -15,7 +16,7 @@ import {
     ConfirmMobileScreen,
     EmailVerificationMobileScreen,
     ForgotPasswordMobileScreen,
-    LandingScreenMobile,
+    // LandingScreenMobile,
     OrdersMobileScreen,
     ProfileAccountActivityMobileScreen,
     ProfileApiKeysMobileScreen,
@@ -63,7 +64,7 @@ import {
     EmailVerificationScreen,
     ForgotPasswordScreen,
     HistoryScreen,
-    LandingScreen,
+    // LandingScreen,
     MagicLink,
     MaintenanceScreen,
     OrdersTabScreen,
@@ -297,7 +298,7 @@ class LayoutComponent extends React.Component<LayoutProps, LayoutState> {
                         <PrivateRoute loading={userLoading} isLogged={isLoggedIn} path="/profile/theme" component={ProfileThemeMobileScreen} />
                         <PrivateRoute loading={userLoading} isLogged={isLoggedIn} path="/profile" component={ProfileMobileScreen} />
                         <Route exact={true} path="/trading/:market?" component={TradingScreenMobile} />
-                        {showLanding() && <Route exact={true} path="/" component={LandingScreenMobile} />}
+                        {/* {showLanding() && <Route exact={true} path="/" component={LandingScreenMobile} />} */}
                         <Route path="**"><Redirect to="/trading/" /></Route>
                     </Switch>
                     {isLoggedIn && <WalletsFetch />}
@@ -319,7 +320,7 @@ class LayoutComponent extends React.Component<LayoutProps, LayoutState> {
                     <Route path="/404" component={RestrictedScreen} />
                     <Route path="/500" component={MaintenanceScreen} />
                     <Route exact={true} path="/trading/:market?" component={TradingScreen} />
-                    {showLanding() && <Route exact={true} path="/" component={LandingScreen} />}
+                    {/* {showLanding() && <Route exact={true} path="/" component={LandingScreen} />} */}
                     <PrivateRoute loading={userLoading} isLogged={isLoggedIn} path="/orders" component={OrdersTabScreen} />
                     <PrivateRoute loading={userLoading} isLogged={isLoggedIn} path="/history" component={HistoryScreen} />
                     <PrivateRoute loading={userLoading} isLogged={isLoggedIn} path="/confirm" component={ConfirmScreen} />
