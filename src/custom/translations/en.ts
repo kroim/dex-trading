@@ -8,5 +8,9 @@ export const en = {
     'custom.openOrders.total': 'Total',
     'custom.openOrders.marker': 'Marker',
     'custom.openOrders.txHash': 'TX Hash',
-    'custom.openOrders.cancel': 'Cancel'
+    'custom.openOrders.cancel': 'Cancel',
+    'custom.openOrders.openOrders': 'Open Orders',
+    'custom.openOrders.orderHistory': 'Order History',
+    'custom.openOrders.tradeHistory': 'Trade History',
+    'custom.openOrders.funds': 'Funds'
 };

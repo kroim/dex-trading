@@ -4,7 +4,7 @@ import { Spinner } from 'react-bootstrap';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect, MapDispatchToPropsFunction } from 'react-redux';
 import { CloseIcon } from '../../assets/images/CloseIcon';
-import { OpenOrders } from '../../components';
+import { OpenOrders, TabPanel } from '../../components';
 import { localeDate, preciseData, setTradeColor } from '../../helpers';
 import { IntlProps } from '../../index';
 import {
@@ -38,6 +38,11 @@ interface DispatchProps {
 type Props = ReduxProps & DispatchProps & IntlProps;
 
 export class OpenOrdersContainer extends React.Component<Props> {
+
+    public state = { tab: 'openOrders', index: 0, disable: false };
+
+    public tabMapping = ['openOrders', 'orderHistory', 'tradeHistory', 'funds'];
+
     public componentDidMount() {
         const { currentMarket, userLoggedIn } = this.props;
         if (userLoggedIn && currentMarket) {
@@ -65,6 +70,30 @@ export class OpenOrdersContainer extends React.Component<Props> {
 
         return (
             <div className={classNames}>
+                <TabPanel
+                    fixed={true}
+                    panels={this.renderTabs()}
+                    onTabChange={this.handleChangeTab}
+                    currentTabIndex={this.state.index}
+                />
+                {/* <div className="cr-table-header__content">
+                    <div className="cr-title-component">
+                        <FormattedMessage id="page.body.trade.header.openOrders" />
+                        <span className="cr-table-header__cancel" onClick={this.handleCancelAll}>
+                            <FormattedMessage id="page.body.openOrders.header.button.cancelAll" />
+                            <CloseIcon className="cr-table-header__close" />
+                        </span>
+                    </div>
+                </div>
+                {fetching ? <div className="open-order-loading"><Spinner animation="border" variant="primary" /></div> : this.openOrders()} */}
+            </div>
+        );
+    }
+
+    private renderCustomOrder = () => {
+        const { fetching } = this.props;
+        return (
+            <div>
                 <div className="cr-table-header__content">
                     <div className="cr-title-component">
                         <FormattedMessage id="page.body.trade.header.openOrders" />
@@ -76,8 +105,42 @@ export class OpenOrdersContainer extends React.Component<Props> {
                 </div>
                 {fetching ? <div className="open-order-loading"><Spinner animation="border" variant="primary" /></div> : this.openOrders()}
             </div>
-        );
+        )
     }
+
+    private renderTabs = () => {
+        const { tab, index } = this.state;
+
+        return [
+            {
+                content: tab === 'openOrders' && index === 0 ? this.renderCustomOrder() : null,
+                label: this.props.intl.formatMessage({ id: 'custom.openOrders.openOrders' }),
+            },
+            {
+                content: tab === 'orderHistory' ? <div>Order History</div> : null,
+                label: this.props.intl.formatMessage({ id: 'custom.openOrders.orderHistory' }),
+            },
+            {
+                content: tab === 'tradeHistory' ? <div>Trade History</div> : null,
+                label: this.props.intl.formatMessage({ id: 'custom.openOrders.tradeHistory' }),
+            },
+            {
+                content: tab === 'funds' ? <div>Funds</div> : null,
+                label: this.props.intl.formatMessage({ id: 'custom.openOrders.funds' }),
+            },
+        ];
+    };
+
+    private handleChangeTab = (index: number) => {
+        if (this.state.tab === this.tabMapping[index]) {
+            return;
+        }
+
+        this.setState({
+            tab: this.tabMapping[index],
+            index: index,
+        });
+    };
 
     private renderHeadersKeys = () => {
         // return [
