@@ -1,11 +1,12 @@
 export const en = {
-    'custom.openOrders.date': 'Date',
-    'custom.openOrders.pairs': 'Pairs',
-    'custom.openOrders.type': 'Type',
-    'custom.openOrders.side': 'Side',
+    'custom.openOrders.date': 'Date & Time',
+    'custom.openOrders.pair': 'Pair',
+    'custom.openOrders.sell': 'Sell',
+    'custom.openOrders.buy': 'Buy',
     'custom.openOrders.price': 'Price',
     'custom.openOrders.amount': 'Amount',
-    'custom.openOrders.filled': 'Filled',
     'custom.openOrders.total': 'Total',
-    'custom.openOrders.triggerConditions': 'Trigger Conditions'
+    'custom.openOrders.marker': 'Marker',
+    'custom.openOrders.txHash': 'TX Hash',
+    'custom.openOrders.cancel': 'Cancel'
 };

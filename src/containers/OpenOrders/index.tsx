@@ -91,12 +91,11 @@ export class OpenOrdersContainer extends React.Component<Props> {
         return [
             'Date',
             'Pair',
-            'Type',
-            'Side',
+            'Sell',
+            'Buy',
+            'Total',
             'Price',
-            'Amount',
-            'Filled',
-            'Total'
+            'Cancel'
             // 'Trigger Conditions'
         ];
     };
@@ -115,14 +114,12 @@ export class OpenOrdersContainer extends React.Component<Props> {
         // ];
         return [
             this.translate('custom.openOrders.date'),
-            this.translate('custom.openOrders.pairs'),
-            this.translate('custom.openOrders.type'),
-            this.translate('custom.openOrders.side'),
+            this.translate('custom.openOrders.pair'),
+            this.translate('custom.openOrders.sell'),
+            this.translate('custom.openOrders.buy'),
+            this.translate('custom.openOrders.total'),
             this.translate('custom.openOrders.price'),
-            this.translate('custom.openOrders.amount'),
-            this.translate('custom.openOrders.filled'),
-            this.translate('custom.openOrders.total')
-            // this.translate('custom.openOrders.triggerConditions')
+            this.translate('custom.openOrders.cancel')
         ];
     };
 
@@ -141,7 +138,8 @@ export class OpenOrdersContainer extends React.Component<Props> {
         const { list, currentMarket } = this.props;
 
         if (list.length === 0) {
-            return [[[''], [''], this.translate('page.noDataToShow')]];
+            // return [[[''], [''], this.translate('page.noDataToShow')]];
+            return [[[this.translate('page.noDataToShow')]]];
         }
 
         return list.map((item: OrderCommon) => {
