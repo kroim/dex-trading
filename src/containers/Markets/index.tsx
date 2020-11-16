@@ -103,7 +103,7 @@ class MarketsContainer extends React.Component<Props> {
     // }
     private testAssetsData = () => {
         // return [[[this.props.intl.formatMessage({id: 'page.noDataToShow'})]]];
-        return [[['ETH', '0.5'], ['DEX', '100']]];
+        return [['ETH', '0.5'], ['DEX', '100']];
     }
 
     private handleOnSelect = (index: string) => {
