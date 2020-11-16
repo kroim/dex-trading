@@ -6,7 +6,7 @@ import {
 } from 'react-intl';
 import { connect, MapDispatchToPropsFunction } from 'react-redux';
 import { incrementalOrderBook } from '../../api';
-import { Decimal } from '../../components/Decimal';
+// import { Decimal } from '../../components/Decimal';
 import { Markets } from '../../components/Markets';
 import { IntlProps } from '../../index';
 import { RootState, selectUserInfo, setCurrentPrice, User } from '../../modules';
@@ -43,9 +43,10 @@ type Props = ReduxProps & DispatchProps & IntlProps;
 
 class MarketsContainer extends React.Component<Props> {
     private headers = [
-        this.props.intl.formatMessage({id: 'page.body.trade.header.markets.content.pair'}),
-        this.props.intl.formatMessage({id: 'page.body.trade.header.markets.content.price'}),
-        this.props.intl.formatMessage({id: 'page.body.trade.header.markets.content.change'}),
+        // this.props.intl.formatMessage({id: 'page.body.trade.header.markets.content.pair'}),
+        // this.props.intl.formatMessage({id: 'page.body.trade.header.markets.content.price'}),
+        // this.props.intl.formatMessage({id: 'page.body.trade.header.markets.content.change'}),
+        'Pair', 'Balance Amount'
     ];
 
     public componentDidMount() {
@@ -74,31 +75,35 @@ class MarketsContainer extends React.Component<Props> {
         return (
             <Markets
                 filters={false}
-                data={this.mapMarkets()}
+                data={this.testAssetsData()}
                 rowKeyIndex={0}
                 onSelect={this.handleOnSelect}
                 selectedKey={key}
                 headers={this.headers}
-                title={this.props.intl.formatMessage({id: 'page.body.trade.header.markets'})}
+                title={this.props.intl.formatMessage({id: 'custom.openOrders.assets'})}
                 filterPlaceholder={this.props.intl.formatMessage({ id: 'page.body.trade.header.markets.content.search'})}
             />
         );
     };
 
-    private mapMarkets() {
-        const { markets, marketTickers } = this.props;
-        const defaultTicker = {
-            last: 0,
-            price_change_percent: '+0.00%',
-        };
+    // private mapMarkets() {
+    //     const { markets, marketTickers } = this.props;
+    //     const defaultTicker = {
+    //         last: 0,
+    //         price_change_percent: '+0.00%',
+    //     };
 
-        return markets.map((market: Market) =>
-            ([
-                market.name,
-                Decimal.format(Number((marketTickers[market.id] || defaultTicker).last), market.amount_precision),
-                (marketTickers[market.id] || defaultTicker).price_change_percent,
-            ]),
-        );
+    //     return markets.map((market: Market) =>
+    //         ([
+    //             market.name,
+    //             Decimal.format(Number((marketTickers[market.id] || defaultTicker).last), market.amount_precision),
+    //             (marketTickers[market.id] || defaultTicker).price_change_percent,
+    //         ]),
+    //     );
+    // }
+    private testAssetsData = () => {
+        // return [[[this.props.intl.formatMessage({id: 'page.noDataToShow'})]]];
+        return [[['ETH', '0.5'], ['DEX', '100']]];
     }
 
     private handleOnSelect = (index: string) => {

@@ -1,6 +1,7 @@
 import classnames from 'classnames';
 import * as React from 'react';
-import { CellData, FilterInput, Table } from '../';
+// import { CellData, FilterInput, Table } from '../';
+import { CellData, Table } from '../';
 
 export interface MarketsProps {
     /**
@@ -61,17 +62,18 @@ export class Markets extends React.Component<MarketsProps, MarketsState> {
 
     private defaultHeaders: string[] = ['Pair', 'Price', '24h Change'];
 
-    public componentWillReceiveProps(nextProps: MarketsProps) {
-        if (nextProps.data !== this.props.data) {
-            this.setState({
-                filteredData: nextProps.data.filter(w => (w[0] as string).toLowerCase().includes(this.state.searchKey.toLowerCase())),
-            });
-        }
-    }
+    // public componentWillReceiveProps(nextProps: MarketsProps) {
+    //     if (nextProps.data !== this.props.data) {
+    //         this.setState({
+    //             filteredData: nextProps.data.filter(w => (w[0] as string).toLowerCase().includes(this.state.searchKey.toLowerCase())),
+    //         });
+    //     }
+    // }
 
     public render() {
         const { filteredData } = this.state;
-        const { filters = true, headers, title, filterPlaceholder = '', rowKeyIndex, selectedKey } = this.props;
+        // const { filters = true, headers, title, filterPlaceholder = '', rowKeyIndex, selectedKey } = this.props;
+        const { filters = true, headers, title, rowKeyIndex, selectedKey } = this.props;
         let tableData = filteredData.length > 0
             ? filteredData
             : [['', '', '']];
@@ -88,12 +90,12 @@ export class Markets extends React.Component<MarketsProps, MarketsState> {
                     onSelect={this.props.onSelect}
                     titleComponent={title ? title : 'Markets'}
                 />
-                <FilterInput
+                {/* <FilterInput
                     data={this.props.data}
                     onFilter={this.handleFilter}
                     filter={this.searchFilter}
                     placeholder={filterPlaceholder}
-                />
+                /> */}
             </div>
         );
     }

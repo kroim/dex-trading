@@ -13,5 +13,6 @@ export const customNationalitiesNames = {
     'custom.openOrders.openOrders': 'Open Orders',
     'custom.openOrders.orderHistory': 'Order History',
     'custom.openOrders.tradeHistory': 'Trade History',
-    'custom.openOrders.funds': 'Funds'
+    'custom.openOrders.funds': 'Funds',
+    'custom.openOrders.assets': 'Assets'
 };
