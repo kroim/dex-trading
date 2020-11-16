@@ -1,12 +1,14 @@
-import classnames from 'classnames';
+// import classnames from 'classnames';
 import * as React from 'react';
 import { Spinner } from 'react-bootstrap';
-import { FormattedMessage, injectIntl } from 'react-intl';
+// import { FormattedMessage, injectIntl } from 'react-intl';
+import { injectIntl } from 'react-intl';
 import { connect, MapDispatchToPropsFunction } from 'react-redux';
-import { CloseIcon } from '../../assets/images/CloseIcon';
+// import { CloseIcon } from '../../assets/images/CloseIcon';
 import { OpenOrders, TabPanel } from '../../components';
 import { localeDate, preciseData, setTradeColor } from '../../helpers';
 import { IntlProps } from '../../index';
+import { Table } from '../../components';
 import {
     Market,
     openOrdersCancelFetch,
@@ -62,30 +64,20 @@ export class OpenOrdersContainer extends React.Component<Props> {
     }
 
     public render() {
-        const { list, fetching } = this.props;
-        const classNames = classnames('pg-open-orders', {
-            'pg-open-orders--empty': !list.length,
-            'pg-open-orders--loading': fetching,
-        });
+        // const { list, fetching } = this.props;
+        // const classNames = classnames('pg-open-orders', {
+        //     'pg-open-orders--empty': !list.length,
+        //     'pg-open-orders--loading': fetching,
+        // });
 
         return (
-            <div className={classNames}>
+            <div className="custom-open-header-tab-container">
                 <TabPanel
                     fixed={true}
                     panels={this.renderTabs()}
                     onTabChange={this.handleChangeTab}
                     currentTabIndex={this.state.index}
                 />
-                {/* <div className="cr-table-header__content">
-                    <div className="cr-title-component">
-                        <FormattedMessage id="page.body.trade.header.openOrders" />
-                        <span className="cr-table-header__cancel" onClick={this.handleCancelAll}>
-                            <FormattedMessage id="page.body.openOrders.header.button.cancelAll" />
-                            <CloseIcon className="cr-table-header__close" />
-                        </span>
-                    </div>
-                </div>
-                {fetching ? <div className="open-order-loading"><Spinner animation="border" variant="primary" /></div> : this.openOrders()} */}
             </div>
         );
     }
@@ -94,7 +86,7 @@ export class OpenOrdersContainer extends React.Component<Props> {
         const { fetching } = this.props;
         return (
             <div>
-                <div className="cr-table-header__content">
+                {/* <div className="cr-table-header__content">
                     <div className="cr-title-component">
                         <FormattedMessage id="page.body.trade.header.openOrders" />
                         <span className="cr-table-header__cancel" onClick={this.handleCancelAll}>
@@ -102,8 +94,68 @@ export class OpenOrdersContainer extends React.Component<Props> {
                             <CloseIcon className="cr-table-header__close" />
                         </span>
                     </div>
-                </div>
+                </div> */}
                 {fetching ? <div className="open-order-loading"><Spinner animation="border" variant="primary" /></div> : this.openOrders()}
+            </div>
+        )
+    }
+
+    private renderCustomOrderHistory = () => {
+        const headers = [
+            this.translate('custom.openOrders.type'),
+            this.translate('custom.openOrders.date'),
+            this.translate('custom.openOrders.pair'),
+            this.translate('custom.openOrders.sell'),
+            this.translate('custom.openOrders.buy'),
+            this.translate('custom.openOrders.total'),
+            this.translate('custom.openOrders.price'),
+            this.translate('custom.openOrders.txHash')
+        ]
+        const tableData = [[[this.translate('page.noDataToShow')]]]
+        return (
+            <div className="cr-open-orders">
+                <Table
+                    header={headers}
+                    data={tableData}
+                    colSpan={8}
+                />
+            </div>
+        )
+    }
+
+    private renderCustomTradeHistory = () => {
+        const headers = [
+            this.translate('custom.openOrders.date'),
+            this.translate('custom.openOrders.pair'),
+            this.translate('custom.openOrders.sell'),
+            this.translate('custom.openOrders.buy'),
+            this.translate('custom.openOrders.total'),
+            this.translate('custom.openOrders.price'),
+            this.translate('custom.openOrders.marker'),
+            this.translate('custom.openOrders.txHash')
+        ]
+        const tableData = [[[this.translate('page.noDataToShow')]]]
+        return (
+            <div className="cr-open-orders">
+                <Table
+                    header={headers}
+                    data={tableData}
+                    colSpan={8}
+                />
+            </div>
+        )
+    }
+
+    private renderCustomFunds = () => {
+        const headers = ['Token Name', 'Balance Amount']
+        const tableData = [[[this.translate('page.noDataToShow')]]]
+        return (
+            <div className="cr-open-orders">
+                <Table
+                    header={headers}
+                    data={tableData}
+                    colSpan={2}
+                />
             </div>
         )
     }
@@ -117,15 +169,15 @@ export class OpenOrdersContainer extends React.Component<Props> {
                 label: this.props.intl.formatMessage({ id: 'custom.openOrders.openOrders' }),
             },
             {
-                content: tab === 'orderHistory' ? <div>Order History</div> : null,
+                content: tab === 'orderHistory' ? this.renderCustomOrderHistory() : null,
                 label: this.props.intl.formatMessage({ id: 'custom.openOrders.orderHistory' }),
             },
             {
-                content: tab === 'tradeHistory' ? <div>Trade History</div> : null,
+                content: tab === 'tradeHistory' ? this.renderCustomTradeHistory() : null,
                 label: this.props.intl.formatMessage({ id: 'custom.openOrders.tradeHistory' }),
             },
             {
-                content: tab === 'funds' ? <div>Funds</div> : null,
+                content: tab === 'funds' ? this.renderCustomFunds() : null,
                 label: this.props.intl.formatMessage({ id: 'custom.openOrders.funds' }),
             },
         ];
@@ -143,14 +195,6 @@ export class OpenOrdersContainer extends React.Component<Props> {
     };
 
     private renderHeadersKeys = () => {
-        // return [
-        //     'Date',
-        //     'Price',
-        //     'Amount',
-        //     'Total',
-        //     'Filled',
-        //     '',
-        // ];
         return [
             'Date',
             'Pair',
@@ -159,22 +203,10 @@ export class OpenOrdersContainer extends React.Component<Props> {
             'Total',
             'Price',
             'Cancel'
-            // 'Trigger Conditions'
         ];
     };
 
     private renderHeaders = () => {
-        // const currentAskUnit = this.props.currentMarket ? ` (${this.props.currentMarket.base_unit.toUpperCase()})` : '';
-        // const currentBidUnit = this.props.currentMarket ? ` (${this.props.currentMarket.quote_unit.toUpperCase()})` : '';
-
-        // return [
-        //     this.translate('page.body.trade.header.openOrders.content.date'),
-        //     this.translate('page.body.trade.header.openOrders.content.price').concat(currentBidUnit),
-        //     this.translate('page.body.trade.header.openOrders.content.amount').concat(currentAskUnit),
-        //     this.translate('page.body.trade.header.openOrders.content.total').concat(currentBidUnit),
-        //     this.translate('page.body.trade.header.openOrders.content.filled'),
-        //     '',
-        // ];
         return [
             this.translate('custom.openOrders.date'),
             this.translate('custom.openOrders.pair'),
@@ -233,10 +265,10 @@ export class OpenOrdersContainer extends React.Component<Props> {
         this.props.openOrdersCancelFetch({ order: orderToDelete, list });
     };
 
-    private handleCancelAll = () => {
-        const { currentMarket } = this.props;
-        currentMarket && this.props.ordersCancelAll({ market: currentMarket.id });
-    };
+    // private handleCancelAll = () => {
+    //     const { currentMarket } = this.props;
+    //     currentMarket && this.props.ordersCancelAll({ market: currentMarket.id });
+    // };
 }
 
 const mapStateToProps = (state: RootState): ReduxProps => ({

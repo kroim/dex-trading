@@ -9,6 +9,7 @@ export const en = {
     'custom.openOrders.marker': 'Marker',
     'custom.openOrders.txHash': 'TX Hash',
     'custom.openOrders.cancel': 'Cancel',
+    'custom.openOrders.type': 'Type',
     'custom.openOrders.openOrders': 'Open Orders',
     'custom.openOrders.orderHistory': 'Order History',
     'custom.openOrders.tradeHistory': 'Trade History',
