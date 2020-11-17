@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { injectIntl } from 'react-intl';
+import { injectIntl, FormattedMessage } from 'react-intl';
 import { connect, MapDispatchToPropsFunction } from 'react-redux';
 import { RouterProps } from 'react-router';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
 // import { showLanding } from '../../api';
 import { LogoIcon } from '../../assets/images/LogoIcon';
+import { CloseIcon } from '../../assets/images/CloseIcon';
 import { IntlProps } from '../../index';
 import { Button } from 'react-bootstrap';
 import {
@@ -53,9 +54,21 @@ const noHeaderRoutes = [
     '/500',
 ];
 
+interface State {
+    showConnectModalFlag: boolean;
+}
+
 type Props = ReduxProps & DispatchProps & IntlProps & LocationProps;
 
-class Head extends React.Component<Props> {
+class Head extends React.Component<Props, State> {
+    constructor(props: Props) {
+        super(props);
+
+        this.state = {
+            showConnectModalFlag: false,
+        };
+    }
+
     public render() {
         const { mobileWallet, location, configsLoading } = this.props;
         const tradingCls = location.pathname.includes('/trading') ? 'pg-container-trading' : '';
@@ -64,6 +77,26 @@ class Head extends React.Component<Props> {
         if (!shouldRenderHeader || configsLoading) {
             return <React.Fragment />;
         }
+        const renderConnectModalBody = (
+            <div className="cr-email-form__form-content">
+                <div className="custom-connect-metamask">
+                    
+                </div>
+                <div className="custom-connect-binance">
+                    
+                </div>
+            </div>
+        );
+        const connectModal = this.state.showConnectModalFlag ? (
+            <div className="cr-modal">
+              <form className="cr-email-form" onSubmit={()=>console.log("connect wallet")}>
+                <div className="pg-change-password-screen">
+                  {this.renderConnectModalHeader()}
+                  {renderConnectModalBody}
+                </div>
+              </form>
+            </div>
+        ) : null;
 
         return (
             <header className={`pg-header`}>
@@ -96,10 +129,9 @@ class Head extends React.Component<Props> {
                         <div className="custom-header-connect-wallet">
                             <Button
                                 block={false}
-                                className="mr-1 mt-1 btn-lg"
+                                className="mr-1 mt-1"
                                 disabled={false}
-                                onClick={() => { console.log("Connect to a wallet ...") }}
-                                size="lg"
+                                onClick={this.showConnectModal}
                                 variant={'outline-secondary'}
                             >
                                 Connect to a wallet
@@ -110,6 +142,7 @@ class Head extends React.Component<Props> {
                         </div>
                     </div>
                 </div>
+                {connectModal}
             </header>
         );
     }
@@ -158,6 +191,30 @@ class Head extends React.Component<Props> {
         );
     };
 
+    private showConnectModal = () => {
+        console.log("Open Connect Modal");
+        this.setState({
+            showConnectModalFlag: true,
+        });
+    };
+    private closeConnectModal = () => {
+        this.setState({
+            showConnectModalFlag: false,
+        });
+    };
+    private renderConnectModalHeader = () => (
+        <div className="cr-email-form__options-group">
+            <div className="cr-email-form__option">
+                <div className="cr-email-form__option-inner">
+                    <FormattedMessage id="page.body.profile.header.account.content.password.change"/>
+                    <div className="cr-email-form__cros-icon" onClick={this.closeConnectModal}>
+                        <CloseIcon className="close-icon" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+    
     // Remove Sidebar by kroim
     // private redirectToLanding = () => {
     //     this.props.toggleSidebar(false);
