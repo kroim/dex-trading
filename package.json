@@ -70,7 +70,8 @@
     "spec:integration": "cypress open",
     "eject": "react-scripts eject",
     "clean": "rimraf build",
-    "analyze": "source-map-explorer build/static/js/main.*"
+    "analyze": "source-map-explorer build/static/js/main.*",
+    "postinstall": "rm -rf ./node_modules/@bscswap/sdk; cp -r ./forks/@bscswap/sdk ./node_modules/@bscswap/sdk"
   },
   "devDependencies": {    
     "@openware/coding-standards": "2.3.0",
@@ -185,6 +186,11 @@
     "start-server-and-test": "^1.11.0",
     "styled-components": "^4.2.0"   
   },  
+  "husky": {
+    "hooks": {    
+      "pre-push": "yarn lint && CI=true yarn test --no-watch"
+    }
+  },
   "prettier": {
     "trailingComma": "es6",
     "tabWidth": 4,
