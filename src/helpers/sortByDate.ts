@@ -1,4 +1,5 @@
-import * as moment from 'moment';
+//import * as moment from 'moment';
+import moment from 'moment';
 import { localeDate } from './localeDate';
 
 export const sortByDate = (prop: string, format: string) => {

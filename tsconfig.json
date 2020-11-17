@@ -14,7 +14,7 @@
       "forceConsistentCasingInFileNames": true,
       "suppressImplicitAnyIndexErrors": false,
       "noUnusedLocals": true,
-      "allowSyntheticDefaultImports": false,
+      "allowSyntheticDefaultImports": true,
       "experimentalDecorators": true,
       "types": [
         "node",
@@ -33,7 +33,7 @@
         "es2017"
       ],
       "skipLibCheck": true,
-      "esModuleInterop": false,
+      "esModuleInterop": true,
       "moduleResolution": "node",
       "resolveJsonModule": true,
       "noEmit": true,

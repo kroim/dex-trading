@@ -1,5 +1,7 @@
 import cr from 'classnames';
-import * as moment from 'moment';
+//import * as moment from 'moment';
+import  moment from 'moment';
+
 import * as React from 'react';
 import { Button } from 'react-bootstrap';
 import { injectIntl } from 'react-intl';
@@ -374,7 +376,9 @@ class IdentityComponent extends React.Component<Props, IdentityState> {
                 return value.match(postcodeRegex) ? true : false;
             case 'dateOfBirth':
                 if (value.length === 10) {
-                    return moment(value, 'DD/MM/YYYY').unix() < (Date.now() / 1000);
+                    // return moment(value, 'DD/MM/YYYY').unix() < (Date.now() / 1000);
+                  return moment(value, 'DD/MM/YYYY').unix() < (Date.now() / 1000);
+                  // return true;
                 }
 
                 return false;
