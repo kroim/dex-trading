@@ -43,6 +43,15 @@ import { rootUserActivitySaga, UserActivityState } from './user/userActivity';
 import { rootWalletsSaga, WalletsState } from './user/wallets';
 import { rootWithdrawLimitSaga, WithdrawLimitState } from './user/withdrawLimit';
 
+import application from './web3wallet/state/application/reducer';
+import web3User from './web3wallet/state/user/reducer';
+import transactions from './web3wallet/state/transactions/reducer';
+import swap from './web3wallet/state/swap/reducer';
+import mint from './web3wallet/state/mint/reducer';
+import lists from './web3wallet/state/lists/reducer';
+import burn from './web3wallet/state/burn/reducer';
+import multicall from './web3wallet/state/multicall/reducer';
+
 export * from './public/markets';
 export * from './public/orderBook';
 export * from './public/globalSettings';
@@ -119,6 +128,14 @@ export interface RootState {
 export const rootReducer = combineReducers({
     public: publicReducer,
     user: userReducer,
+    application,
+    web3User,
+    transactions,
+    swap,
+    mint,
+    burn,
+    multicall,
+    lists
 });
 
 export function* rootSaga() {
