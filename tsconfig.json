@@ -4,29 +4,9 @@
       // "sourceRoot": null,
       "rootDir": "src",
       "allowJs": true,
-      "strict": true,
-      "alwaysStrict": true,
-      "strictNullChecks": true,      
-      "noFallthroughCasesInSwitch": true,
-      "noImplicitAny": false,
-      "noImplicitThis": true,
-      "noImplicitReturns": true,      
-      "forceConsistentCasingInFileNames": true,
-      "suppressImplicitAnyIndexErrors": false,
-      "noUnusedLocals": true,
-      "allowSyntheticDefaultImports": true,
-      "experimentalDecorators": true,
-      "downlevelIteration": true,          
-      "types": [
-        "node",
-        "react-spring",
-        "jest"
-      ],
-      "typeRoots": [
-        "./node_modules/@types"
-      ],
+      "strict": false,
+      // "strict": true,
       "target": "es5",
-      "module": "esnext",
       "lib": [
         "es2015",
         "dom",
@@ -35,13 +15,35 @@
         "es2017"
       ],
       "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "noEmit": true,
       "esModuleInterop": true,
+      "module": "esnext",
       "moduleResolution": "node",
       "resolveJsonModule": true,
-      "noEmit": true,
+      "isolatedModules": true,
       "jsx": "preserve",
+      "downlevelIteration": true,
+      "allowSyntheticDefaultImports": true,
+      // "alwaysStrict": true,
+      // "strictNullChecks": true,      
+      // "noFallthroughCasesInSwitch": true,
       // "noImplicitAny": false,
-      "isolatedModules": true
+      // "noImplicitThis": true,
+      // "noImplicitReturns": true,      
+      "suppressImplicitAnyIndexErrors": false,
+      "noUnusedLocals": true,
+      "experimentalDecorators": true,
+      "types": [
+        "node",
+        "react-spring",
+        "jest"
+      ],
+      "typeRoots": [
+        "./node_modules/@types"
+      ],
+      
+      // "noImplicitAny": false,
     },
     "include": [
       "./src/assets",
@@ -51,7 +53,8 @@
     "exclude": [
       "./node_modules",
       "./src/*.test.*",
-      "./src/charting_library"
+      "./src/charting_library",
+      "cypress"
     ]
 }
   

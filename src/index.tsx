@@ -14,6 +14,23 @@ import { rangerSagas } from './modules/public/ranger';
 import { rangerMiddleware, sagaMiddleware, store } from './store';
 
 
+import { Web3Provider } from '@ethersproject/providers'
+import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core'
+import { NetworkContextName } from './modules/web3wallet/constants';
+
+const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
+
+if ('ethereum' in window) {
+    ;(window.ethereum as any).autoRefreshOnNetworkChange = false
+  }
+
+function getLibrary(provider: any): Web3Provider {
+const library = new Web3Provider(provider,"any")
+library.pollingInterval = 15000
+return library
+}
+
+
 if (!Intl.PluralRules) {
     require('@formatjs/intl-pluralrules/polyfill');
     require('@formatjs/intl-pluralrules/locale-data/en');
@@ -42,9 +59,13 @@ if (sentryEnabled()) {
 }
 
 const render = () => ReactDOM.render(
-    <Provider store={store}>
-        <App />
-    </Provider>,
+    <Web3ReactProvider getLibrary={getLibrary}>
+      <Web3ProviderNetwork getLibrary={getLibrary}>
+        <Provider store={store}>
+            <App />
+        </Provider>
+        </Web3ProviderNetwork>
+    </Web3ReactProvider>,
     document.getElementById('root') as HTMLElement,
 );
 

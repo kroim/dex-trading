@@ -14,7 +14,7 @@ import { updateVersion } from './user/actions'
 
 const PERSISTED_KEYS: string[] = ['user', 'transactions', 'lists']
 
-const store = configureStore({
+const web3_store = configureStore({
   reducer: {
     application,
     user,
@@ -29,9 +29,9 @@ const store = configureStore({
   preloadedState: load({ states: PERSISTED_KEYS })
 })
 
-store.dispatch(updateVersion())
+web3_store.dispatch(updateVersion())
 
-export default store
+export default web3_store
 
-export type AppState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export type AppState = ReturnType<typeof web3_store.getState>
+export type AppDispatch = typeof web3_store.dispatch
