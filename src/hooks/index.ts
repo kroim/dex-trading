@@ -13,3 +13,5 @@ export * from './useUserActivityFetch';
 export * from './useUserOrdersHistoryFetch';
 export * from './useWalletsAddressFetch';
 export * from './useWalletsFetch';
+//******* web3 wallet hook **********//
+export * from './useActiveWeb3React';

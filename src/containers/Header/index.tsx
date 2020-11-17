@@ -4,6 +4,8 @@ import { connect, MapDispatchToPropsFunction } from 'react-redux';
 import { RouterProps } from 'react-router';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
+import { Button } from 'react-bootstrap';
+
 // import { showLanding } from '../../api';
 import { LogoIcon } from '../../assets/images/LogoIcon';
 import { IntlProps } from '../../index';
@@ -91,6 +93,9 @@ class Head extends React.Component<Props> {
                         {this.renderMarketToolbar()}
                         {/* <NavBar onLinkChange={this.closeMenu}/> */}
                     </div>
+                    <div className="pg-header" >
+                        { this.renderConnectButton() }
+                    </div>
                 </div>
             </header>
         );
@@ -117,6 +122,19 @@ class Head extends React.Component<Props> {
         }
 
         return <HeaderToolbar/>;
+    };
+
+    private  renderConnectButton =()=> {
+        return <Button  block={true}
+                        className="btn-block mr-1 mt-1 btn-lg"
+                        disabled={false}
+                        onClick={this.toggleWalletModal}
+                        size="lg"
+                        variant='success'> Connect Wallet </Button>;
+    };
+
+    private toggleWalletModal = () => {
+        console.log("handle Connect!")
     };
 
     private renderMarketToggler = () => {
