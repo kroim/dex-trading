@@ -1,11 +1,16 @@
 {
     "compilerOptions": {
-      "sourceMap": false,
-      "sourceRoot": null,
+      // "sourceMap": false,
+      // "sourceRoot": null,
       "rootDir": "src",
-      "allowJs": false,
+      "allowJs": true,
       "strict": true,
-      "noImplicitReturns": true,
+      "alwaysStrict": true,
+      "strictNullChecks": true,      
+      "noFallthroughCasesInSwitch": true,
+      "noImplicitAny": false,
+      "noImplicitThis": true,
+      "noImplicitReturns": true,      
       "forceConsistentCasingInFileNames": true,
       "suppressImplicitAnyIndexErrors": false,
       "noUnusedLocals": true,
@@ -23,6 +28,8 @@
       "lib": [
         "es2015",
         "dom",
+	      "dom.iterable",
+      	"esnext",
         "es2017"
       ],
       "skipLibCheck": true,
@@ -31,7 +38,7 @@
       "resolveJsonModule": true,
       "noEmit": true,
       "jsx": "preserve",
-      "noImplicitAny": false,
+      // "noImplicitAny": false,
       "isolatedModules": true
     },
     "include": [
