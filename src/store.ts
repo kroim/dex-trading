@@ -1,6 +1,6 @@
 import { applyMiddleware, compose, createStore } from 'redux';
 // import { combineReducers } from 'redux';
-// import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
+// import { getDefaultMiddleware } from '@reduxjs/toolkit';
 // import { save, load } from 'redux-localstorage-simple';
 import createSagaMiddleware from 'redux-saga';
 import { rootReducer } from './modules';
@@ -17,16 +17,18 @@ import { updateVersion } from './modules/web3wallet/state/user/actions'
 const sagaMiddleware = createSagaMiddleware();
 const rangerMiddleware = createSagaMiddleware();
 // const PERSISTED_KEYS: string[] = ['user', 'transactions', 'lists']
-
 const composeEnhancer: typeof compose = (window as any)
     .__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const store = createStore(
     rootReducer,
+    // load({ states: PERSISTED_KEYS }),
     composeEnhancer(
         applyMiddleware(
             sagaMiddleware,
             rangerMiddleware,
+            // ...getDefaultMiddleware(),
+            // save({ states: PERSISTED_KEYS })
         ),
     ),
 );

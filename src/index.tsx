@@ -17,6 +17,12 @@ import { rangerMiddleware, sagaMiddleware, store } from './store';
 import { Web3Provider } from '@ethersproject/providers'
 import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core'
 import { NetworkContextName } from './modules/web3wallet/constants';
+// import ApplicationUpdater from './modules/web3wallet/state/application/updater'
+// import TransactionUpdater from './modules/web3wallet/state/transactions/updater'
+// import ListsUpdater from './modules/web3wallet/state/lists/updater'
+// import UserUpdater from './modules/web3wallet/state/user/updater'
+// import MulticallUpdater from './modules/web3wallet/state/multicall/updater'
+// import Web3App from './modules/web3wallet/pages/App';
 
 const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
 
@@ -30,6 +36,17 @@ library.pollingInterval = 15000
 return library
 }
 
+// function Updaters() {
+//     return (
+//       <>
+//         <ListsUpdater />
+//         <UserUpdater />
+//         <ApplicationUpdater />
+//         <TransactionUpdater />
+//         <MulticallUpdater />
+//       </>
+//     )
+//   }
 
 if (!Intl.PluralRules) {
     require('@formatjs/intl-pluralrules/polyfill');
@@ -62,7 +79,9 @@ const render = () => ReactDOM.render(
     <Web3ReactProvider getLibrary={getLibrary}>
       <Web3ProviderNetwork getLibrary={getLibrary}>
         <Provider store={store}>
+        {/* <Updaters /> */}
             <App />
+            {/* <Web3App /> */}
         </Provider>
         </Web3ProviderNetwork>
     </Web3ReactProvider>,

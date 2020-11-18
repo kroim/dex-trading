@@ -20,7 +20,7 @@ import CoinbaseWalletIcon from '../../assets/images/coinbaseWalletIcon.svg'
 import { RowBetween } from '../Row'
 import { shortenAddress } from '../../utils'
 import { useAllTransactions } from '../../state/transactions/hooks'
-// import { NetworkContextName } from '../../constants'
+import { NetworkContextName } from '../../constants'
 import { injected, walletconnect, walletlink, fortmatic, portis } from '../../connectors'
 import Loader from '../Loader'
 
@@ -134,10 +134,12 @@ const SOCK = (
 
 export default function Web3Status() {
   const { t } = useTranslation()
+  console.log("====================================")
   const { active, account, connector, error } = useWeb3React()
-  // const contextNetwork = useWeb3React(NetworkContextName)
-  const contextNetwork = useWeb3React('NETWORK')
-
+  const contextNetwork = useWeb3React(NetworkContextName)
+  // const contextNetwork = useWeb3React('NETWORK')
+  console.log(active, account, connector);
+  console.log(contextNetwork, NetworkContextName);
   const { ENSName } = useENSName(account)
 
   const allTransactions = useAllTransactions()
