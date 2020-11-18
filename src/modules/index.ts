@@ -44,7 +44,7 @@ import { rootWalletsSaga, WalletsState } from './user/wallets';
 import { rootWithdrawLimitSaga, WithdrawLimitState } from './user/withdrawLimit';
 
 import application from './web3wallet/state/application/reducer';
-import web3User from './web3wallet/state/user/reducer';
+import user from './web3wallet/state/user/reducer';
 import transactions from './web3wallet/state/transactions/reducer';
 import swap from './web3wallet/state/swap/reducer';
 import mint from './web3wallet/state/mint/reducer';
@@ -100,7 +100,7 @@ export interface RootState {
         depth: DepthState;
         incrementDepth: DepthIncrementState;
     };
-    user: {
+    baseuser: {
         apiKeys: ApiKeysState;
         auth: AuthState;
         beneficiaries: BeneficiariesState;
@@ -127,9 +127,9 @@ export interface RootState {
 
 export const rootReducer = combineReducers({
     public: publicReducer,
-    user: userReducer,
+    baseuser: userReducer,
     application,
-    web3User,
+    user,
     transactions,
     swap,
     mint,

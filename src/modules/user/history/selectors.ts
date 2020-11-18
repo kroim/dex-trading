@@ -2,19 +2,19 @@ import { RootState } from '../../index';
 import { WalletHistoryList } from './types';
 
 export const selectHistory = (state: RootState): WalletHistoryList =>
-    state.user.history.list;
+    state.baseuser.history.list;
 
 export const selectCurrentPage = (state: RootState): number =>
-    state.user.history.page;
+    state.baseuser.history.page;
 
 export const selectFirstElemIndex = (state: RootState, limit): number =>
-    (state.user.history.page * limit) + 1;
+    (state.baseuser.history.page * limit) + 1;
 
 export const selectLastElemIndex = (state: RootState, limit: number): number =>
-    (state.user.history.page * limit) + state.user.history.list.length;
+    (state.baseuser.history.page * limit) + state.baseuser.history.list.length;
 
 export const selectNextPageExists = (state: RootState, limit: number): boolean =>
-    state.user.history.nextPageExists;
+    state.baseuser.history.nextPageExists;
 
 export const selectHistoryLoading = (state: RootState): boolean =>
-    state.user.history.fetching;
+    state.baseuser.history.fetching;

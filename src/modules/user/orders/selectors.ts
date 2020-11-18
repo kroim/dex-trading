@@ -1,7 +1,7 @@
 import { RootState } from '../../index';
 
-const selectOrdersState = (state: RootState): RootState['user']['orders'] =>
-    state.user.orders;
+const selectOrdersState = (state: RootState): RootState['baseuser']['orders'] =>
+    state.baseuser.orders;
 
 export const selectOrderExecuteLoading = (state: RootState): boolean =>
     selectOrdersState(state).executeLoading;
