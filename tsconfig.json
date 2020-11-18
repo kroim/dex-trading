@@ -32,7 +32,7 @@
       // "noImplicitThis": true,
       // "noImplicitReturns": true,      
       "suppressImplicitAnyIndexErrors": false,
-      "noUnusedLocals": true,
+      "noUnusedLocals": false,
       "experimentalDecorators": true,
       "types": [
         "node",

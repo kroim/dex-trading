@@ -8,7 +8,7 @@
     "noImplicitReturns": true,
     "forceConsistentCasingInFileNames": true,
     "suppressImplicitAnyIndexErrors": false,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "allowSyntheticDefaultImports": false,
     "experimentalDecorators": true,
     "types": [
