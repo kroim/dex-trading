@@ -123,6 +123,7 @@ export interface RootState {
         wallets: WalletsState;
         withdrawLimit: WithdrawLimitState;
     };
+    application: any;
 }
 
 export const rootReducer = combineReducers({

@@ -11,6 +11,9 @@ import * as mobileTranslations from './mobile/translations';
 import { selectCurrentLanguage, selectMobileDeviceState } from './modules';
 import { languageMap } from './translations';
 
+import Popups from './modules/web3wallet/components/Popups';
+import ThemeProvider from './modules/web3wallet/theme';
+
 const gaKey = gaTrackerKey();
 const browserHistory = createBrowserHistory();
 
@@ -80,7 +83,11 @@ export const App = () => {
             <Router history={browserHistory}>
                 <ErrorWrapper>
                     <React.Suspense fallback={null}>
-                        <RenderDeviceContainers />
+                        <ThemeProvider>
+                            <Popups />
+                            <RenderDeviceContainers />
+                        </ThemeProvider>
+                        
                     </React.Suspense>
                 </ErrorWrapper>
             </Router>
