@@ -22,9 +22,10 @@ const HeaderFrame = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-direction: column;
-  width: 100%;
+  // flex-direction: column;
+  // width: 100%;
   top: 0;
+  right: 10px;
   position: absolute;
   z-index: 2;
   ${({ theme }) => theme.mediaWidth.upToExtraSmall`

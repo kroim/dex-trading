@@ -15,14 +15,13 @@ import { rangerMiddleware, sagaMiddleware, store } from './store';
 
 
 import { Web3Provider } from '@ethersproject/providers'
-import { createWeb3ReactRoot, useWeb3React, Web3ReactProvider } from '@web3-react/core'
+import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core'
 import { NetworkContextName } from './modules/web3wallet/constants';
 import ApplicationUpdater from './modules/web3wallet/state/application/updater'
 import TransactionUpdater from './modules/web3wallet/state/transactions/updater'
 import ListsUpdater from './modules/web3wallet/state/lists/updater'
 import UserUpdater from './modules/web3wallet/state/user/updater'
 import MulticallUpdater from './modules/web3wallet/state/multicall/updater'
-import { useEagerConnect, useInactiveListener } from './modules/web3wallet/hooks';
 
 const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
 
@@ -33,7 +32,6 @@ if ('ethereum' in window) {
 function getLibrary(provider: any): Web3Provider {
     const library = new Web3Provider(provider, "any")
     library.pollingInterval = 15000
-    console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL", library);
     return library
 }
 
@@ -75,7 +73,6 @@ if (sentryEnabled()) {
         Sentry.init({ dsn: `https://${key}@${organization}.ingest.sentry.io/${project}` });
     }
 }
-
 
 const render = () => ReactDOM.render(
     <Web3ReactProvider getLibrary={getLibrary}>

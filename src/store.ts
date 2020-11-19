@@ -5,14 +5,6 @@ import { save } from 'redux-localstorage-simple';
 import createSagaMiddleware from 'redux-saga';
 import { rootReducer } from './modules';
 import thunk from 'redux-thunk';
-// import application from './modules/web3wallet/state/application/reducer';
-// import web3User from './modules/web3wallet/state/user/reducer';
-// import transactions from './modules/web3wallet/state/transactions/reducer';
-// import swap from './modules/web3wallet/state/swap/reducer';
-// import mint from './modules/web3wallet/state/mint/reducer';
-// import lists from './modules/web3wallet/state/lists/reducer';
-// import burn from './modules/web3wallet/state/burn/reducer';
-// import multicall from './modules/web3wallet/state/multicall/reducer';
 import { updateVersion } from './modules/web3wallet/state/user/actions'
 
 const sagaMiddleware = createSagaMiddleware();
@@ -23,13 +15,11 @@ const composeEnhancer: typeof compose = (window as any)
 
 const store = createStore(
     rootReducer,
-    // load({ states: PERSISTED_KEYS }),
     composeEnhancer(
         applyMiddleware(
             thunk,
             sagaMiddleware,
             rangerMiddleware,
-            // ...getDefaultMiddleware(),
             save({ states: PERSISTED_KEYS })
         ),
     ),

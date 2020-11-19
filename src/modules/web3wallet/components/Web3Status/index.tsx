@@ -134,12 +134,8 @@ const SOCK = (
 
 export default function Web3Status() {
   const { t } = useTranslation()
-  console.log("====================================")
   const { active, account, connector, error } = useWeb3React()
   const contextNetwork = useWeb3React(NetworkContextName)
-  // const contextNetwork = useWeb3React('NETWORK')
-  console.log(active, account, connector);
-  console.log(contextNetwork, NetworkContextName);
   const { ENSName } = useENSName(account)
 
   const allTransactions = useAllTransactions()
