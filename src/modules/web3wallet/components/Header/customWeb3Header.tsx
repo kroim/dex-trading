@@ -8,7 +8,7 @@ import styled from 'styled-components'
 // import Logo from '../../assets/images/logo.png'
 // import LogoDark from '../../assets/images/logo_white.png'
 import { useActiveWeb3React } from '../../hooks'
-// import { useDarkModeManager } from '../../state/user/hooks'
+import { useDarkModeManager } from '../../state/user/hooks'
 import { useETHBalances } from '../../state/wallet/hooks'
 
 import { YellowCard } from '../Card'
@@ -125,7 +125,9 @@ export default function Web3Header() {
   const { account, chainId } = useActiveWeb3React()
 
   const userEthBalance = useETHBalances([account])[account]
-  // const [isDark] = useDarkModeManager()
+  const [isDark, toggleDarkMode] = useDarkModeManager()
+  console.log("isDark: ", isDark);
+  toggleDarkMode()
 
   return (
     <HeaderFrame>
