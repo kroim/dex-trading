@@ -10,8 +10,8 @@
       "lib": [
         "es2015",
         "dom",
-	      "dom.iterable",
-      	"esnext",
+          "dom.iterable",
+        "esnext",
         "es2017"
       ],
       "skipLibCheck": true,
@@ -57,4 +57,3 @@
       "cypress"
     ]
 }
-  
