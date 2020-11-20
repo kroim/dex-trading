@@ -71,20 +71,24 @@ const apiConfig = {
           }
         ]
       }
-      let pair = allPairs[i];
-      item.id = pair.id;
-      if (stableTokens.indexOf(pair.token0.symbol) > -1) {
-        item.name = pair.token0.symbol + '/' + pair.token1.symbol;
-        item.base_unit = pair.token0.symbol;
-        item.quote_unit = pair.token1.symbol;
+      item.id = allPairs[i].id;
+      let token0 = allPairs[i].token0.symbol;
+      if (token0 == 'WBNB') token0 = 'BNB';
+      let token1 = allPairs[i].token1.symbol;
+      if (token1 == 'WBNB') token1 = 'BNB';
+      if (stableTokens.indexOf(token0) > -1) {
+        item.name = token0 + "/" + token1;
+        item.base_unit = token0;
+        item.quote_unit = token1;
       } else {
-        item.name = pair.token1.symbol + '/' + pair.token0.symbol;
-        item.base_unit = pair.token1.symbol;
-        item.quote_unit = pair.token0.symbol;
+        item.name = token1 + '/' + token0;
+        item.base_unit = token1;
+        item.quote_unit = token0;
       }
       d_markets.push(item);
     }
     // return this.k_sampleData()
+    console.log(d_markets);
     return d_markets
   },
   k_urls: function () {
