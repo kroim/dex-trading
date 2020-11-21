@@ -319,8 +319,10 @@ const mockserver = {
                 permutations = Combinatorics.permutationCombination(headers).toArray().sort(function (a, b) { return b.length - a.length; });
                 permutations.push([]);
             }
-            if (apiConfig.k_urls().indexOf(path) > -1) {
+            let find_flag = apiConfig.k_findTrade(path);
+            if (apiConfig.k_urls().indexOf(path) > -1 || find_flag) {
                 let kRes = await apiConfig.k_query(path, query);
+                console.log("kRes === ".red);
                 if (kRes) {
                     return res.end(JSON.stringify(kRes));
                 } else {
