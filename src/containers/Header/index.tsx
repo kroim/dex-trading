@@ -1,12 +1,11 @@
 import * as React from 'react';
-import { injectIntl, FormattedMessage } from 'react-intl';
+import { injectIntl } from 'react-intl';
 import { connect, MapDispatchToPropsFunction } from 'react-redux';
 import { RouterProps } from 'react-router';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
 // import { showLanding } from '../../api';
 import { LogoIcon } from '../../assets/images/LogoIcon';
-import { CloseIcon } from '../../assets/images/CloseIcon';
 import { IntlProps } from '../../index';
 // import { Button } from 'react-bootstrap';
 // import Web3Status from '../../modules/web3wallet/components/Web3Status';
@@ -57,21 +56,9 @@ const noHeaderRoutes = [
     '/500',
 ];
 
-interface State {
-    showConnectModalFlag: boolean;
-}
-
 type Props = ReduxProps & DispatchProps & IntlProps & LocationProps;
 
-class Head extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-
-        this.state = {
-            showConnectModalFlag: false,
-        };
-    }
-
+class Head extends React.Component<Props> {
     public render() {
         
         const { mobileWallet, location, configsLoading } = this.props;
@@ -81,26 +68,6 @@ class Head extends React.Component<Props, State> {
         if (!shouldRenderHeader || configsLoading) {
             return <React.Fragment />;
         }
-        const renderConnectModalBody = (
-            <div className="cr-email-form__form-content">
-                <div className="custom-connect-metamask">
-                    
-                </div>
-                <div className="custom-connect-binance">
-                    
-                </div>
-            </div>
-        );
-        const connectModal = this.state.showConnectModalFlag ? (
-            <div className="cr-modal">
-              <form className="cr-email-form" onSubmit={()=>console.log("connect wallet")}>
-                <div className="pg-change-password-screen">
-                  {this.renderConnectModalHeader()}
-                  {renderConnectModalBody}
-                </div>
-              </form>
-            </div>
-        ) : null;
 
         return (
             <header className={`pg-header`}>
@@ -133,7 +100,6 @@ class Head extends React.Component<Props, State> {
                         <Web3Header/>
                     </div>
                 </div>
-                {connectModal}
             </header>
         );
     }
@@ -185,30 +151,6 @@ class Head extends React.Component<Props, State> {
         );
     };
 
-    private showConnectModal = () => {
-        console.log("Open Connect Modal");
-        this.setState({
-            showConnectModalFlag: true,
-        });
-    };
-    private closeConnectModal = () => {
-        this.setState({
-            showConnectModalFlag: false,
-        });
-    };
-    private renderConnectModalHeader = () => (
-        <div className="cr-email-form__options-group">
-            <div className="cr-email-form__option">
-                <div className="cr-email-form__option-inner">
-                    <FormattedMessage id="page.body.profile.header.account.content.password.change"/>
-                    <div className="cr-email-form__cros-icon" onClick={this.closeConnectModal}>
-                        <CloseIcon className="close-icon" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-    
     // Remove Sidebar by kroim
     // private redirectToLanding = () => {
     //     this.props.toggleSidebar(false);
@@ -241,4 +183,4 @@ export const Header = compose(
     injectIntl,
     withRouter,
     connect(mapStateToProps, mapDispatchToProps),
-)(Head) as React.ComponentClass;
+)(Head) as React.ComponentClass
