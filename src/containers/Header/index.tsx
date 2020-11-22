@@ -183,4 +183,4 @@ export const Header = compose(
     injectIntl,
     withRouter,
     connect(mapStateToProps, mapDispatchToProps),
-)(Head) as React.ComponentClass
+)(Head) as React.ComponentClass;
