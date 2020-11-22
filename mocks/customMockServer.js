@@ -8,12 +8,14 @@ const apiConfig = {
   currencies: "/api/v2/peatio/public/currencies",
   k_query: async function (pathParam, queryParam) {
     if (pathParam == this.markets) {
-      console.log(" ===== Get Markets ===== ".red)
+      console.log(" ===== Get Markets ===== ".magenta)
       return this.k_markets();
-      // return this.k_sampleData();
-    }
-    else if (this.k_findTrade(pathParam)) {
-      console.log(" ===== Get Trade Data ===== ".green);
+      // return this.k_sampleMarkets();
+    } else if (pathParam == this.tickers) {
+      console.log(" ===== Get Ticker Data ===== ".magenta);
+      return this.k_sampleTickers();
+    } else if (this.k_findTrade(pathParam)) {
+      console.log(" ===== Get Trade Data ===== ".magenta);
       return this.k_trades(pathParam, queryParam);
     }
   },
@@ -26,6 +28,7 @@ const apiConfig = {
         id: value
       }
     });
+    console.log(tokens.data.asSymbol);
     let pairs = await client.query({
       query: queries.PAIR_SEARCH,
       variables: {
@@ -76,7 +79,7 @@ const apiConfig = {
           }
         ]
       }
-      // item.id = allPairs[i].id;
+      item.id = allPairs[i].id;
       let token0 = allPairs[i].token0.symbol;
       if (token0 == 'WBNB') token0 = 'BNB';
       let token1 = allPairs[i].token1.symbol;
@@ -90,7 +93,7 @@ const apiConfig = {
         item.base_unit = token1.toLowerCase();
         item.quote_unit = token0.toLowerCase();
       }
-      item.id = item.base_unit.toLowerCase() + item.quote_unit.toLowerCase();
+      // item.id = item.base_unit.toLowerCase() + item.quote_unit.toLowerCase();
       d_markets.push(item);
     }
     // return this.k_sampleData()
@@ -125,7 +128,7 @@ const apiConfig = {
         trade_item.taker_type = "sell";
         trade_item.amount = parseFloat(item.amount0Out);
         try {
-          trade_item.price = parseFloat((parseFloat(item.amount1In)/parseFloat(item.amount0Out)).toFixed(6));
+          trade_item.price = parseFloat((parseFloat(item.amount1In) / parseFloat(item.amount0Out)).toFixed(6));
         } catch (e) {
           trade_item.price = 0;
         }
@@ -133,7 +136,7 @@ const apiConfig = {
         trade_item.taker_type = "buy";
         trade_item.amount = parseFloat(item.amount0In);
         try {
-          trade_item.price = parseFloat((parseFloat(item.amount1Out)/parseFloat(item.amount0In)).toFixed(6));
+          trade_item.price = parseFloat((parseFloat(item.amount1Out) / parseFloat(item.amount0In)).toFixed(6));
         } catch (e) {
           trade_item.price = 0;
         }
@@ -186,15 +189,17 @@ const apiConfig = {
   },
   k_urls: function () {
     return [
-      this.markets
+      this.markets,
+      this.tickers
     ]
   },
   k_findTrade: function (urlPath) {
     if (urlPath.match(new RegExp("markets/" + "(.*)" + "/trades"))) {
       return true;
+      // return false;
     } else return false;
   },
-  k_sampleData: function () {
+  k_sampleMarkets: function () {
     return [
       {
         "id": "dashbtc",
@@ -301,6 +306,53 @@ const apiConfig = {
         ]
       }
     ]
+  },
+  k_sampleTickers: function () {
+    let ts = parseInt(Date.now() / 1000);
+    return {
+      "ethbtc": {
+        "at": ts,
+        "ticker": {
+          "amount": "124.021",
+          "buy": "0.240",
+          "sell": "0.250",
+          "low": "0.238",
+          "high": "0.253",
+          "last": "0.245",
+          "volume": "200.0",
+          "open": 0.247,
+          "price_change_percent": "+0.81%"
+        }
+      },
+      "dashbtc": {
+        "at": ts,
+        "ticker": {
+          "amount": "23.0",
+          "buy": "1.20",
+          "sell": "1.30",
+          "low": "1.15",
+          "high": "1.35",
+          "last": "1.250",
+          "volume": "50.0",
+          "open": 1.250,
+          "price_change_percent": "+0.00%"
+        }
+      },
+      "btcusd": {
+        "at": ts,
+        "ticker": {
+          "amount": "60.0",
+          "buy": "1200.0",
+          "sell": "1300.0",
+          "low": "1150.0",
+          "high": "1350.0",
+          "last": "1250.0",
+          "volume": "120.0",
+          "open": 1251.0,
+          "price_change_percent": "+0.08%"
+        }
+      },
+    }
   }
 }
 
