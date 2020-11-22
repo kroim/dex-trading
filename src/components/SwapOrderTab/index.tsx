@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { TabPanel } from '../../components';
 import { FilterPrice } from '../../filters';
-import { getAmount, getTotalPrice } from '../../helpers';
-import { Decimal, OrderForm } from '../index';
+// import { getAmount, getTotalPrice } from '../../helpers';
+// import { Decimal, OrderForm } from '../index';
 
+import SwapOrder from '../../modules/web3wallet/components/SwapOrder'
 
 /**
  * from Swap page of swapliquidity */ 
@@ -106,10 +107,10 @@ interface State {
     amountBuy: string;
 }
 
-const defaultOrderTypes: DropdownElem[] = [
-    'Limit',
-    'Market',
-];
+// const defaultOrderTypes: DropdownElem[] = [
+//     'Limit',
+//     'Market',
+// ];
 
 const splitBorder = 449;
 const defaultWidth = 635;
@@ -184,31 +185,31 @@ export class Order extends React.Component<OrderComponentProps, State> {
 
     public getPanel = (type: FormType) => {
         const {
-            availableBase,
-            availableQuote,
-            disabled,
-            priceMarketBuy,
-            priceMarketSell,
-            priceLimit,
+            // availableBase,
+            // availableQuote,
+            // disabled,
+            // priceMarketBuy,
+            // priceMarketSell,
+            // priceLimit,
             from,
-            to,
-            currentMarketAskPrecision,
-            currentMarketBidPrecision,
-            orderTypes,
-            orderTypesIndex,
-            asks,
-            bids,
-            currentMarketFilters,
-            listenInputPrice,
+            // to,
+            // currentMarketAskPrecision,
+            // currentMarketBidPrecision,
+            // orderTypes,
+            // orderTypesIndex,
+            // asks,
+            // bids,
+            // currentMarketFilters,
+            // listenInputPrice,
             translate,
         } = this.props;
-        const { amountSell, amountBuy } = this.state;
+        // const { amountSell, amountBuy } = this.state;
 
-        const proposals = this.isTypeSell(type) ? bids : asks;
-        const available = this.isTypeSell(type) ? availableBase : availableQuote;
-        const priceMarket = this.isTypeSell(type) ? priceMarketSell : priceMarketBuy;
-        const disabledData = this.isTypeSell(type) ? {} : { disabled };
-        const amount = this.isTypeSell(type) ? amountSell : amountBuy;
+        // const proposals = this.isTypeSell(type) ? bids : asks;
+        // const available = this.isTypeSell(type) ? availableBase : availableQuote;
+        // const priceMarket = this.isTypeSell(type) ? priceMarketSell : priceMarketBuy;
+        // const disabledData = this.isTypeSell(type) ? {} : { disabled };
+        // const amount = this.isTypeSell(type) ? amountSell : amountBuy;
         const preLabel = this.isTypeSell(type) ? (
             translate('page.body.trade.header.newOrder.content.tabs.sell')
         ) : (
@@ -220,27 +221,28 @@ export class Order extends React.Component<OrderComponentProps, State> {
         
         return {
             content: (
-                <OrderForm
-                    type={type}
-                    from={from}
-                    {...disabledData}
-                    to={to}
-                    available={available}
-                    priceMarket={priceMarket}
-                    priceLimit={priceLimit}
-                    onSubmit={this.props.onSubmit}
-                    orderTypes={orderTypes || defaultOrderTypes}
-                    orderTypesIndex={orderTypesIndex || defaultOrderTypes}
-                    currentMarketAskPrecision={currentMarketAskPrecision}
-                    currentMarketBidPrecision={currentMarketBidPrecision}
-                    totalPrice={getTotalPrice(amount, priceMarket, proposals)}
-                    amount={amount}
-                    listenInputPrice={listenInputPrice}
-                    handleAmountChange={this.handleAmountChange}
-                    handleChangeAmountByButton={this.handleChangeAmountByButton}
-                    currentMarketFilters={currentMarketFilters}
-                    translate={translate}
-                />
+                <SwapOrder />
+                // <OrderForm
+                //     type={type}
+                //     from={from}
+                //     {...disabledData}
+                //     to={to}
+                //     available={available}
+                //     priceMarket={priceMarket}
+                //     priceLimit={priceLimit}
+                //     onSubmit={this.props.onSubmit}
+                //     orderTypes={orderTypes || defaultOrderTypes}
+                //     orderTypesIndex={orderTypesIndex || defaultOrderTypes}
+                //     currentMarketAskPrecision={currentMarketAskPrecision}
+                //     currentMarketBidPrecision={currentMarketBidPrecision}
+                //     totalPrice={getTotalPrice(amount, priceMarket, proposals)}
+                //     amount={amount}
+                //     listenInputPrice={listenInputPrice}
+                //     handleAmountChange={this.handleAmountChange}
+                //     handleChangeAmountByButton={this.handleChangeAmountByButton}
+                //     currentMarketFilters={currentMarketFilters}
+                //     translate={translate}
+                // />
             ),
             label: preLabel || label,
         };
@@ -260,55 +262,55 @@ export class Order extends React.Component<OrderComponentProps, State> {
         });
     };
 
-    private handleAmountChange = (amount, type) => {
-        if (type === 'sell') {
-            this.setState({ amountSell: amount });
-        } else {
-            this.setState({ amountBuy: amount });
-        }
-    };
+    // private handleAmountChange = (amount, type) => {
+    //     if (type === 'sell') {
+    //         this.setState({ amountSell: amount });
+    //     } else {
+    //         this.setState({ amountBuy: amount });
+    //     }
+    // };
 
-    private handleChangeAmountByButton = (value, orderType, price, type) => {
-        const { bids, asks, availableBase, availableQuote } = this.props;
-        const proposals = this.isTypeSell(type) ? bids : asks;
-        const available = this.isTypeSell(type) ? availableBase : availableQuote;
-        let newAmount = '';
+    // private handleChangeAmountByButton = (value, orderType, price, type) => {
+    //     const { bids, asks, availableBase, availableQuote } = this.props;
+    //     const proposals = this.isTypeSell(type) ? bids : asks;
+    //     const available = this.isTypeSell(type) ? availableBase : availableQuote;
+    //     let newAmount = '';
 
-        switch (type) {
-            case 'buy':
-                switch (orderType) {
-                    case 'Limit':
-                        newAmount = available && +price ? (
-                            Decimal.format(available / +price * value, this.props.currentMarketAskPrecision)
-                        ) : '';
+    //     switch (type) {
+    //         case 'buy':
+    //             switch (orderType) {
+    //                 case 'Limit':
+    //                     newAmount = available && +price ? (
+    //                         Decimal.format(available / +price * value, this.props.currentMarketAskPrecision)
+    //                     ) : '';
 
-                        break;
-                    case 'Market':
-                        newAmount = available ? (
-                            Decimal.format(getAmount(Number(available), proposals, value), this.props.currentMarketAskPrecision)
-                        ) : '';
+    //                     break;
+    //                 case 'Market':
+    //                     newAmount = available ? (
+    //                         Decimal.format(getAmount(Number(available), proposals, value), this.props.currentMarketAskPrecision)
+    //                     ) : '';
 
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            case 'sell':
-                newAmount = available ? (
-                    Decimal.format(available * value, this.props.currentMarketAskPrecision)
-                ) : '';
+    //                     break;
+    //                 default:
+    //                     break;
+    //             }
+    //             break;
+    //         case 'sell':
+    //             newAmount = available ? (
+    //                 Decimal.format(available * value, this.props.currentMarketAskPrecision)
+    //             ) : '';
 
-                break;
-            default:
-                break;
-        }
+    //             break;
+    //         default:
+    //             break;
+    //     }
 
-        if (type === 'sell') {
-            this.setState({ amountSell: newAmount });
-        } else {
-            this.setState({ amountBuy: newAmount });
-        }
-    };
+    //     if (type === 'sell') {
+    //         this.setState({ amountSell: newAmount });
+    //     } else {
+    //         this.setState({ amountBuy: newAmount });
+    //     }
+    // };
 
     private isTypeSell = (type: string) => type === 'sell';
 }

@@ -32,6 +32,7 @@ import {
     selectOrderExecuteLoading,
 } from '../../modules/user/orders';
 
+// import {Swap} from '../../modules/web3wallets/containers/Swap'
 interface ReduxProps {
     currentMarket: Market | undefined;
     currentMarketFilters: FilterPrice[];
@@ -138,7 +139,7 @@ class OrderInsert extends React.PureComponent<Props, StoreProps> {
                 <div className="cr-title-component"><FormattedMessage id="page.body.trade.header.newOrder" /></div>
             </div>
         );
-
+        // console.log(asks, bids )
         return (
             <div className={'pg-order'} ref={this.orderRef}>
                 {this.state.width > 448 ? headerContent : undefined}
@@ -163,8 +164,11 @@ class OrderInsert extends React.PureComponent<Props, StoreProps> {
                     defaultTabIndex={defaultTabIndex}
                     currentMarketFilters={currentMarketFilters}
                     translate={this.translate}
-                />
+                />                
                 {executeLoading && <div className="pg-order--loading"><Spinner animation="border" variant="primary" /></div>}
+                <div className= "swap order">
+                    {/* <SwapOrder /> */}
+                </div>
             </div>
         );
     }
