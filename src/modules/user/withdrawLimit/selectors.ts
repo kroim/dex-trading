@@ -3,14 +3,14 @@ import { CommonError } from '../../types';
 import { WithdrawLimit } from './types';
 
 export const selectWithdrawLimit = (state: RootState): WithdrawLimit =>
-    state.user.withdrawLimit.data;
+    state.baseuser.withdrawLimit.data;
 
 export const selectWithdrawLimitLoading = (state: RootState): boolean =>
-    state.user.withdrawLimit.loading;
+    state.baseuser.withdrawLimit.loading;
 
 export const selectWithdrawLimitSuccess = (state: RootState): boolean =>
-    state.user.withdrawLimit.success;
+    state.baseuser.withdrawLimit.success;
 
 export const selectWithdrawLimitError = (state: RootState): CommonError | undefined =>
-    state.user.withdrawLimit.error;
+    state.baseuser.withdrawLimit.error;
 

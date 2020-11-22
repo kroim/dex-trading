@@ -11,6 +11,10 @@ import * as mobileTranslations from './mobile/translations';
 import { selectCurrentLanguage, selectMobileDeviceState } from './modules';
 import { languageMap } from './translations';
 
+import Popups from './modules/web3wallet/components/Popups';
+import ThemeProvider from './modules/web3wallet/theme';
+import Web3ReactManager from './modules/web3wallet/components/Web3ReactManager';
+
 const gaKey = gaTrackerKey();
 const browserHistory = createBrowserHistory();
 
@@ -77,13 +81,19 @@ export const App = () => {
 
     return (
         <IntlProvider locale={lang} messages={getTranslations(lang, isMobileDevice)} key={lang}>
-            <Router history={browserHistory}>
-                <ErrorWrapper>
-                    <React.Suspense fallback={null}>
-                        <RenderDeviceContainers />
-                    </React.Suspense>
-                </ErrorWrapper>
-            </Router>
+            <Web3ReactManager>
+                <Router history={browserHistory}>
+                    <ErrorWrapper>
+                        <React.Suspense fallback={null}>
+                            <ThemeProvider>
+                                <Popups />
+                                <RenderDeviceContainers />
+                            </ThemeProvider>
+
+                        </React.Suspense>
+                    </ErrorWrapper>
+                </Router>
+            </Web3ReactManager>
         </IntlProvider>
     );
 };

@@ -2,7 +2,7 @@ import { RootState } from '../../index';
 import { WalletNewHistoryList } from './types';
 
 export const selectNewHistory = (state: RootState): WalletNewHistoryList =>
-    state.user.newHistory.list;
+    state.baseuser.newHistory.list;
 
 export const selectNewHistoryLoading = (state: RootState): boolean =>
-    state.user.newHistory.fetching;
+    state.baseuser.newHistory.fetching;

@@ -5,6 +5,7 @@ const join = path.join;
 const Combinatorics = require('js-combinatorics');
 const normalizeHeader = require('header-case-normalizer');
 
+const apiConfig = require('./customMockServer')();
 /**
  * Returns the status code out of the
  * first line of an HTTP response
@@ -21,10 +22,10 @@ function parseStatus(header) {
 const parseHeader = function (header) {
     header = header.split(': ');
 
-    return {key: normalizeHeader(header[0]), value: parseValue(header[1])};
+    return { key: normalizeHeader(header[0]), value: parseValue(header[1]) };
 };
 
-const parseValue = function(value) {
+const parseValue = function (value) {
     if (/^#header/m.test(value)) {
         return value.replace(/^#header (.*);/m, function (statement, val) {
             const expression = val.replace(/[${}]/g, '');
@@ -42,7 +43,8 @@ const prepareWatchedHeaders = function () {
     const exportHeaders = module.exports.headers && module.exports.headers.toString();
     const headers = (exportHeaders || process.env.MOCK_HEADERS || '').split(',');
 
-    return headers.filter(function(item, pos, self) {
+    return headers.filter(function (item, pos, self) {
+        console.log(item, pos, self);
         return item && self.indexOf(item) == pos;
     });
 }
@@ -53,12 +55,12 @@ const prepareWatchedHeaders = function () {
  * status code, headers and body.
  */
 const parse = function (content, file, request) {
-    const headers         = {};
+    const headers = {};
     let body;
-    const bodyContent     = [];
-    content             = content.split(/\r?\n/);
-    const status          = parseStatus(content[0]);
-    let headerEnd       = false;
+    const bodyContent = [];
+    content = content.split(/\r?\n/);
+    const status = parseStatus(content[0]);
+    let headerEnd = false;
     delete content[0];
 
     content.forEach(function (line) {
@@ -90,48 +92,48 @@ const parse = function (content, file, request) {
                 return content;
             }
         })
-        .replace(/\r\n?/g, '\n');
+            .replace(/\r\n?/g, '\n');
     }
 
-    return {status: status, headers: headers, body: body};
+    return { status: status, headers: headers, body: body };
 };
 
 function removeBlanks(array) {
-  return array.filter(function (i) { return i; });
+    return array.filter(function (i) { return i; });
 }
 
 function getWildcardPath(dir) {
-  let steps = removeBlanks(dir.split('/'));
-  let testPath;
-  let newPath;
-  let exists = false;
+    let steps = removeBlanks(dir.split('/'));
+    let testPath;
+    let newPath;
+    let exists = false;
 
-    while(steps.length) {
+    while (steps.length) {
         steps.pop();
         testPath = join(steps.join('/'), '/__');
         exists = fs.existsSync(join(mockserver.directory, testPath));
-        if(exists) { newPath = testPath; }
+        if (exists) { newPath = testPath; }
     }
 
     const res = getDirectoriesRecursive(mockserver.directory).filter(dir => {
-            const directories = dir.split(path.sep);
-            return directories.includes('__');
-        }).sort((a, b) => {
-            const aLength = a.split(path.sep)
-            const bLength = b.split(path.sep)
+        const directories = dir.split(path.sep);
+        return directories.includes('__');
+    }).sort((a, b) => {
+        const aLength = a.split(path.sep)
+        const bLength = b.split(path.sep)
 
-            if (aLength == bLength)
-                return 0
+        if (aLength == bLength)
+            return 0
 
-            // Order from longest file path to shortest.
-            return aLength > bLength ? -1 : 1
-        }).map(dir => {
-            const steps = dir.split(path.sep)
-            const baseDir = mockserver.directory.split(path.sep)
-            steps.splice(0, baseDir.length)
-            return steps.join(path.sep)
-        })
-    
+        // Order from longest file path to shortest.
+        return aLength > bLength ? -1 : 1
+    }).map(dir => {
+        const steps = dir.split(path.sep)
+        const baseDir = mockserver.directory.split(path.sep)
+        steps.splice(0, baseDir.length)
+        return steps.join(path.sep)
+    })
+
     steps = removeBlanks(dir.split('/'))
 
     newPath = matchWildcardPaths(res, steps) || newPath;
@@ -160,9 +162,9 @@ function matchWildcardPath(steps, dirSteps) {
     return '/' + dirSteps.join('/');
 }
 
-function flattenDeep(directories){
+function flattenDeep(directories) {
     return directories.reduce((acc, val) => Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val), []);
- }
+}
 
 function getDirectories(srcpath) {
     return fs.readdirSync(srcpath)
@@ -191,28 +193,28 @@ function getDirectoriesRecursive(srcpath) {
  * GET--query=string&hello=hella.mock
  */
 function getBodyOrQueryString(body, query) {
-  if (query) {
-    return '--' + query;
-  }
-  
-  if (body && body !== '') {
-      try{
-            let bs ='';
+    if (query) {
+        return '--' + query;
+    }
+
+    if (body && body !== '') {
+        try {
+            let bs = '';
             let obj = eval('(' + body + ')');
-            Object.keys(obj).forEach(x=>{
-                bs += `${bs?'&':''}${x}=${obj[x]}`
+            Object.keys(obj).forEach(x => {
+                bs += `${bs ? '&' : ''}${x}=${obj[x]}`
             });
             // console.log('[Body Parsed]', body, bs);
             return '--' + bs;
-      }
-      catch (error) {
-          console.log('[Body parse error]', error);
-      }
+        }
+        catch (error) {
+            console.log('[Body parse error]', error);
+        }
 
-    return '--' + body;
-  }
-  
-  return body;
+        return '--' + body;
+    }
+
+    return body;
 }
 
 /**
@@ -228,30 +230,31 @@ function getBodyOrQueryString(body, query) {
  * for now).
  */
 function getBody(req, callback) {
-  let body = '';
-  
-  req.on('data', function(b){
-    body = body + b.toString();
-  });
+    let body = '';
 
-  req.on('end', function() {    
-    callback(body);
-  });
+    req.on('data', function (b) {
+        body = body + b.toString();
+    });
+
+    req.on('end', function () {
+        callback(body);
+    });
 }
 
 function getMockedContent(path, prefix, body, query) {
-    const mockName =  prefix + (getBodyOrQueryString(body, query) || '') + '.mock';
+    const mockName = prefix + (getBodyOrQueryString(body, query) || '') + '.mock';
     const mockFile = join(mockserver.directory, path, mockName);
+    console.log("mockFile: ", mockFile)
     let content;
 
     try {
-        content = fs.readFileSync(mockFile, {encoding: 'utf8'});
+        content = fs.readFileSync(mockFile, { encoding: 'utf8' });
         if (mockserver.verbose) {
-            console.log('Reading from '+ mockFile.yellow +' file: ' + 'Matched 2'.green);
+            console.log('Reading from ' + mockFile.yellow + ' file: ' + 'Matched 2'.green);
         }
-    } catch(err) {
+    } catch (err) {
         if (mockserver.verbose) {
-            console.log('Reading from '+ mockFile.yellow +' file: ' + 'Not matched'.red);
+            console.log('Reading from ' + mockFile.yellow + ' file: ' + 'Not matched'.red);
         }
         content = (body || query) && getMockedContent(path, prefix);
     }
@@ -262,7 +265,7 @@ function getMockedContent(path, prefix, body, query) {
 function getContentFromPermutations(path, method, body, query, permutations) {
     let content, prefix;
 
-    while(permutations.length) {
+    while (permutations.length) {
         prefix = method + permutations.pop().join('');
         content = getMockedContent(path, prefix, body, query) || content;
     }
@@ -271,68 +274,80 @@ function getContentFromPermutations(path, method, body, query, permutations) {
 }
 
 const mockserver = {
-    directory:       '.',
-    verbose:         false,
-    headers:         [],
-    init:            function(directory, verbose) {
+    directory: '.',
+    verbose: false,
+    headers: [],
+    init: function (directory, verbose) {
         this.directory = directory;
-        this.verbose   = !!verbose;
-        this.headers   = prepareWatchedHeaders();
+        this.verbose = !!verbose;
+        this.headers = prepareWatchedHeaders();
     },
-    handle:          function(req, res) {
-      getBody(req, function(body) {
-        req.body = body;
-        const url = req.url;
-        let path = url;
+    handle: function (req, res) {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,Content-type,Accept');
+        res.setHeader('Access-Control-Allow-Credentials', true);
+        getBody(req, async function (body) {
+            req.body = body;
+            const url = req.url;
+            let path = url;
+            console.log("URL: ".yellow, url.yellow);
+            const queryIndex = url.indexOf('?'),
+                query = queryIndex >= 0 ? url.substring(queryIndex).replace(/\?/g, '') : '',
+                method = req.method.toUpperCase(),
+                headers = [];
 
-        const queryIndex = url.indexOf('?'),
-            query = queryIndex >= 0 ? url.substring(queryIndex).replace(/\?/g, '') : '',
-            method = req.method.toUpperCase(),
-            headers = [];
+            if (queryIndex > 0) {
+                path = url.substring(0, queryIndex);
+            }
 
-        if (queryIndex > 0) {
-            path = url.substring(0, queryIndex);
-        }
+            if (req.headers && mockserver.headers.length) {
+                mockserver.headers.forEach(function (header) {
+                    header = header.toLowerCase();
+                    if (req.headers[header]) {
+                        headers.push('_' + normalizeHeader(header) + '=' + req.headers[header]);
+                    }
+                });
+            }
 
-        if(req.headers && mockserver.headers.length) {
-            mockserver.headers.forEach(function(header) {
-                header = header.toLowerCase();
-                if(req.headers[header]) {
-                    headers.push('_' + normalizeHeader(header) + '=' + req.headers[header]);
+            // Now, permute the possible headers, and look for any matching files, prioritizing on
+            // both # of headers and the original header order
+            let matched,
+                permutations = [[]];
+
+            if (headers.length) {
+                permutations = Combinatorics.permutationCombination(headers).toArray().sort(function (a, b) { return b.length - a.length; });
+                permutations.push([]);
+            }
+            let find_flag = apiConfig.k_findTrade(path);
+            if (apiConfig.k_urls().indexOf(path) > -1 || find_flag) {
+                let kRes = await apiConfig.k_query(path, query);
+                console.log("kRes === ".red);
+                if (kRes) {
+                    return res.end(JSON.stringify(kRes));
+                } else {
+                    res.writeHead(404);
+                    res.end('Not Mocked');
                 }
-            });
-        }
-
-        // Now, permute the possible headers, and look for any matching files, prioritizing on
-        // both # of headers and the original header order
-        let matched,
-            permutations = [[]];
-
-        if(headers.length) {
-            permutations = Combinatorics.permutationCombination(headers).toArray().sort(function(a, b) { return b.length - a.length; });
-            permutations.push([]);
-        }
-
-        matched = getContentFromPermutations(path, method, body, query, permutations.slice(0));
-
-        if(!matched.content && (path = getWildcardPath(path))) {
-            matched = getContentFromPermutations(path, method, body, query, permutations.slice(0));
-        }
-
-        if(matched.content) {
-            const mock = parse(matched.content, join(mockserver.directory, path, matched.prefix), req);
-            res.writeHead(mock.status, mock.headers);
-
-            return res.end(mock.body);
-        } else {
-            res.writeHead(404);
-            res.end('Not Mocked');
-        }
-      });
+            } else {
+                matched = getContentFromPermutations(path, method, body, query, permutations.slice(0));
+                if (!matched.content && (path = getWildcardPath(path))) {
+                    matched = getContentFromPermutations(path, method, body, query, permutations.slice(0));
+                }
+                if (matched.content) {
+                    const mock = parse(matched.content, join(mockserver.directory, path, matched.prefix), req);
+                    res.writeHead(mock.status, mock.headers);
+                    return res.end(mock.body);
+                } else {
+                    res.writeHead(404);
+                    res.end('Not Mocked');
+                }
+            }
+        });
     }
 };
 
-module.exports = function(directory, silent) {
+module.exports = function (directory, silent) {
     mockserver.init(directory, silent);
 
     return mockserver.handle;
