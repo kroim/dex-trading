@@ -267,3 +267,24 @@ export function useDefaultsFromURLSearch() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, chainId])
 }
+
+// updates the swap state to use the defaults for a given network
+export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrency:string, field: Field) {
+  const { chainId } = useActiveWeb3React()
+  const dispatch = useDispatch<AppDispatch>()  
+
+  useEffect(() => {
+    if (!chainId) return
+        
+    dispatch(
+      replaceSwapState({
+        typedValue: "0",
+        field: field,
+        inputCurrencyId: inputCurrency,
+        outputCurrencyId: outputCurrency,
+        recipient: null
+      })
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, chainId])
+}

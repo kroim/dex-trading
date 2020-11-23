@@ -62,6 +62,17 @@ export interface OrderComponentProps {
     /**
      * Whether order is disabled to execute
      */
+    /**
+     * Name of currency for price field
+     */
+    fromContract: string;
+    /**
+     * Name of currency for amount field
+     */
+    toContract: string;
+    /**
+     * Whether order is disabled to execute
+     */
     disabled?: boolean;
     handleSendType?: (index: number, label: string) => void;
     /**
@@ -107,10 +118,10 @@ interface State {
     amountBuy: string;
 }
 
-// const defaultOrderTypes: DropdownElem[] = [
-//     'Limit',
-//     'Market',
-// ];
+const defaultOrderTypes: DropdownElem[] = [
+    'Limit',
+    'Market',
+];
 
 const splitBorder = 449;
 const defaultWidth = 635;
@@ -191,12 +202,14 @@ export class Order extends React.Component<OrderComponentProps, State> {
             // priceMarketBuy,
             // priceMarketSell,
             // priceLimit,
+            fromContract,
+            toContract,
             from,
-            // to,
+            to,
             // currentMarketAskPrecision,
             // currentMarketBidPrecision,
-            // orderTypes,
-            // orderTypesIndex,
+            orderTypes,
+            orderTypesIndex,
             // asks,
             // bids,
             // currentMarketFilters,
@@ -217,11 +230,19 @@ export class Order extends React.Component<OrderComponentProps, State> {
         );
         const label = this.isTypeSell(type) ? 'Sell' : 'Buy';
         
-        console.log(from)
+        // console.log(from)
         
         return {
             content: (
-                <SwapOrder />
+                <SwapOrder
+                    fromToken={fromContract}
+                    toToken={toContract} 
+                    fromKey={from}
+                    toKey={to}
+                    type={type}
+                    orderTypes={orderTypes || defaultOrderTypes}
+                    orderTypesIndex={orderTypesIndex || defaultOrderTypes}
+                     />
                 // <OrderForm
                 //     type={type}
                 //     from={from}

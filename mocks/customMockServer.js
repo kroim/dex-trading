@@ -28,7 +28,7 @@ const apiConfig = {
         id: value
       }
     });
-    console.log(tokens.data.asSymbol);
+    // console.log(tokens.data.asSymbol);
     let pairs = await client.query({
       query: queries.PAIR_SEARCH,
       variables: {
@@ -38,6 +38,7 @@ const apiConfig = {
     })
     // let allPairs = pairs.data.as0.concat(pairs.data.as1).concat(pairs.data.asAddress);
     let allPairs = pairs.data.as0;
+    // console.log("allPairs: ".red, allPairs);
     let d_markets = [];
     for (let i = 0; i < allPairs.length; i++) {
       let item = {
@@ -45,6 +46,8 @@ const apiConfig = {
         "name": "BTC/USD",
         "base_unit": "btc",
         "quote_unit": "usd",
+        "base_contract": "",
+        "quote_contract": "",
         "state": "enabled",
         "amount_precision": 3,
         "price_precision": 6,
@@ -81,17 +84,23 @@ const apiConfig = {
       }
       item.id = allPairs[i].id;
       let token0 = allPairs[i].token0.symbol;
+      let token0_contract = allPairs[i].token0.id;
       if (token0 == 'WBNB') token0 = 'BNB';
       let token1 = allPairs[i].token1.symbol;
+      let token1_contract = allPairs[i].token1.id;
       if (token1 == 'WBNB') token1 = 'BNB';
       if (stableTokens.indexOf(token0) > -1) {
         item.name = token0 + "/" + token1;
         item.base_unit = token0.toLowerCase();
+        item.base_contract = token0_contract;
         item.quote_unit = token1.toLowerCase();
+        item.quote_contract = token1_contract;
       } else {
         item.name = token1 + '/' + token0;
         item.base_unit = token1.toLowerCase();
+        item.base_contract = token1_contract;
         item.quote_unit = token0.toLowerCase();
+        item.quote_contract = token0_contract;
       }
       // item.id = item.base_unit.toLowerCase() + item.quote_unit.toLowerCase();
       d_markets.push(item);

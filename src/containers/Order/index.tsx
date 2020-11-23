@@ -148,6 +148,7 @@ class OrderInsert extends React.PureComponent<Props, StoreProps> {
                     bids={bids}
                     disabled={executeLoading}
                     from={currentMarket.quote_unit}
+                    fromContract={currentMarket.quote_contract}
                     availableBase={this.getAvailableValue(walletBase)}
                     availableQuote={this.getAvailableValue(walletQuote)}
                     onSubmit={this.handleSubmit}
@@ -155,6 +156,7 @@ class OrderInsert extends React.PureComponent<Props, StoreProps> {
                     priceMarketSell={Number((currentTicker || defaultCurrentTicker).last)}
                     priceLimit={priceLimit}
                     to={currentMarket.base_unit}
+                    toContract= {currentMarket.base_contract}
                     handleSendType={this.getOrderType}
                     orderTypes={this.getOrderTypes}
                     currentMarketAskPrecision={currentMarket.amount_precision}

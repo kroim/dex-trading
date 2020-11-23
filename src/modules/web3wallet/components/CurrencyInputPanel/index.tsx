@@ -72,17 +72,26 @@ const StyledDropDown = styled(DropDown)<{ selected: boolean }>`
 
 const InputPanel = styled.div<{ hideInput?: boolean }>`
   ${({ theme }) => theme.flexColumnNoWrap}
-  position: relative;
-  border-radius: ${({ hideInput }) => (hideInput ? '8px' : '20px')};
-  background-color: ${({ theme }) => theme.bg2};
+  position: relative;  
   z-index: 1;
 `
+// const InputPanel = styled.div<{ hideInput?: boolean }>`
+//   ${({ theme }) => theme.flexColumnNoWrap}
+//   position: relative;
+//   // border-radius: ${({ hideInput }) => (hideInput ? '8px' : '12px')};
+//   // background-color: ${({ theme }) => theme.bg2};
+//   z-index: 1;
+// `
 
 const Container = styled.div<{ hideInput: boolean }>`
-  border-radius: ${({ hideInput }) => (hideInput ? '8px' : '20px')};
-  border: 1px solid ${({ theme }) => theme.bg2};
-  background-color: ${({ theme }) => theme.bg1};
+  border-radius: ${({ hideInput }) => (hideInput ? '8px' : '8px')};
+  border: 1px solid ${({ theme }) => theme.bg2};  
 `
+// const Container = styled.div<{ hideInput: boolean }>`
+//   border-radius: ${({ hideInput }) => (hideInput ? '8px' : '8px')};
+//   border: 1px solid ${({ theme }) => theme.bg2};
+//   background-color: ${({ theme }) => theme.bg1};
+// `
 
 const StyledTokenName = styled.span<{ active?: boolean }>`
   ${({ active }) => (active ? '  margin: 0 0.25rem 0 0.75rem;' : '  margin: 0 0.25rem 0 0.25rem;')}

@@ -97,7 +97,7 @@ export function useTokenBalance(account?: string, token?: Token): TokenAmount | 
 export function useCurrencyBalances(
   account?: string,
   currencies?: (Currency | undefined)[]
-): (CurrencyAmount | undefined)[] {
+): (CurrencyAmount | undefined)[] {  
   const tokens = useMemo(() => currencies?.filter((currency): currency is Token => currency instanceof Token) ?? [], [
     currencies
   ])
@@ -105,7 +105,7 @@ export function useCurrencyBalances(
   const tokenBalances = useTokenBalances(account, tokens)
   const containsETH: boolean = useMemo(() => currencies?.some(currency => currency === ETHER) ?? false, [currencies])
   const ethBalance = useETHBalances(containsETH ? [account] : [])
-
+  // console.log(account);
   return useMemo(
     () =>
       currencies?.map(currency => {

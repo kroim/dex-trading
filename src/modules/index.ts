@@ -99,6 +99,7 @@ export interface RootState {
         recentTrades: RecentTradesState;
         depth: DepthState;
         incrementDepth: DepthIncrementState;
+        // swap: SwapState;
     };
     baseuser: {
         apiKeys: ApiKeysState;

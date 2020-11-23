@@ -7,20 +7,23 @@ import { Text } from 'rebass'
 import { ThemeContext } from 'styled-components'
 import AddressInputPanel from '../../components/AddressInputPanel'
 import { ButtonError, ButtonLight, ButtonPrimary } from '../../components/Button'
-import Card, { GreyCard } from '../../components/Card'
+// import Card, { GreyCard } from '../../components/Card'
+import  { GreyCard } from '../../components/Card'
 import { AutoColumn } from '../../components/Column'
 import ConfirmSwapModal from '../../components/swap/ConfirmSwapModal'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
 // import { SwapPoolTabs } from '../../components/NavigationTabs'
 import { AutoRow, RowBetween } from '../../components/Row'
-import AdvancedSwapDetailsDropdown from '../../components/swap/AdvancedSwapDetailsDropdown'
+// import AdvancedSwapDetailsDropdown from '../../components/swap/AdvancedSwapDetailsDropdown'
 import BetterTradeLink from '../../components/swap/BetterTradeLink'
 import confirmPriceImpactWithoutFee from '../../components/swap/confirmPriceImpactWithoutFee'
-import { ArrowWrapper, BottomGrouping, Dots, SwapCallbackError, Wrapper } from '../../components/swap/styleds'
-import TradePrice from '../../components/swap/TradePrice'
+// import { ArrowWrapper, BottomGrouping, Dots, SwapCallbackError, Wrapper } from '../../components/swap/styleds'
+import { ArrowWrapper, BottomGrouping, Dots, SwapCallbackError } from '../../components/swap/styleds'
+// import TradePrice from '../../components/swap/TradePrice'
 // import { TokenWarningCards } from '../../components/TokenWarningCard'
 
-import { BETTER_TRADE_LINK_THRESHOLD, INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
+//import { BETTER_TRADE_LINK_THRESHOLD, INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
+import { BETTER_TRADE_LINK_THRESHOLD } from '../../constants'
 import { getTradeVersion, isTradeBetter } from '../../data/V1'
 import { useActiveWeb3React } from '../../hooks'
 import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useApproveCallback'
@@ -28,8 +31,9 @@ import useENSAddress from '../../hooks/useENSAddress'
 import { useSwapCallback } from '../../hooks/useSwapCallback'
 import useToggledVersion, { Version } from '../../hooks/useToggledVersion'
 import useWrapCallback, { WrapType } from '../../hooks/useWrapCallback'
-import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
-import { useAllLists } from '../../state/lists/hooks'
+//import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
+import { useWalletModalToggle } from '../../state/application/hooks'
+// import { useAllLists } from '../../state/lists/hooks'
 
 
 
@@ -38,7 +42,8 @@ import {
   useDefaultsFromURLSearch,
   useDerivedSwapInfo,
   useSwapActionHandlers,
-  useSwapState
+  useSwapState,
+  useDefaultsFromCurrentMarket
 } from '../../state/swap/hooks'
 import {
   useExpertModeManager,
@@ -49,26 +54,81 @@ import {
 import { LinkStyledButton, TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
-import { ClickableText } from '../Pool/styleds'
+// import { ClickableText } from '../Pool/styleds'
+// import { from } from 'apollo-boost'
 
-export default function SwapOrder() {
+// import classnames from 'classnames';
+//----- added ----//
+import { DropdownComponent } from '../../../../components/Dropdown';
+// import { useAllTokens } from '../../hooks/Tokens'
+// import { Order } from '../../../../components/Order'
+export declare const enum OrderType {
+	Limit = 1,
+	Market = 2,
+	Stop = 3,
+	StopLimit = 4
+}
+type DropdownElem = number | string | React.ReactNode;
+
+interface SwapOrderProps {
+  // value: string,
+  fromToken: string;
+  fromKey: string;  
+  toToken: string;
+  toKey: string;
+  type: string;
+  /**
+     * Available types of order
+     */
+  orderTypes: DropdownElem[];
+    /**
+     * Available types of order without translations
+     */
+  orderTypesIndex: DropdownElem[];
+}
+
+export default function SwapOrder({
+ fromToken, toToken, type, orderTypes, orderTypesIndex, fromKey, toKey
+}: SwapOrderProps) {
   useDefaultsFromURLSearch()
 
+  //console.log(fromToken, toToken)
   // const { account, chainId } = useActiveWeb3React()
   const { account } = useActiveWeb3React()
+  // const allTokens = useAllTokens()
+  // console.log(allTokens)
   const theme = useContext(ThemeContext)
   // console.log(cha)
   // toggle wallet when disconnected
   const toggleWalletModal = useWalletModalToggle()
 
   // for expert mode
-  const toggleSettings = useToggleSettingsMenu()
+  // const toggleSettings = useToggleSettingsMenu()
   const [isExpertMode] = useExpertModeManager()
 
   // get custom setting values for user
   const [deadline] = useUserDeadline()
   const [allowedSlippage] = useUserSlippageTolerance()
 
+  const { onSwitchTokens, onCurrencySelection, onUserInput, onChangeRecipient } = useSwapActionHandlers()
+
+  // get element with caseignore prop
+
+//   const objSetter = (prop, obj)=>{ 
+//     prop = (prop + "").toLowerCase(); 
+//     for(var p in obj){
+//      if( prop == (p+ "").toLowerCase()){
+//            //obj[p] = prop;
+//            return obj[p];
+//            break;
+//       }
+//    }
+// }
+
+  // onCurrencySelection(Field.INPUT, objSetter(fromToken, allTokens))
+  //console.log(fromToken)
+  
+  useDefaultsFromCurrentMarket(fromToken, toToken, Field.INPUT)
   // swap state
   const { independentField, typedValue, recipient } = useSwapState()
   const {
@@ -80,20 +140,19 @@ export default function SwapOrder() {
     inputError: swapInputError
   } = useDerivedSwapInfo()
   
+  useDefaultsFromCurrentMarket(fromToken, toToken, Field.INPUT)
+  // currencies[Field.OUTPUT] = toKey=='BNB'? toKey: objSetter(toToken, allTokens);
+  // currencies[Field.INPUT] = fromKey=='BNB'? fromKey: objSetter(fromToken, allTokens);
+  // console.log(currencyBalances);
+
   const { wrapType, execute: onWrap, inputError: wrapInputError } = useWrapCallback(
     currencies[Field.INPUT],
     currencies[Field.OUTPUT],
     typedValue
   )
-  
-  // currencies[Field.INPUT] = new Currency( 18,  "BNB", "BNB");
 
-  //   console.log("---currencies", currencies);
-  // console.log()
-  const allLists = useAllLists()
-  // console.log(allLists[0].tokens[1])
-  currencies[Field.OUTPUT] =  allLists?allLists[0].tokens[1]:undefined;
-  currencies[Field.INPUT] =  allLists && allLists[50]?allLists[50].tokens[1]:undefined;
+  // console.log(allTokens["0x99C5A2Fcc97b59FE6D0B56e21e72B002F644123F"])
+  // currencies[Field.INPUT] =  allLists && allLists[50]?allLists[50].tokens[1]:undefined;
   // currencies[Field.INPUT] = allLists?[0].tokens[50]
 
   const showWrap: boolean = wrapType !== WrapType.NOT_APPLICABLE
@@ -123,7 +182,9 @@ export default function SwapOrder() {
         [Field.OUTPUT]: independentField === Field.OUTPUT ? parsedAmount : trade?.outputAmount
       }
 
-  const { onSwitchTokens, onCurrencySelection, onUserInput, onChangeRecipient } = useSwapActionHandlers()
+  
+  //const { onCurrencySelection, onUserInput, onChangeRecipient } = useSwapActionHandlers()
+  
   const isValid = !swapInputError
   const dependentField: Field = independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT
 
@@ -233,8 +294,8 @@ export default function SwapOrder() {
   }, [tradeToConfirm, account, priceImpactWithoutFee, recipient, recipientAddress, showConfirm, swapCallback, trade])
 
   // errors
-  const [showInverted, setShowInverted] = useState<boolean>(false)
-
+  // const [showInverted, setShowInverted] = useState<boolean>(false)
+  
   // warnings on slippage
   const priceImpactSeverity = warningSeverity(priceImpactWithoutFee)
 
@@ -264,13 +325,39 @@ export default function SwapOrder() {
     setSwapState({ tradeToConfirm: trade, swapErrorMessage, txHash, attemptingTxn, showConfirm })
   }, [attemptingTxn, showConfirm, swapErrorMessage, trade, txHash])
 
+  const handleOrderTypeChange = ((index: number) => {
+   console.log("number", index)
+  })
+
   // console.log(currencies);
   // console.log("---output");
   // console.log(Field.OUTPUT)
   return (
     <>
-      {/* {showWarning && <TokenWarningCards currencies={currencies} />}       */}              
-        <Wrapper id="swap-page">
+      {/* {showWarning && <TokenWarningCards currencies={currencies} />}       */}         
+      <div className='cr-order-form'>     
+        <div className="cr-order-item">
+            <div className="cr-order-item__dropdown__label">
+                {type}
+            </div>
+            <DropdownComponent list={ orderTypes} onSelect={handleOrderTypeChange} placeholder=""/>
+        </div>
+        {/* <div className="cr-order-item">
+            <div className="cr-order-input">
+                <fieldset className="cr-order-input__fieldset">
+                    <legend className={'cr-order-input__fieldset__label'}>
+                                            </legend>
+                    <div className="cr-order-input__fieldset__input">
+                        &asymp;<span className="cr-order-input__fieldset__input__price">
+                          ssss</span>
+                    </div>
+                </fieldset>
+                <div className="cr-order-input__crypto-icon">
+                    {fromToken.toUpperCase()}
+                </div>
+            </div>
+        </div> */}
+        {/* <Wrapper id="swap-page"> */}
           <ConfirmSwapModal
             isOpen={showConfirm}
             trade={trade}
@@ -322,7 +409,7 @@ export default function SwapOrder() {
                   </LinkStyledButton>
                 ) : null}
               </AutoRow>
-            </AutoColumn>
+            </AutoColumn> 
             <CurrencyInputPanel
               value={formattedAmounts[Field.OUTPUT]}
               onUserInput={handleTypeOutput}
@@ -332,7 +419,7 @@ export default function SwapOrder() {
               onCurrencySelect={address => onCurrencySelection(Field.OUTPUT, address)}
               otherCurrency={currencies[Field.INPUT]}
               id="swap-currency-output"
-            />
+            /> 
 
             {recipient !== null && !showWrap ? (
               <>
@@ -348,7 +435,7 @@ export default function SwapOrder() {
               </>
             ) : null}
 
-            {showWrap ? null : (
+            {/* {showWrap ? null : (
               <Card padding={'.25rem .75rem 0 .75rem'} borderRadius={'20px'}>
                 <AutoColumn gap="4px">
                   <RowBetween align="center">
@@ -376,7 +463,7 @@ export default function SwapOrder() {
                   )}
                 </AutoColumn>
               </Card>
-            )}
+            )} */}
           </AutoColumn>
           <BottomGrouping>
             {!account ? (
@@ -465,9 +552,9 @@ export default function SwapOrder() {
             {isExpertMode && swapErrorMessage ? <SwapCallbackError error={swapErrorMessage} /> : null}
             {betterTradeLinkVersion && <BetterTradeLink version={betterTradeLinkVersion} />}
           </BottomGrouping>
-        </Wrapper>
-      
-      <AdvancedSwapDetailsDropdown trade={trade} />
+        {/* </Wrapper> */}
+      </div>
+      {/* <AdvancedSwapDetailsDropdown trade={trade} /> */}
     </>
   )
 }
