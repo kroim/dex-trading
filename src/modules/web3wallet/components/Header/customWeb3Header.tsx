@@ -111,6 +111,9 @@ const BalanceText = styled(Text)`
   `};
 `
 
+const HiddenTag = styled.div`
+  display: none;
+`
 const NETWORK_LABELS: { [chainId in ChainId]: string | null } = {
   [ChainId.MAINNET]: null,
   [ChainId.RINKEBY]: 'Rinkeby',
@@ -125,8 +128,7 @@ export default function Web3Header() {
   const { account, chainId } = useActiveWeb3React()
 
   const userEthBalance = useETHBalances([account])[account]
-  const [isDark, toggleDarkMode] = useDarkModeManager()
-  console.log("isDark: ", isDark);
+  const [isDark, toggleDarkMode] = useDarkModeManager();
   toggleDarkMode()
 
   return (
@@ -134,6 +136,7 @@ export default function Web3Header() {
       <RowBetween style={{ alignItems: 'flex-start' }} padding="1rem 1rem 0 1rem">
         <HeaderControls>
           <HeaderElement>
+            <HiddenTag>{isDark}</HiddenTag>
             <TestnetWrapper>
               {!isMobile && NETWORK_LABELS[chainId] && <NetworkCard>{NETWORK_LABELS[chainId]}</NetworkCard>}
             </TestnetWrapper>

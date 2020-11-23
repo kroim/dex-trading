@@ -320,9 +320,10 @@ const mockserver = {
                 permutations.push([]);
             }
             let find_flag = apiConfig.k_findTrade(path);
+            console.log("find_flag: ", find_flag);
             if (apiConfig.k_urls().indexOf(path) > -1 || find_flag) {
                 let kRes = await apiConfig.k_query(path, query);
-                console.log("kRes === ".red);
+                console.log("kRes === ".black);
                 if (kRes) {
                     return res.end(JSON.stringify(kRes));
                 } else {

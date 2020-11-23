@@ -129,9 +129,9 @@ class Head extends React.Component<Props> {
 
     private renderMarketToggler = () => {
         const { currentMarket, marketSelectorOpened, colorTheme } = this.props;
-        console.log("currentMarket: ", currentMarket);
-        console.log("marketSelectorOpened: ", marketSelectorOpened);
-        console.log("colorTheme: ", colorTheme);
+        // console.log("currentMarket: ", currentMarket);
+        // console.log("marketSelectorOpened: ", marketSelectorOpened);
+        // console.log("colorTheme: ", colorTheme);
         const isLight = colorTheme === 'light';
         if (!this.props.location.pathname.includes('/trading/')) {
             return null;

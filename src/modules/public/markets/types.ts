@@ -22,6 +22,8 @@ export interface Market {
     name: string;
     base_unit: string;
     quote_unit: string;
+    base_contract: string;
+    quote_contract: string;
     min_price: string;
     max_price: string;
     min_amount: string;
