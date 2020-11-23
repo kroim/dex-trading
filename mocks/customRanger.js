@@ -1,18 +1,9 @@
 const { client } = require('./apollo/client')
 const queries = require('./apollo/queries')()
 const colors = require('colors');
+const k_functions = require('./k_functions')();
 
 const customRanger = {
-    compareTimestamp: function (a, b) {
-        if (a.timestamp < b.timestamp) return 1;
-        if (a.timestamp > b.timestamp) return -1;
-        return 0;
-    },
-    comparePrice: function (a, b) {
-        if (a.price < b.price) return 1;
-        if (a.price > b.price) return -1;
-        return 0;
-    },
     getMarketId: function (streams) {
         let marketID = "";
         for (let k = 0; k < streams.length; k++) {
@@ -20,6 +11,56 @@ const customRanger = {
             if (item.indexOf(".trades") > -1) marketID = item.replace(".trades", "");
         }
         return marketID;
+    },
+    getKLineParams: function (streams) {
+        let pairAddress = "", period = 15;
+        for (let k = 0; k < streams.length; k++) {
+            let item = streams[k];
+            if (item.indexOf(".kline-") > -1) {
+                let itemSplits = item.split(".");
+                if (itemSplits.length < 2) break;
+                pairAddress = itemSplits[0];
+                switch (itemSplits[1]) {
+                    case "kline-1m":
+                        period = 1;
+                        break;
+                    case "kline-5m":
+                        period = 5;
+                        break;
+                    case "kline-15m":
+                        period = 15;
+                        break;
+                    case "kline-30m":
+                        period = 30;
+                        break;
+                    case "kline-1h":
+                        period = 60;
+                        break;
+                    case "kline-2h":
+                        period = 120;
+                        break;
+                    case "kline-4h":
+                        period = 240;
+                        break;
+                    case "kline-6h":
+                        period = 360;
+                        break;
+                    case "kline-12h":
+                        period = 720;
+                        break;
+                    case "kline-1d":
+                        period = 1440;
+                        break;
+                    case "kline-3d":
+                        period = 4320;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            }
+        }
+        return [pairAddress, period];
     },
     replaceTickerId: function (marketId, streams) {
         let res_streams = [];
@@ -89,7 +130,7 @@ const customRanger = {
             }
             data.push(dataItem);
         }
-        data.sort(this.compareTimestamp);
+        data.sort(k_functions.compareTimestampDecent);  // decent
         // console.log("CompareTimestamp: ", data);
         let tmpData = [];
         let volume = 0, sum_price = 0;
@@ -111,52 +152,85 @@ const customRanger = {
             let price_change_percent = (tmpData[tmpData.length - 1].price - tmpData[0].price) * 100;
             if (price_change_percent < 0) ticker[pairAddress].price_change_percent = price_change_percent.toFixed(2) + "%";
             else ticker[pairAddress].price_change_percent = "+" + price_change_percent.toFixed(2) + "%";
-            tmpData.sort(this.comparePrice);
+            tmpData.sort(k_functions.comparePriceDecent);  // decnet
             ticker[pairAddress].high = tmpData[0].price;
             ticker[pairAddress].low = tmpData[tmpData.length - 1].price;
         }
         return ticker;
     },
-    getChartTrades: async function (pairAddress) {
+    getChartTrades: async function (pairAddress, period) {
+        console.log(" === getChartTrades === ".magenta);
+        if (!pairAddress) return [];
         const transactions = {}
+        let skip = 0; let count = 100;
+        if (period > 300) count = 1000;
+        else count = period * 3;
         try {
             let result = await client.query({
-                query: queries.FILTERED_TRANSACTIONS,
+                query: queries.GET_SWAP_TRANSACTIONS,
                 variables: {
-                    allPairs: [pairAddress]
+                    allPairs: [pairAddress],
+                    count,
+                    skip
                 },
                 fetchPolicy: 'no-cache'
             })
-            transactions.mints = result.data.mints
-            transactions.burns = result.data.burns
-            transactions.swaps = result.data.swaps
+            transactions.swaps = result.data.swaps;
         } catch (e) {
             console.log("Transaction GraghQL error:".red, e);
+            transactions = [];
         }
         let data = [];
         for (let k = 0; k < transactions.swaps.length; k++) {
             let item = transactions.swaps[k];
-            trade_item.id = item.id; trade_item.created_at = parseInt(item.transaction.timestamp);
-            trade_item.total = parseFloat(item.amountUSD); trade_item.market = pairAddress;
+            let dataItem = { amount: 0, price: 0, timestamp: parseInt(item.transaction.timestamp) };
             if (item.amount0In == "0") {
-                trade_item.taker_type = "sell";
-                trade_item.amount = parseFloat(item.amount0Out);
+                dataItem.amount = parseFloat(item.amount0Out);
                 try {
-                    trade_item.price = parseFloat((parseFloat(item.amount1In) / parseFloat(item.amount0Out)).toFixed(6));
+                    dataItem.price = parseFloat((parseFloat(item.amount1In) / parseFloat(item.amount0Out)).toFixed(6));
                 } catch (e) {
-                    trade_item.price = 0;
+                    dataItem.price = 0;
                 }
             } else {
-                trade_item.taker_type = "buy";
-                trade_item.amount = parseFloat(item.amount0In);
+                dataItem.amount = parseFloat(item.amount0In);
                 try {
-                    trade_item.price = parseFloat((parseFloat(item.amount1Out) / parseFloat(item.amount0In)).toFixed(6));
+                    dataItem.price = parseFloat((parseFloat(item.amount1Out) / parseFloat(item.amount0In)).toFixed(6));
                 } catch (e) {
-                    trade_item.price = 0;
+                    dataItem.price = 0;
                 }
             }
-            data.push(trade_item);
+            data.push(dataItem);
         }
+        // console.log("Swap Transaction: ", transactions.swaps.length);
+        data.sort(k_functions.compareTimestampDecent); // decent
+        let currentTime = new Date();
+        let time_to = parseInt(currentTime.getTime() / 1000);
+        let time_from = parseInt((currentTime - 1000 * 60 * period) / 1000);
+        let periodData = [];
+        let startIndex = 0;
+        for (let i = 0; i < data.length; i++) {
+            if (data[i].timestamp < time_from) break;
+            if (data[i].timestamp >= time_from && data[i].timestamp <= time_to) {
+                periodData.push(data[i]);
+                startIndex++;
+            }
+        }
+        if (data.length > (startIndex + 1)) periodData.push(data[startIndex]);
+        let chartData = [];
+        if (periodData.length > 0) {
+            let chart_item = [1605968100, 0.0, 0.0, 0.0, 0.0, 0.0]; // timestamp, open, high, low, close, volume
+            chart_item[0] = time_to;
+            chart_item[1] = periodData[periodData.length - 1].price;
+            chart_item[4] = periodData[0].price;
+            for (let j = 0; j < periodData.length; j++) {
+                chart_item[5] += periodData[j].amount;
+            }
+            periodData.sort(k_functions.comparePriceAccent);  // accent
+            chart_item[2] = periodData[periodData.length - 1].price;
+            chart_item[3] = periodData[0].price;
+            chartData = chart_item;
+        }
+        return chartData;
     },
 };
 
