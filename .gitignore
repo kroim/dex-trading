@@ -27,4 +27,4 @@ index.css
 tsconfig.json
 
 # environment config
-public/config/env.js
+env.js
