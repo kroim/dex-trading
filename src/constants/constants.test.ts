@@ -20,7 +20,8 @@ describe('Constants', () => {
     ];
 
     it('Rendering correct title prefix', () => {
-        expect(PG_TITLE_PREFIX).toBe('Cryptobase');
+        // expect(PG_TITLE_PREFIX).toBe('Cryptobase');
+        expect(PG_TITLE_PREFIX).toBe('JULSwap');
     });
 
     it('Rendering correct storage default limit', () => {

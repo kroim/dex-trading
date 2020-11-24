@@ -176,6 +176,22 @@ query pairs($tokens: [Bytes]!, $id: String) {
     }
   }
 `,
+  GET_ORDERS_FROM_BLOCK: gql`
+query getOrdersFromBlock($fromBlock: BigInt, $toBlock: BigInt) {
+  orders(where:{blockNumber_gte:$fromBlock,blockNumber_lte:$toBlock,status:open}) {
+    id
+    inputToken
+    outputToken
+    minReturn
+    owner
+    secret
+    witness
+    module
+    inputAmount
+    createdTxHash
+  }
+}
+`,
 
 }
 
