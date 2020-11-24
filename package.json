@@ -3,6 +3,7 @@
   "version": "2.6.0",
   "private": true,
   "dependencies": {
+    "@ethersproject/providers": "^5.0.16",
     "@formatjs/intl-pluralrules": "^3.2.5",
     "@formatjs/intl-relativetimeformat": "^7.0.0",
     "@openware/cryptofont": "2.3.0",

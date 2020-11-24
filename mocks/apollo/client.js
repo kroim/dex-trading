@@ -32,8 +32,18 @@ const blockClient = new ApolloClient({
   cache: new InMemoryCache()
 })
 
+const relayClient = new ApolloClient({
+  link: new HttpLink({
+    // uri: 'https://api.thegraph.com/subgraphs/name/pine-finance/pine_orders'  // chain_id: 1
+    uri: 'https://subgraph.swapliquidity.org/subgraphs/name/swapliquidity/limitorders',  // chain_id: 56
+    fetch: fetch
+  }),
+  cache: new InMemoryCache()
+})
+
 module.exports = {
   client,
   healthClient,
-  blockClient
+  blockClient,
+  relayClient
 }

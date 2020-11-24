@@ -1,6 +1,6 @@
-const { skipPartiallyEmittedExpressions } = require('typescript');
-const { client } = require('./apollo/client')
-const queries = require('./apollo/queries')()
+let JsonRpcProvider = require('@ethersproject/providers');
+const { client } = require('./apollo/client');
+const queries = require('./apollo/queries')();
 const k_functions = require('./k_functions')();
 const stableTokens = ['USDT', 'USDC', 'BUSD', 'DAI', 'BNB']
 const apiConfig = {
@@ -44,6 +44,9 @@ const apiConfig = {
       }
       return await this.k_charts(pathParam, period, time_from, time_to);
       // return this.k_sampleChartHistory()
+    } else if (this.k_findTrade(pathParam) == 'orders') {
+      console.log(" ===== Get Orders Data ===== ".magenta);
+      console.log(queryParam);
     }
   },
   k_markets: async function () {
@@ -289,6 +292,8 @@ const apiConfig = {
     } else if (urlPath.match(new RegExp("markets/" + "(.*)" + "/k-line"))) {
       return "k-line";
       // return null;
+    } else if (urlPath.match(new RegExp("/api/v2/peatio/market/orders" + "(.*)"))) {
+      return "orders";
     } else return null;
   },
   k_sampleMarkets: function () {
