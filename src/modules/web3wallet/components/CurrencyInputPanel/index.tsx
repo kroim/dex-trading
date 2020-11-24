@@ -9,7 +9,7 @@ import DoubleCurrencyLogo from '../DoubleLogo'
 import { RowBetween } from '../Row'
 import { TYPE } from '../../theme'
 import { Input as NumericalInput } from '../NumericalInput'
-import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
+// import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 
 import { useActiveWeb3React } from '../../hooks'
 import { useTranslation } from 'react-i18next'
@@ -20,25 +20,20 @@ const InputRow = styled.div<{ selected: boolean }>`
   padding: ${({ selected }) => (selected ? '0.75rem 0.5rem 0.75rem 1rem' : '0.75rem 0.75rem 0.75rem 1rem')};
 `
 
-const CurrencySelect = styled.button<{ selected: boolean }>`
+const CurrencySelect = styled.div<{ selected: boolean }>`
   align-items: center;
   height: 2.2rem;
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 300;
   background-color: ${({ selected, theme }) => (selected ? theme.bg1 : theme.primary1)};
   color: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: ${({ selected }) => (selected ? 'none' : '0px 6px 10px rgba(0, 0, 0, 0.075)')};
   outline: none;
   cursor: pointer;
   user-select: none;
   border: none;
-  padding: 0 0.5rem;
-
-  :focus,
-  :hover {
-    background-color: ${({ selected, theme }) => (selected ? theme.bg2 : darken(0.05, theme.primary1))};
-  }
+  padding: 0 0.5rem;  
 `
 
 const LabelRow = styled.div`
@@ -60,15 +55,15 @@ const Aligner = styled.span`
   justify-content: space-between;
 `
 
-const StyledDropDown = styled(DropDown)<{ selected: boolean }>`
-  margin: 0 0.25rem 0 0.5rem;
-  height: 35%;
+// const StyledDropDown = styled(DropDown)<{ selected: boolean }>`
+//   margin: 0 0.25rem 0 0.5rem;
+//   height: 35%;
 
-  path {
-    stroke: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
-    stroke-width: 1.5px;
-  }
-`
+//   path {
+//     stroke: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
+//     stroke-width: 1.5px;
+//   }
+// `
 
 const InputPanel = styled.div<{ hideInput?: boolean }>`
   ${({ theme }) => theme.flexColumnNoWrap}
@@ -95,7 +90,7 @@ const Container = styled.div<{ hideInput: boolean }>`
 
 const StyledTokenName = styled.span<{ active?: boolean }>`
   ${({ active }) => (active ? '  margin: 0 0.25rem 0 0.75rem;' : '  margin: 0 0.25rem 0 0.25rem;')}
-  font-size:  ${({ active }) => (active ? '20px' : '16px')};
+  font-size:  ${({ active }) => (active ? '18px' : '18px')};
 
 `
 
@@ -237,7 +232,7 @@ export default function CurrencyInputPanel({
                     : currency?.symbol) || t('selectToken')}
                 </StyledTokenName>
               )}
-              {!disableCurrencySelect && <StyledDropDown selected={!!currency} />}
+              {/* {!disableCurrencySelect && <StyledDropDown selected={!!currency} />} */}
             </Aligner>
           </CurrencySelect>
         </InputRow>

@@ -51,10 +51,10 @@ class MarketsContainer extends React.Component<Props> {
         // this.props.intl.formatMessage({id: 'page.body.trade.header.markets.content.change'}),
         'Pair', 'Balance Amount'
     ];
-    constructor(p){
-        super(p)        
+    // constructor(p){
+    //     super(p)        
        // this. = React.createRef()
-    }
+    // }
     public componentDidMount() {
         if (this.props.markets.length === 0) {
             this.props.tickers();

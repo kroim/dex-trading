@@ -12,8 +12,6 @@ import {
 import { ETHER } from '@bscswap/sdk';
 
 
-
-
 export declare const enum OrderType {
 	Limit = 1,
 	Market = 2,
@@ -28,6 +26,10 @@ interface UpdateSwapOrderProps {
   toKey: string;    
 }
 
+//========= for function component in web3 module and class component of baseapp module ============== 
+  // The component instance will be extended
+  // with whatever you return from the callback passed
+  // as the second argument
 const { forwardRef, useImperativeHandle  } = React;
 export const UpdateMarketPairFroward = forwardRef((props, ref) => {
 
@@ -37,20 +39,14 @@ export const UpdateMarketPairFroward = forwardRef((props, ref) => {
   const objSetter = (prop, obj)=>{ 
     prop = (prop + "").toLowerCase(); 
     for(var p in obj){
-     if( prop == (p+ "").toLowerCase()){
+     if( prop === (p+ "").toLowerCase()){
            //obj[p] = prop;
-           return obj[p];
-           break;
+           return obj[p];           
       }
    }
 }
-  // The component instance will be extended
-  // with whatever you return from the callback passed
-  // as the second argument
   useImperativeHandle(ref, () => ({
-
-    
-  
+     
     setMarketPair(market) {
       //console.log(market)
       //console.log(allTokens)
@@ -58,10 +54,10 @@ export const UpdateMarketPairFroward = forwardRef((props, ref) => {
       // console.log(onCurrencySelection)
       // onCurrencySelection(Field.INPUT, market.baseContract )
       console.log(market)
-      if(market.quote_unit.toLowerCase()=="bnb") onCurrencySelection(Field.INPUT, ETHER)
+      if(market.quote_unit.toLowerCase()==="bnb") onCurrencySelection(Field.INPUT, ETHER)
        else  onCurrencySelection(Field.INPUT, objSetter(market.quote_contract, allTokens))
 
-      if(market.base_unit.toLowerCase()=="bnb") onCurrencySelection(Field.OUTPUT, ETHER)
+      if(market.base_unit.toLowerCase()==="bnb") onCurrencySelection(Field.OUTPUT, ETHER)
       else  onCurrencySelection(Field.OUTPUT, objSetter(market.base_contract, allTokens))      
       //alert("getAlert from Child");
     }
