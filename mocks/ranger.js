@@ -107,9 +107,7 @@ const kLine = (time, period) => {
     const low = Math.min(open, close) - delta;
     const volume = timeToVolume(time, periodInSeconds);
 
-    const kLineRes = [roundedTime, open, high, low, close, volume];
-    console.log("kLineRes: ".red, kLineRes);
-    return [1606095900, 559.74, 562.49, 559.1, 560.21, 576.2332957899999];
+    return [roundedTime, open, high, low, close, volume].map().toString()
 }
 
 let tradeIndex = 100000;
@@ -209,22 +207,11 @@ const matchedTradesMock = (ws) => {
 //     sendEvent(ws, `${marketId}.kline-3d`, kLine(at, 4320));
 //     sendEvent(ws, `${marketId}.kline-1w`, kLine(at, 10080));
 // };
-const klinesMock = (ws) => () => {
-    let marketId = customRanger.getMarketId(ws.streams);
-    let at = parseInt(Date.now() / 1000);
-
-    sendEvent(ws, `${marketId}.kline-1m`, kLine(at, 1));
-    sendEvent(ws, `${marketId}.kline-5m`, kLine(at, 5));
-    sendEvent(ws, `${marketId}.kline-15m`, kLine(at, 15));
-    sendEvent(ws, `${marketId}.kline-30m`, kLine(at, 30));
-    sendEvent(ws, `${marketId}.kline-1h`, kLine(at, 60));
-    sendEvent(ws, `${marketId}.kline-2h`, kLine(at, 120));
-    sendEvent(ws, `${marketId}.kline-4h`, kLine(at, 240));
-    sendEvent(ws, `${marketId}.kline-6h`, kLine(at, 360));
-    sendEvent(ws, `${marketId}.kline-12h`, kLine(at, 720));
-    sendEvent(ws, `${marketId}.kline-1d`, kLine(at, 1440));
-    sendEvent(ws, `${marketId}.kline-3d`, kLine(at, 4320));
-    sendEvent(ws, `${marketId}.kline-1w`, kLine(at, 10080));
+const klinesMock = (ws) => async () => {
+    const [pairAddress, period] = customRanger.getKLineParams(ws.streams);
+    let kLineItem = await customRanger.getChartTrades(pairAddress, period);
+    console.log("kLineItem: ".red, kLineItem);
+    ws.send(JSON.stringify(kLineItem));
 };
 class RangerMock {
     constructor(port, markets) {
@@ -267,8 +254,8 @@ class RangerMock {
         // ws.timers.push(setTimeout(() => {sendEvent(ws, "deposit_address", { currency: "xrp", address: "a4E49HU6CTHyYMmsYt3F1ar1q5W89t3hfQ?dt=1" })}, 10000));
         
         ws.timers.push(setInterval(tickersMock(ws), 3000));
-        ws.timers.push(setInterval(matchedTradesMock(ws), 10000));
-        ws.timers.push(setInterval(klinesMock(ws), 2500));
+        // ws.timers.push(setInterval(matchedTradesMock(ws), 10000));
+        ws.timers.push(setInterval(klinesMock(ws), 25000));
     }
     closeConnection() {
         console.log('Ranger: connection closed');

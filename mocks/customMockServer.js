@@ -1,5 +1,7 @@
+const { skipPartiallyEmittedExpressions } = require('typescript');
 const { client } = require('./apollo/client')
 const queries = require('./apollo/queries')()
+const k_functions = require('./k_functions')();
 const stableTokens = ['USDT', 'USDC', 'BUSD', 'DAI', 'BNB']
 const apiConfig = {
   balances: "/api/v2/peatio/account/balances",
@@ -21,25 +23,27 @@ const apiConfig = {
     } else if (this.k_findTrade(pathParam) == 'k-line') {
       console.log(" ===== Get K Line Data ===== ".magenta);
       console.log("ChartURL: ".red, pathParam, ", ", queryParam);
+      let currentTime = new Date();
+      let period = 15;
+      let time_to = parseInt(currentTime.getTime() / 1000);
+      let time_from = parseInt((currentTime - 1000 * 60 * 60 * 24 * 1) / 1000);
       if (queryParam) {
         let querySplits = queryParam.split("&");
-        console.log(querySplits);
         for (let i = 0; i < querySplits.length; i++) {
           let queryItem = querySplits[i];
+          if (queryItem.indexOf("period=") > -1) {
+            period = parseInt(queryItem.replace("period=", ""));
+          }
+          if (queryItem.indexOf("time_from=") > -1) {
+            time_from = parseInt(queryItem.replace("time_from=", ""));
+          }
           if (queryItem.indexOf("time_to=") > -1) {
-            let lastTime = parseInt(queryItem.replace("time_to=", ""));
-            console.log(lastTime);
-            if (lastTime && lastTime < 1605983400) {
-              return {
-                no_data: true,
-                nextTime: lastTime
-              }
-            }
+            time_to = parseInt(queryItem.replace("time_to=", ""));
           }
         }
       }
-      return this.k_sampleChartHistory()
-      // return []
+      return await this.k_charts(pathParam, period, time_from, time_to);
+      // return this.k_sampleChartHistory()
     }
   },
   k_markets: async function () {
@@ -130,7 +134,19 @@ const apiConfig = {
     }
     // return this.k_sampleData()
     // console.log(d_markets);
-    return d_markets
+    let tokenOrderList = ['BNB', 'BUSD', 'JULB', 'OBRB', 'SWGB'];
+    let firstList = [null, null, null, null, null];
+    let secondList = [];
+    for (let i = 0; i < d_markets.length; i++) {
+      let tokenIndex = tokenOrderList.indexOf(d_markets[i].quote_unit.toUpperCase());
+      if (tokenIndex > -1 && !firstList[tokenIndex]) {
+        firstList[tokenOrderList.indexOf(d_markets[i].quote_unit.toUpperCase())] = d_markets[i];
+      } else secondList.push(d_markets[i]);
+    }
+    firstList = firstList.filter(function (el) { return el });
+    let marketList = firstList.concat(secondList);
+    // console.log("marketList: ", marketList);
+    return marketList
   },
   k_trades: async function (pathParam, queryParam) {
     let pairAddress = pathParam.match(new RegExp("markets/" + "(.*)" + "/trades"))[1];
@@ -179,45 +195,86 @@ const apiConfig = {
     // console.log(data);
     return data;
   },
-  k_tradesWrong: async function (pathParam, queryParam) {
-    let pairAddress = pathParam.match(new RegExp("markets/" + "(.*)" + "/trades"))[1];
-    console.log("pairAddress: ".red, pairAddress.green);
-    let skip = 0;
-    let allFound = false;
-    let data = []
-    while (!allFound) {
+  k_charts: async function (pathParam, period, time_from, time_to) {
+    let pairAddress = pathParam.match(new RegExp("markets/" + "(.*)" + "/k-line"))[1];
+    console.log(pairAddress.green, period, time_from, time_to);
+    const transactions = {}
+    let skip = 0; let count = 1000;
+    try {
       let result = await client.query({
-        query: queries.PAIR_CHART,
+        query: queries.GET_SWAP_TRANSACTIONS,
         variables: {
-          pairAddress: pairAddress,
+          allPairs: [pairAddress],
+          count,
           skip
         },
-        fetchPolicy: 'cache-first'
+        fetchPolicy: 'no-cache'
       })
-      skip += 1000
-      let skip_data = [];
-      for (let i = 0; i < result.data.pairDayDatas.length; i++) {
-        let skip_item = result.data.pairDayDatas[i];
-        let trade_item = { id: 492221222, price: 2.418e-05, amount: 20.1, total: 0.000486018, market: "dashbtc", created_at: 1597321400, taker_type: "buy" };
-        trade_item.id = skip_item.id.replace(pairAddress + "-", "");
-        trade_item.created_at = skip_item.date;
-        if (skip_item.dailyVolumeToken0 == '0' || skip_item.dailyVolumeToken1 == '0') {
-          trade_item.amount = 0; trade_item.total = 0; trade_item.market = pairAddress; trade_item.price = 0; trade_item.taker_type = "buy"
-        } else {
-          trade_item.amount = parseFloat(skip_item.dailyVolumeToken0); trade_item.total = parseFloat(skip_item.dailyVolumeToken1);
-          trade_item.price = parseFloat((trade_item.total / trade_item.amount).toFixed(6));
-          trade_item.market = pairAddress; trade_item.taker_type = "buy";
-        }
-        skip_data.push(trade_item);
-      }
-      data = data.concat(skip_data)
-      if (result.data.pairDayDatas.length < 1000) {
-        allFound = true
-      }
+      // transactions.mints = result.data.mints
+      // transactions.burns = result.data.burns
+      transactions.swaps = result.data.swaps;
+    } catch (e) {
+      console.log("Transaction GraghQL error:".red, e);
+      transactions.swaps = [];
     }
-    // console.log("result.data: ".blue, pathParam);
-    // console.log(data);
-    return data;
+    let data = [];
+    for (let k = 0; k < transactions.swaps.length; k++) {
+      let item = transactions.swaps[k];
+      let dataItem = { amount: 0, price: 0, timestamp: parseInt(item.transaction.timestamp) };
+      if (item.amount0In == "0") {
+        dataItem.amount = parseFloat(item.amount0Out);
+        try {
+          dataItem.price = parseFloat((parseFloat(item.amount1In) / parseFloat(item.amount0Out)).toFixed(6));
+        } catch (e) {
+          dataItem.price = 0;
+        }
+      } else {
+        dataItem.amount = parseFloat(item.amount0In);
+        try {
+          dataItem.price = parseFloat((parseFloat(item.amount1Out) / parseFloat(item.amount0In)).toFixed(6));
+        } catch (e) {
+          dataItem.price = 0;
+        }
+      }
+      data.push(dataItem);
+    }
+    // console.log("Swap Transaction: ", transactions.swaps.length);
+    data.sort(k_functions.compareTimestampAccent); // accent
+    // console.log("Data: ", data);
+    let chartData = [];
+    if (data.length > 0 && data[0].timestamp > time_to) {
+      console.log("   === No Data ===   ".red);
+      return { no_data: true, nextTime: time_to };
+    }
+    let currentPeriod = time_from;
+    let nextPeriod = time_from + period * 60;
+    let periodData = [];
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].timestamp > time_to) break;
+      if (data[i].timestamp > nextPeriod) {
+        currentPeriod = nextPeriod;
+        nextPeriod = nextPeriod + period * 60;
+        if (periodData.length > 0) {
+          let chart_item = [1605968100, 0.0, 0.0, 0.0, 0.0, 0.0]; // timestamp, open, high, low, close, volume
+          chart_item[0] = currentPeriod;
+          chart_item[1] = periodData[0].price;
+          chart_item[4] = periodData[periodData.length - 1].price;
+          for (let j = 0; j < periodData.length; j++) {
+            chart_item[5] += periodData[j].amount;
+          }
+          periodData.sort(k_functions.comparePriceAccent);  // accent
+          chart_item[2] = periodData[periodData.length - 1].price;
+          chart_item[3] = periodData[0].price;
+          chartData.push(chart_item);
+        }
+        periodData = [];
+        if (i > 0) periodData.push(data[i - 1]);
+      }
+      periodData.push(data[i]);
+    }
+    // console.log("chartData: ".red, chartData);
+    // return [];
+    return chartData;
   },
   k_urls: function () {
     return [

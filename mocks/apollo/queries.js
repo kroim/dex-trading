@@ -149,6 +149,33 @@ query pairs($tokens: [Bytes]!, $id: String) {
     }
   }
 `,
+  GET_SWAP_TRANSACTIONS: gql`
+  query($allPairs: [Bytes]!, $count: Int!, $skip: Int!) {
+    swaps(first: 1000, skip: $skip, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
+      transaction {
+        id
+        timestamp
+      }
+      id
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+      amount0In
+      amount0Out
+      amount1In
+      amount1Out
+      amountUSD
+      to
+    }
+  }
+`,
 
 }
 
