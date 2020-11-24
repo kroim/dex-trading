@@ -3,8 +3,7 @@ import { TabPanel } from '../../components';
 import { FilterPrice } from '../../filters';
 // import { getAmount, getTotalPrice } from '../../helpers';
 // import { Decimal, OrderForm } from '../index';
-
-import SwapOrder from '../../modules/web3wallet/components/SwapOrder'
+import /*SwapOrder,*/ { SwapOrderWithSwapInput } from '../../modules/web3wallet/components/SwapOrder'
 
 /**
  * from Swap page of swapliquidity */ 
@@ -194,6 +193,8 @@ export class Order extends React.Component<OrderComponentProps, State> {
         );
     }
 
+    private swapInputAndOutputFuncRef = React.createRef<any>();
+
     public getPanel = (type: FormType) => {
         const {
             // availableBase,
@@ -234,7 +235,7 @@ export class Order extends React.Component<OrderComponentProps, State> {
         
         return {
             content: (
-                <SwapOrder
+                <SwapOrderWithSwapInput
                     fromToken={fromContract}
                     toToken={toContract} 
                     fromKey={from}
@@ -242,6 +243,7 @@ export class Order extends React.Component<OrderComponentProps, State> {
                     type={type}
                     orderTypes={orderTypes || defaultOrderTypes}
                     orderTypesIndex={orderTypesIndex || defaultOrderTypes}
+                    ref={this.swapInputAndOutputFuncRef}
                      />
                 // <OrderForm
                 //     type={type}
@@ -274,6 +276,9 @@ export class Order extends React.Component<OrderComponentProps, State> {
     };
 
     private handleChangeTab = (index: number, label?: string) => {
+
+        console.log("--", label);
+        this.swapInputAndOutputFuncRef.current.swapInputAndOutput(label)
         if (this.props.handleSendType && label) {
           this.props.handleSendType(index, label);
         }
