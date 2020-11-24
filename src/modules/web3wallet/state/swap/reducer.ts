@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit'
-import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
+import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, testAction, typeInput } from './actions'
 
 export interface SwapState {
   readonly independentField: Field
@@ -61,6 +61,9 @@ export default createReducer<SwapState>(initialState, builder =>
           [field]: { currencyId: currencyId }
         }
       }
+    })
+    .addCase(testAction, state => {
+      console.log('testAction is called...');
     })
     .addCase(switchCurrencies, state => {
       return {

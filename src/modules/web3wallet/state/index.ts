@@ -35,3 +35,4 @@ export default web3_store
 
 export type AppState = ReturnType<typeof web3_store.getState>
 export type AppDispatch = typeof web3_store.dispatch
+

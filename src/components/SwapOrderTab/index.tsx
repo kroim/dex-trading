@@ -335,3 +335,4 @@ export class Order extends React.Component<OrderComponentProps, State> {
 
     private isTypeSell = (type: string) => type === 'sell';
 }
+

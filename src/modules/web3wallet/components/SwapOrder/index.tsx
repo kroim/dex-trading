@@ -43,7 +43,8 @@ import {
   useDerivedSwapInfo,
   useSwapActionHandlers,
   useSwapState,
-  useDefaultsFromCurrentMarket
+  useDefaultsFromCurrentMarket,
+  // setSwapStateAny
 } from '../../state/swap/hooks'
 import {
   useExpertModeManager,
@@ -124,7 +125,6 @@ export default function SwapOrder({
 //       }
 //    }
 // }
-
   // onCurrencySelection(Field.INPUT, objSetter(fromToken, allTokens))
   //console.log(fromToken)
   
@@ -140,7 +140,7 @@ export default function SwapOrder({
     inputError: swapInputError
   } = useDerivedSwapInfo()
   
-  useDefaultsFromCurrentMarket(fromToken, toToken, Field.INPUT)
+  // setSwapStateAny(fromToken, toToken, Field.INPUT)
   // currencies[Field.OUTPUT] = toKey=='BNB'? toKey: objSetter(toToken, allTokens);
   // currencies[Field.INPUT] = fromKey=='BNB'? fromKey: objSetter(fromToken, allTokens);
   // console.log(currencyBalances);
@@ -312,7 +312,8 @@ export default function SwapOrder({
   // const [dismissedToken1] = useTokenWarningDismissal(chainId, currencies[Field.OUTPUT])
   // const showWarning =
   //   (!dismissedToken0 && !!currencies[Field.INPUT]) || (!dismissedToken1 && !!currencies[Field.OUTPUT])
-
+  
+  //console.log("=== from:", fromKey);
   const handleConfirmDismiss = useCallback(() => {
     setSwapState({ showConfirm: false, tradeToConfirm, attemptingTxn, swapErrorMessage, txHash })
     // if there was a tx hash, we want to clear the input

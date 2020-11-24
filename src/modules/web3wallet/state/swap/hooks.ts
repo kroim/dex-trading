@@ -275,7 +275,8 @@ export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrenc
 
   useEffect(() => {
     if (!chainId) return
-        
+    // console.log("--", inputCurrency)
+
     dispatch(
       replaceSwapState({
         typedValue: "0",
@@ -287,4 +288,15 @@ export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrenc
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, chainId])
+}
+
+export function setSwapStateAny(inputCurrency:string, outputCurrency:string, field: Field) {
+  console.log("--", inputCurrency)
+      replaceSwapState({
+        typedValue: "0",
+        field: field,
+        inputCurrencyId: inputCurrency,
+        outputCurrencyId: outputCurrency,
+        recipient: null
+      })    
 }

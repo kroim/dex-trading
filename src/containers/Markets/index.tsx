@@ -21,6 +21,8 @@ import {
     Ticker,
 } from '../../modules/public/markets';
 import { depthFetch } from '../../modules/public/orderBook';
+import { testAction } from '../../modules/web3wallet/state/swap/actions';
+// import { RecentTrades } from '../RecentTrades';
 
 interface ReduxProps {
     userData: User;
@@ -37,22 +39,26 @@ interface DispatchProps {
     depthFetch: typeof depthFetch;
     tickers: typeof marketsTickersFetch;
     setCurrentPrice: typeof setCurrentPrice;
+    
 }
 
 type Props = ReduxProps & DispatchProps & IntlProps;
 
-class MarketsContainer extends React.Component<Props> {
+class MarketsContainer extends React.Component<Props> {    
     private headers = [
         // this.props.intl.formatMessage({id: 'page.body.trade.header.markets.content.pair'}),
         // this.props.intl.formatMessage({id: 'page.body.trade.header.markets.content.price'}),
         // this.props.intl.formatMessage({id: 'page.body.trade.header.markets.content.change'}),
         'Pair', 'Balance Amount'
     ];
-
+    constructor(p){
+        super(p)        
+       // this. = React.createRef()
+    }
     public componentDidMount() {
         if (this.props.markets.length === 0) {
             this.props.tickers();
-        }
+        }        
     }
 
     public render() {
@@ -68,11 +74,14 @@ class MarketsContainer extends React.Component<Props> {
         );
     }
 
+    
+
     private markets = () => {
         const { currentMarket } = this.props;
         const key = currentMarket && currentMarket.name;
 
         return (
+            <div>
             <Markets
                 filters={false}
                 data={this.testAssetsData()}
@@ -82,7 +91,10 @@ class MarketsContainer extends React.Component<Props> {
                 headers={this.headers}
                 title={this.props.intl.formatMessage({id: 'custom.openOrders.assets'})}
                 filterPlaceholder={this.props.intl.formatMessage({ id: 'page.body.trade.header.markets.content.search'})}
-            />
+            >                
+            </Markets>            
+            </div>
+            
         );
     };
 
@@ -110,13 +122,14 @@ class MarketsContainer extends React.Component<Props> {
         const { markets, currentMarket } = this.props;
         const marketToSet = markets.find(el => el.name === index);
         this.props.setCurrentPrice(0);
-
+        console.log("-----handleOnSelect")
         if (marketToSet && (!currentMarket || currentMarket.id !== marketToSet.id)) {
             this.props.setCurrentMarket(marketToSet);
             if (!incrementalOrderBook()) {
               this.props.depthFetch(marketToSet);
             }
         }
+        // this.testFunc.current.getAlert()
     };
 }
 
@@ -134,6 +147,7 @@ const mapDispatchToProps: MapDispatchToPropsFunction<DispatchProps, {}> =
         depthFetch: (market: Market) => dispatch(depthFetch(market)),
         tickers: () => dispatch(marketsTickersFetch()),
         setCurrentPrice: payload => dispatch(setCurrentPrice(payload)),
+        testAction: payload => dispatch(testAction(payload))
     });
 
 export const MarketsComponent = injectIntl(connect(mapStateToProps, mapDispatchToProps)(MarketsContainer)) as any;

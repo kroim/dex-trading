@@ -16,3 +16,5 @@ export const replaceSwapState = createAction<{
   recipient: string | null
 }>('replaceSwapState')
 export const setRecipient = createAction<{ recipient: string | null }>('setRecipient')
+
+export const testAction = createAction<{ id: string | null }>('testActionType')
