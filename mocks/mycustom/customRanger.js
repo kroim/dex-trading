@@ -76,7 +76,7 @@ const customRanger = {
         return res_streams;
     },
     getTikcer: async function (pairAddress) {
-        console.log(" === getTicker === ".magenta);
+        // console.log(" === getTicker === ".magenta);
         const transactions = {}
         try {
             let result = await client.query({

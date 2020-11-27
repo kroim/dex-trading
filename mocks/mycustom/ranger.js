@@ -1,5 +1,6 @@
 const WebSocket = require('ws');
 const Helpers = require('./helpers')
+const customRanger = require('./customRanger')();
 
 const isSubscribed = (streams, routingKey) => {
     for (const i in streams) {
@@ -12,10 +13,12 @@ const isSubscribed = (streams, routingKey) => {
 }
 
 const sendEvent = (ws, routingKey, event) => {
+    console.log("RoutingKey: ".red, routingKey);
     try {
         if (isSubscribed(ws.streams, routingKey)) {
             const payload = {};
             payload[routingKey] = event;
+            console.log("[" + new Date().toISOString() + "]payload[routingKey:" + routingKey + "]: ".magenta, payload[routingKey]);
             ws.send(JSON.stringify(payload));
         }
     } catch (error) {
@@ -23,8 +26,17 @@ const sendEvent = (ws, routingKey, event) => {
     }
 }
 
-const tickersMock = (ws, markets) => () => {
-    sendEvent(ws, "global.tickers", Helpers.getTickers(markets));
+// const tickersMock = (ws, markets) => () => {
+//     sendEvent(ws, "global.tickers", Helpers.getTickers(markets));
+// };
+const tickersMock = (ws) => async () => {
+    let marketId = customRanger.getMarketId(ws.streams);
+    let ticker = await customRanger.getTikcer(marketId);
+    let pairTicker = {
+        "global.tickers": ticker
+    }
+    console.log("Ticker: ".red, pairTicker);
+    ws.send(JSON.stringify(pairTicker));
 };
 
 const balancesMock = (ws) => () => {
@@ -47,6 +59,7 @@ const orderBookSnapshotMock = (ws, marketId) => () => {
             console.log(`orderBookSnapshotMock sending: ${marketId}`);
             const payload = {};
             payload[`${marketId}.ob-snap`] = Helpers.getDepth(ws.sequences[marketId]);
+            console.log("[" + new Date().toISOString() + "]payload: ".magenta, payload[`${marketId}.ob-snap`])
             ws.send(JSON.stringify(payload));
         }
     } catch (error) {
@@ -94,13 +107,14 @@ const kLine = (time, period) => {
     const low = Math.min(open, close) - delta;
     const volume = timeToVolume(time, periodInSeconds);
 
-    return [roundedTime, open, high, low, close, volume].map(String);
+    return [roundedTime, open, high, low, close, volume].map().toString()
 }
 
 let tradeIndex = 100000;
 let orderIndex = 100;
 
-const matchedTradesMock = (ws, marketId) => {
+const matchedTradesMock = (ws) => {
+    let marketId = customRanger.getMarketId(ws.streams);
     let kind = "bid";
     let price = 0.1;
     let volume = 1000;
@@ -132,7 +146,7 @@ const matchedTradesMock = (ws, marketId) => {
             "remaining_volume": volume,
             "origin_volume": volume,
             "executed_volume": executedVolume,
-            "side": takerType, 
+            "side": takerType,
             "created_at": at,
             "updated_at": at + 1,
             "order_type": orderType,
@@ -177,21 +191,27 @@ const matchedTradesMock = (ws, marketId) => {
     }
 };
 
-const klinesMock = (ws, marketId) => () => {
-    let at = parseInt(Date.now() / 1000);
+// const klinesMock = (ws, marketId) => () => {
+//     let at = parseInt(Date.now() / 1000);
 
-    sendEvent(ws, `${marketId}.kline-1m`, kLine(at, 1));
-    sendEvent(ws, `${marketId}.kline-5m`, kLine(at, 5));
-    sendEvent(ws, `${marketId}.kline-15m`, kLine(at, 15));
-    sendEvent(ws, `${marketId}.kline-30m`, kLine(at, 30));
-    sendEvent(ws, `${marketId}.kline-1h`, kLine(at, 60));
-    sendEvent(ws, `${marketId}.kline-2h`, kLine(at, 120));
-    sendEvent(ws, `${marketId}.kline-4h`, kLine(at, 240));
-    sendEvent(ws, `${marketId}.kline-6h`, kLine(at, 360));
-    sendEvent(ws, `${marketId}.kline-12h`, kLine(at, 720));
-    sendEvent(ws, `${marketId}.kline-1d`, kLine(at, 1440));
-    sendEvent(ws, `${marketId}.kline-3d`, kLine(at, 4320));
-    sendEvent(ws, `${marketId}.kline-1w`, kLine(at, 10080));
+//     sendEvent(ws, `${marketId}.kline-1m`, kLine(at, 1));
+//     sendEvent(ws, `${marketId}.kline-5m`, kLine(at, 5));
+//     sendEvent(ws, `${marketId}.kline-15m`, kLine(at, 15));
+//     sendEvent(ws, `${marketId}.kline-30m`, kLine(at, 30));
+//     sendEvent(ws, `${marketId}.kline-1h`, kLine(at, 60));
+//     sendEvent(ws, `${marketId}.kline-2h`, kLine(at, 120));
+//     sendEvent(ws, `${marketId}.kline-4h`, kLine(at, 240));
+//     sendEvent(ws, `${marketId}.kline-6h`, kLine(at, 360));
+//     sendEvent(ws, `${marketId}.kline-12h`, kLine(at, 720));
+//     sendEvent(ws, `${marketId}.kline-1d`, kLine(at, 1440));
+//     sendEvent(ws, `${marketId}.kline-3d`, kLine(at, 4320));
+//     sendEvent(ws, `${marketId}.kline-1w`, kLine(at, 10080));
+// };
+const klinesMock = (ws) => async () => {
+    const [pairAddress, period] = customRanger.getKLineParams(ws.streams);
+    let kLineItem = await customRanger.getChartTrades(pairAddress, period);
+    console.log("kLineItem: ".red, kLineItem);
+    ws.send(JSON.stringify(kLineItem));
 };
 class RangerMock {
     constructor(port, markets) {
@@ -221,16 +241,21 @@ class RangerMock {
 
         console.log(`Ranger: connection accepted, url: ${request.url}`);
         this.subscribe(ws, Helpers.getStreamsFromUrl(request.url));
-        ws.timers.push(setInterval(tickersMock(ws, this.markets), 3000));
-        // ws.timers.push(setInterval(balancesMock(ws), 3000));
-        this.markets.forEach((name) => {
-            let { baseUnit, quoteUnit, marketId } = Helpers.getMarketInfos(name);
-            ws.timers.push(setInterval(orderBookIncrementMock(ws, marketId), 200));
-            ws.timers.push(setInterval(orderBookUpdateMock(ws, marketId), 2000));
-            ws.timers.push(setInterval(matchedTradesMock(ws, marketId), 10000));
-            ws.timers.push(setInterval(klinesMock(ws, marketId), 2500));
-        });
-        ws.timers.push(setTimeout(() => {sendEvent(ws, "deposit_address", { currency: "xrp", address: "a4E49HU6CTHyYMmsYt3F1ar1q5W89t3hfQ?dt=1" })}, 10000));
+        // // original
+        // // ws.timers.push(setInterval(tickersMock(ws, this.markets), 3000));
+        ws.timers.push(setInterval(balancesMock(ws), 3000));
+        // this.markets.forEach((name) => {
+        //     let { baseUnit, quoteUnit, marketId } = Helpers.getMarketInfos(name);
+        //     ws.timers.push(setInterval(orderBookIncrementMock(ws, marketId), 200));
+        //     ws.timers.push(setInterval(orderBookUpdateMock(ws, marketId), 2000));
+        // //   ws.timers.push(setInterval(matchedTradesMock(ws, marketId), 10000));
+        // //   ws.timers.push(setInterval(klinesMock(ws, marketId), 2500));
+        // });
+        // ws.timers.push(setTimeout(() => {sendEvent(ws, "deposit_address", { currency: "xrp", address: "a4E49HU6CTHyYMmsYt3F1ar1q5W89t3hfQ?dt=1" })}, 10000));
+        
+        ws.timers.push(setInterval(tickersMock(ws), 3000));
+        // ws.timers.push(setInterval(matchedTradesMock(ws), 10000));
+        ws.timers.push(setInterval(klinesMock(ws), 25000));
     }
     closeConnection() {
         console.log('Ranger: connection closed');
@@ -265,12 +290,18 @@ class RangerMock {
 
     }
     subscribe(ws, streams) {
+        console.log("streams: ".magenta, streams);
+        let marketId = customRanger.getMarketId(streams);
+        streams = customRanger.replaceTickerId(marketId, streams);
         ws.streams = Helpers.unique(ws.streams.concat(streams));
-        console.log(`subcribed to : ${ws.streams}`)
-        this.markets.forEach((name) => {
-            let { marketId } = Helpers.getMarketInfos(name);
-            orderBookSnapshotMock(ws, marketId)();
-        });
+        ws.streams = customRanger.replaceTickerId(marketId, ws.streams);
+        console.log("subcribed to ws.streams: ".magenta, marketId, ws.streams);
+        customRanger.getTikcer(marketId);
+        // orderBookSnapshotMock(ws, marketId)();
+        // this.markets.forEach((name) => {
+        // let { marketId } = Helpers.getMarketInfos(name);
+        // orderBookSnapshotMock(ws, marketId)();
+        // });
         ws.send(JSON.stringify({ "success": { "message": "subscribed", "streams": ws.streams } }))
     }
     unsubscribe(ws, streams) {

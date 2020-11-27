@@ -1,4 +1,4 @@
-let JsonRpcProvider = require('@ethersproject/providers');
+let { JsonRpcProvider } = require('@ethersproject/providers');
 const { client } = require('./apollo/client');
 const queries = require('./apollo/queries')();
 const k_functions = require('./k_functions')();
@@ -202,14 +202,12 @@ const apiConfig = {
     let pairAddress = pathParam.match(new RegExp("markets/" + "(.*)" + "/k-line"))[1];
     console.log(pairAddress.green, period, time_from, time_to);
     const transactions = {}
-    let skip = 0; let count = 1000;
     try {
       let result = await client.query({
         query: queries.GET_SWAP_TRANSACTIONS,
         variables: {
-          allPairs: [pairAddress],
-          count,
-          skip
+          pairAddr: pairAddress,
+          time_to: time_to
         },
         fetchPolicy: 'no-cache'
       })
@@ -243,31 +241,60 @@ const apiConfig = {
     }
     // console.log("Swap Transaction: ", transactions.swaps.length);
     data.sort(k_functions.compareTimestampAccent); // accent
-    // console.log("Data: ", data);
+    let p_printIndex = 0;
+    for (let p_i = 0; p_i < data.length; p_i++) {
+      if (data[p_i].timestamp > time_from && data[p_i].timestamp < (time_from + 180)) {
+        console.log(data[p_i]);
+        p_printIndex++;
+      }
+      if (p_printIndex > 10) break;
+    }
     let chartData = [];
     if (data.length > 0 && data[0].timestamp > time_to) {
       console.log("   === No Data ===   ".red);
       return { no_data: true, nextTime: time_to };
     }
     let currentPeriod = time_from;
-    let nextPeriod = time_from + period * 60;
+    if (period < 60) period = 60;
+    let nextPeriod = parseInt(new Date(time_from * 1000).setMinutes(new Date(time_from * 1000).getMinutes() + period) / 1000);
+    // console.log("currentPeriod, nextPeriod: ".red, currentPeriod, nextPeriod);
     let periodData = [];
+    let periodProcess = function (period_data, p_time) {
+      if (period_data.length > 0) {
+        let period_item = [1605968100, 0.0, 0.0, 0.0, 0.0, 0.0]; // timestamp, open, high, low, close, volume
+        period_item[0] = p_time;
+        period_item[1] = period_data[0].price;
+        period_item[4] = period_data[periodData.length - 1].price;
+        for (let j = 0; j < period_data.length; j++) {
+          period_item[5] += period_data[j].amount;
+        }
+        period_data.sort(k_functions.comparePriceAccent);  // accent
+        period_item[2] = period_data[period_data.length - 1].price;
+        period_item[3] = period_data[0].price;
+        return period_item
+      }
+    }
+    let printIndex = 0;
     for (let i = 0; i < data.length; i++) {
-      if (data[i].timestamp > time_to) break;
+      if (data[i].timestamp > time_to) {
+        if (periodData.length > 1) {
+          let chart_item_final = periodProcess(periodData, currentPeriod);
+          chartData.push(chart_item_final);
+        }
+        break;
+      }
       if (data[i].timestamp > nextPeriod) {
         currentPeriod = nextPeriod;
-        nextPeriod = nextPeriod + period * 60;
+        let tmp = nextPeriod;
+        nextPeriod = parseInt(new Date(tmp * 1000).setMinutes(new Date(tmp * 1000).getMinutes() + period) / 1000);
         if (periodData.length > 0) {
-          let chart_item = [1605968100, 0.0, 0.0, 0.0, 0.0, 0.0]; // timestamp, open, high, low, close, volume
-          chart_item[0] = currentPeriod;
-          chart_item[1] = periodData[0].price;
-          chart_item[4] = periodData[periodData.length - 1].price;
-          for (let j = 0; j < periodData.length; j++) {
-            chart_item[5] += periodData[j].amount;
-          }
-          periodData.sort(k_functions.comparePriceAccent);  // accent
-          chart_item[2] = periodData[periodData.length - 1].price;
-          chart_item[3] = periodData[0].price;
+          // if (printIndex < 3) {
+          // console.log("currentPeriod, nextPeriod: ".red, currentPeriod, nextPeriod);
+          // console.log("PeriodData: ".red, periodData);
+          // }
+          let chart_item = periodProcess(periodData, currentPeriod);
+          // if (printIndex < 3) console.log("ChartItem: ".red, chart_item);
+          // printIndex ++;
           chartData.push(chart_item);
         }
         periodData = [];
