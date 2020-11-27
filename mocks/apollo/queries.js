@@ -11,18 +11,6 @@ const queries = {
       name
       totalLiquidity
     }
-    asName: tokens(where: { name_contains: $value }, orderBy: totalLiquidity, orderDirection: desc) {
-      id
-      symbol
-      name
-      totalLiquidity
-    }
-    asAddress: tokens(where: { id: $id }, orderBy: totalLiquidity, orderDirection: desc) {
-      id
-      symbol
-      name
-      totalLiquidity
-    }
   }
 `,
   PAIR_SEARCH: gql`
@@ -41,19 +29,6 @@ query pairs($tokens: [Bytes]!, $id: String) {
     }
   }
   as1: pairs(where: { token1_in: $tokens }) {
-    id
-    token0 {
-      id
-      symbol
-      name
-    }
-    token1 {
-      id
-      symbol
-      name
-    }
-  }
-  asAddress: pairs(where: { id: $id }) {
     id
     token0 {
       id
@@ -150,8 +125,8 @@ query pairs($tokens: [Bytes]!, $id: String) {
   }
 `,
   GET_SWAP_TRANSACTIONS: gql`
-  query($allPairs: [Bytes]!, $count: Int!, $skip: Int!) {
-    swaps(first: 1000, skip: $skip, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
+  query($pairAddr: Bytes!, $time_to: Int!) {
+    swaps(first: 1000, where: {timestamp_lte: $time_to, pair: $pairAddr}, orderBy: timestamp, orderDirection: desc) {
       transaction {
         id
         timestamp
