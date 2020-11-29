@@ -147,10 +147,12 @@ export function useDerivedMintInfo(
 
   if (currencyAAmount && currencyBalances?.[Field.CURRENCY_A]?.lessThan(currencyAAmount)) {
     error = 'Insufficient ' + currencies[Field.CURRENCY_A]?.symbol + ' balance'
+    // error = 'Insufficient balance'
   }
 
   if (currencyBAmount && currencyBalances?.[Field.CURRENCY_B]?.lessThan(currencyBAmount)) {
     error = 'Insufficient ' + currencies[Field.CURRENCY_B]?.symbol + ' balance'
+    // error = 'Insufficient balance'
   }
 
   return {
