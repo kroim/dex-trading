@@ -48,9 +48,6 @@ export const UpdateMarketPairFroward = forwardRef((props, ref) => {
   // with whatever you return from the callback passed
   // as the second argument
   useImperativeHandle(ref, () => ({
-
-    
-  
     setMarketPair(market) {
       //console.log(market)
       //console.log(allTokens)
