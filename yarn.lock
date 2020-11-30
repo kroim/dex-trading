@@ -1129,6 +1129,11 @@
   resolved "https://registry.yarnpkg.com/@bscswap/contracts/-/contracts-1.0.1.tgz#396b65ff26af746f86e991ab0dce0b77724e5974"
   integrity sha512-UIDqa9bTjM297ThqEAiKp5gvCC6HkdHoL0/JdE/t4wCZiJmWTyhul0FtRLGc28dQ51PcliZeiQQOqyGNgZ4Pnw==
 
+"@bscswap/contracts@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@bscswap/contracts/-/contracts-1.0.2.tgz#c6d639a43018bec808be02004c6a103b923fd604"
+  integrity sha512-/tJ/GviHfCqzGAkO2W2YkDkWNgcySueHfjlqhbXAA1EmOAhIqHr0IbT7PJpE2/dkegEnuv3moCCl2hndK8dHRA==
+
 "@bscswap/sdk@3.0.14":
   version "3.0.14"
   resolved "https://registry.yarnpkg.com/@bscswap/sdk/-/sdk-3.0.14.tgz#30545d88444de6d9ca6a0c846b7672061885e943"
@@ -10759,6 +10764,11 @@ loader-utils@1.2.3, loader-utils@^1.0.2, loader-utils@^1.1.0, loader-utils@^1.2.
     emojis-list "^2.0.0"
     json5 "^1.0.1"
 
+local-storage@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/local-storage/-/local-storage-2.0.0.tgz#748b7d041b197f46f3ec7393640851c175b64db8"
+  integrity sha512-/0sRoeijw7yr/igbVVygDuq6dlYCmtsuTmmpnweVlVtl/s10pf5BCq8LWBxW/AMyFJ3MhMUuggMZiYlx6qr9tw==
+
 locate-path@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/locate-path/-/locate-path-2.0.0.tgz#2b568b265eec944c6d9c0de9c3dbbbca0354cd8e"
@@ -16717,6 +16727,19 @@ unist-util-visit@^1.1.0:
   resolved "https://registry.yarnpkg.com/unist-util-visit/-/unist-util-visit-1.4.1.tgz#4724aaa8486e6ee6e26d7ff3c8685960d560b1e3"
   dependencies:
     unist-util-visit-parents "^2.0.0"
+
+"uniswap-v2-sdk@npm:@bscswap/sdk@^3.0.14":
+  version "3.0.15"
+  resolved "https://registry.yarnpkg.com/@bscswap/sdk/-/sdk-3.0.15.tgz#3d0d63b92471d16e24257156a1b8c241582ccdad"
+  integrity sha512-DSslMJyAlL3vUK+5Z3e6p2p0avIbHqj36ym2dCXNJ6G78sP79F4i51ivyFsWuW5n3LPesvi2OPO5l3zyWL9IgQ==
+  dependencies:
+    "@bscswap/contracts" "1.0.2"
+    big.js "^5.2.2"
+    decimal.js-light "^2.5.0"
+    jsbi "^3.1.1"
+    tiny-invariant "^1.1.0"
+    tiny-warning "^1.0.3"
+    toformat "^2.0.0"
 
 universalify@^0.1.0:
   version "0.1.2"
