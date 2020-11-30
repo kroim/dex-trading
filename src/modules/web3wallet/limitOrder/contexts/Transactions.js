@@ -146,7 +146,6 @@ export function useTransactionAdder() {
   const { chainId } = useWeb3React()
 
   const [, { add }] = useTransactionsContext()
-  console.log('useTransactionsContext', add)
  
   return useCallback(
     (response, customData = {}) => {

@@ -40,6 +40,7 @@ export default function TokenLogo({ address, size = '1rem', ...rest }) {
   if (address === 'BNB') {
     return <StyledBnbLogo size={size} />
   } else if (!error && !BAD_IMAGES[address]) {
+    console.log("TokenLogo Address: ", address);
     path = TOKEN_ICON_API(address.toLowerCase())
   } else {
     return (
