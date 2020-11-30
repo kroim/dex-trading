@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 import { useWeb3React } from '@web3-react/core'
-import { ChainId } from 'uniswap-v2-sdk'
+// import { ChainId } from 'uniswap-v2-sdk'
+import { ChainId } from '@bscswap/sdk'
 
 import { isAddress, getTokenName, getTokenSymbol, getTokenDecimals, safeAccess } from '../utils'
 import { DEFAULT_TOKENS_EXTRA, DISABLED_TOKENS } from './DefaultTokens'

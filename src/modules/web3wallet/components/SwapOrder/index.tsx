@@ -34,7 +34,7 @@ import useWrapCallback, { WrapType } from '../../hooks/useWrapCallback'
 //import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
 import { useWalletModalToggle } from '../../state/application/hooks'
 // import { useAllLists } from '../../state/lists/hooks'
-
+import ExchangePage from '../../limitOrder/components/ExchangePage'
 
 
 import { Field } from '../../state/swap/actions'
@@ -316,7 +316,7 @@ export const SwapOrderWithSwapInput = forwardRef(({ fromKey, fromToken, toKey, t
     console.log("number", index)
     k_setOrderType(index);
   })
-  
+
   return (
     <>
       <div className='cr-order-form'>
@@ -327,7 +327,9 @@ export const SwapOrderWithSwapInput = forwardRef(({ fromKey, fromToken, toKey, t
           <DropdownComponent list={orderTypes} onSelect={handleOrderTypeChange} placeholder="" />
         </div>
         {k_orderType === 0 ? (
-          <div></div>
+          <div>
+            <ExchangePage initialCurrency={currencies[Field.INPUT]}/>
+          </div>
         ) : (
             <div>
               <ConfirmSwapModal

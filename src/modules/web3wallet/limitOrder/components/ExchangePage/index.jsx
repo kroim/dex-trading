@@ -6,7 +6,7 @@ import * as ls from 'local-storage'
 import { ethers } from 'ethers'
 import styled from 'styled-components'
 
-import { Button } from '../../theme'
+import { Button } from '../../../theme'
 import CurrencyInputPanel from '../CurrencyInputPanel'
 import OversizedPanel from '../OversizedPanel'
 import ArrowDown from '../../assets/svg/SVGArrowDown'
@@ -169,7 +169,7 @@ function swapStateReducer(state, action) {
     case 'FLIP_RATE_OP': {
       const { rateOp, inputRateValue } = state
 
-      const rate = inputRateValue ? ethers.utils.bigNumberify(ethers.utils.parseUnits(inputRateValue, 18)) : undefined
+      const rate = inputRateValue ? ethers.BigNumber.from(ethers.utils.parseUnits(inputRateValue, 18)) : undefined
       const flipped = rate ? amountFormatter(flipRate(rate), 18, 18, false) : ''
 
       return {
@@ -232,20 +232,20 @@ function applyExchangeRateTo(inputValue, exchangeRate, inputDecimals, outputDeci
       (inputDecimals || inputDecimals === 0) &&
       (outputDecimals || outputDecimals === 0)
     ) {
-      const factor = ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(18))
+      const factor = ethers.BigNumber.from(10).pow(ethers.BigNumber.from(18))
 
       if (invert) {
         return inputValue
           .mul(factor)
           .div(exchangeRate)
-          .mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(outputDecimals)))
-          .div(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(inputDecimals)))
+          .mul(ethers.BigNumber.from(10).pow(ethers.BigNumber.from(outputDecimals)))
+          .div(ethers.BigNumber.from(10).pow(ethers.BigNumber.from(inputDecimals)))
       } else {
         return exchangeRate
           .mul(inputValue)
           .div(factor)
-          .mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(outputDecimals)))
-          .div(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(inputDecimals)))
+          .mul(ethers.BigNumber.from(10).pow(ethers.BigNumber.from(outputDecimals)))
+          .div(ethers.BigNumber.from(10).pow(ethers.BigNumber.from(inputDecimals)))
       }
     }
   } catch { }
@@ -254,7 +254,7 @@ function applyExchangeRateTo(inputValue, exchangeRate, inputDecimals, outputDeci
 function exchangeRateDiff(exchangeRateA, exchangeRateB) {
   try {
     if (exchangeRateA && exchangeRateB) {
-      const factor = ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(18))
+      const factor = ethers.BigNumber.from(10).pow(ethers.BigNumber.from(18))
       const deltaRaw = factor.mul(exchangeRateA).div(exchangeRateB)
 
       if (false && deltaRaw < factor) {
@@ -269,7 +269,7 @@ function exchangeRateDiff(exchangeRateA, exchangeRateB) {
 function flipRate(rate) {
   try {
     if (rate) {
-      const factor = ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(18))
+      const factor = ethers.BigNumber.from(10).pow(ethers.BigNumber.from(18))
       return factor.mul(factor).div(rate)
     }
   } catch { }
@@ -281,7 +281,7 @@ function safeParseUnits(number, units) {
   } catch {
     const margin = units * 8
     const decimals = ethers.utils.parseUnits(number, margin)
-    return decimals.div(ethers.utils.bigNumberify(10).pow(margin - units))
+    return decimals.div(ethers.BigNumber.from(10).pow(margin - units))
   }
 }
 
@@ -337,11 +337,11 @@ export default function ExchangePage({ initialCurrency }) {
   )
 
   if (bestTradeExactIn) {
-    inputValue = ethers.utils.bigNumberify(
+    inputValue = ethers.BigNumber.from(
       ethers.utils.parseUnits(bestTradeExactIn.inputAmount.toExact(), inputDecimals)
     )
   } else if (independentField === INPUT && independentValue) {
-    inputValue = ethers.utils.bigNumberify(ethers.utils.parseUnits(independentValue, inputDecimals))
+    inputValue = ethers.BigNumber.from(ethers.utils.parseUnits(independentValue, inputDecimals))
   }
 
   switch (independentField) {
@@ -419,13 +419,11 @@ export default function ExchangePage({ initialCurrency }) {
     realInputValue &&
     getExchangeRate(realInputValue, inputDecimals, outputValueParsed, outputDecimals, rateOp === RATE_OP_DIV)
 
-  const limitSlippage = ethers.utils
-    .bigNumberify(SLIPPAGE_WARNING)
-    .mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(16)))
+  const limitSlippage = ethers.BigNumber.from(SLIPPAGE_WARNING)
+    .mul(ethers.BigNumber.from(10).pow(ethers.BigNumber.from(16)))
 
-  const limitExecution = ethers.utils
-    .bigNumberify(EXECUTION_WARNING)
-    .mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(16)))
+  const limitExecution = ethers.BigNumber.from(EXECUTION_WARNING)
+    .mul(ethers.BigNumber.from(10).pow(ethers.BigNumber.from(16)))
 
   // validate + parse independent value
   const [independentError, setIndependentError] = useState()
@@ -497,7 +495,7 @@ export default function ExchangePage({ initialCurrency }) {
       ? exchangeRateDiff(inverseRate, exchangeRateInverted)
       : exchangeRateDiff(rateRaw, exchangeRate)
 
-  const highSlippageWarning = rateDelta && rateDelta.lt(ethers.utils.bigNumberify(0).sub(limitSlippage))
+  const highSlippageWarning = rateDelta && rateDelta.lt(ethers.BigNumber.from(0).sub(limitSlippage))
   const rateDeltaFormatted = amountFormatter(rateDelta, 16, 2, true)
 
   const isValid = outputValueParsed && !inputError && !independentError

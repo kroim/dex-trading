@@ -17,8 +17,8 @@ export default function Provider({ children }) {
     fetch("https://gasbsc.justliquidity.org/").then((res) => {
       res.json().then(gasInfo => {
         try {
-          // setGasPrice(ethers.utils.bigNumberify(gasInfo.data.fast))
-          setGasPrice(ethers.utils.bigNumberify(gasInfo.fast).mul(1000000000))
+          // setGasPrice(ethers.BigNumber.from(gasInfo.data.fast))
+          setGasPrice(ethers.BigNumber.from(gasInfo.fast).mul(1000000000))
         } catch {}
       })
     })

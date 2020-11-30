@@ -1,4 +1,4 @@
-import { Trade, TokenAmount, Pair, CurrencyAmount, Token, ETHER, WETH, JSBI } from 'uniswap-v2-sdk'
+import { Trade, TokenAmount, Pair, CurrencyAmount, Token, ETHER, WETH, JSBI } from '@bscswap/sdk'
 import flatMap from 'lodash.flatmap'
 import { useMemo } from 'react'
 import { Interface } from '@ethersproject/abi'
@@ -9,7 +9,7 @@ import PAIR_ABI from '../constants/abis/pair.json'
 import { useActiveWeb3React } from './index'
 import { useTokenDetails } from '../contexts/Tokens'
 
-import { useMultipleContractSingleData } from '../state/multicall/hooks'
+import { useMultipleContractSingleData } from '../../state/multicall/hooks'
 
 export const PairState = {
   LOADING: 'LOADING',

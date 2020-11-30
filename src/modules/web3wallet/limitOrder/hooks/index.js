@@ -14,7 +14,7 @@ import {
 } from '../utils'
 import copy from 'copy-to-clipboard'
 import { NetworkContextName, MULTICALL_NETWORKS } from '../constants'
-import { injected } from '../connectors'
+import { injected } from '../../connectors'
 
 // modified from https://usehooks.com/useDebounce/
 export function useDebounce(value, delay) {

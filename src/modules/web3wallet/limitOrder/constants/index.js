@@ -1,8 +1,9 @@
-import { Token, ChainId, WETH } from 'uniswap-v2-sdk'
+// import { Token, ChainId, WETH } from 'uniswap-v2-sdk'
+import { Token, ChainId, WETH } from '@bscswap/sdk'
 import { ethers } from 'ethers'
 
 // @TODO: we should test fortmatic, portis, walletconnect, walletlink before adding
-import { injected, fortmatic } from '../connectors'
+import { injected, fortmatic } from '../../connectors'
 
 export const BNB_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
 
@@ -59,7 +60,7 @@ export const UNISWAPV2_ADDRESSES = {
   }
 }
 
-export const GENERIC_GAS_LIMIT_ORDER_EXECUTE = ethers.utils.bigNumberify(400000)
+export const GENERIC_GAS_LIMIT_ORDER_EXECUTE = ethers.BigNumber.from(400000)
 
 export const ROUTER_ADDRESS = '0xbd67d157502A23309Db761c41965600c2Ec788b2'
 
