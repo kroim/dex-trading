@@ -46,7 +46,7 @@ const InputRow = styled.div`
   ${({ theme }) => theme.flexRowNoWrap}
   align-items: center;
 
-  padding: 0.25rem 0.85rem 0.75rem;
+  padding: 0.25rem 0.85rem 0.5rem;
 `
 
 const Input = styled(BorderlessInput)`
@@ -126,7 +126,7 @@ const LabelRow = styled.div`
   color: ${({ theme }) => theme.doveGray};
   font-size: 0.75rem;
   line-height: 1rem;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   span:hover {
     cursor: pointer;
     color: ${({ theme }) => darken(0.2, theme.doveGray)};

@@ -91,7 +91,7 @@ const ExchangeRate = styled.span`
 const Flex = styled.div`
   display: flex;
   justify-content: center;
-  padding: 2rem;
+  padding: 1rem;
 
   button {
     max-width: 20rem;
@@ -627,20 +627,6 @@ export default function ExchangePage({ initialCurrency }) {
         value={inputValueFormatted}
         errorMessage={inputError ? inputError : independentField === INPUT ? independentError : ''}
       />
-      <OversizedPanel>
-        <DownArrowBackground>
-          <RateIcon
-            RateIconSVG={rateOp === RATE_OP_MULT ? SVGClose : SVGDiv}
-            icon={rateOp}
-            onClick={() => {
-              dispatchSwapState({ type: 'FLIP_RATE_OP' })
-            }}
-            clickable
-            alt="swap"
-            active={isValid}
-          />
-        </DownArrowBackground>
-      </OversizedPanel>
       <CurrencyInputPanel
         title={t('Price')}
         showCurrencySelector={false}
@@ -657,49 +643,6 @@ export default function ExchangePage({ initialCurrency }) {
           dispatchSwapState({ type: 'UPDATE_INDEPENDENT', payload: { value: rateValue, field: RATE } })
         }}
       />
-      <OversizedPanel>
-        <ExchangeRateWrapper
-          onClick={() => {
-            setInverted(inverted => !inverted)
-          }}
-        >
-          <ExchangeRate>
-            {/* Execution rate at {gasPrice ? amountFormatter(gasPrice, 9, 0, false) : '...'} GWEI */}
-            Beta Version JustLiquidity Limit Orders<br /> for SwapLiquidity and PancakeSwap
-          </ExchangeRate>
-          {executionRateNegative ? (
-            'Never executes'
-          ) : rateOp !== RATE_OP_DIV ? (
-            <span>
-              {executionRate
-                ? `1 ${inputSymbol} = ${amountFormatter(executionRate, 18, 4, false)} ${outputSymbol}`
-                : ' - '}
-            </span>
-          ) : rateOp !== RATE_OP_DIV ? (
-            <span>
-              {executionRate
-                ? `1 ${inputSymbol} = ${amountFormatter(executionRate, 18, 4, false)} ${outputSymbol}`
-                : ' - '}
-            </span>
-          ) : (
-                  <span>
-                    {executionRate
-                      ? `1 ${outputSymbol} = ${amountFormatter(executionRate, 18, 4, false)} ${inputSymbol}`
-                      : ' - '}
-                  </span>
-                )}
-        </ExchangeRateWrapper>
-        <DownArrowBackground>
-          <DownArrow
-            onClick={() => {
-              dispatchSwapState({ type: 'FLIP_INDEPENDENT' })
-            }}
-            clickable
-            alt="swap"
-            active={isValid}
-          />
-        </DownArrowBackground>
-      </OversizedPanel>
       <CurrencyInputPanel
         title={t('Total')}
         allBalances={allBalances}
@@ -718,28 +661,6 @@ export default function ExchangePage({ initialCurrency }) {
         errorMessage={independentField === OUTPUT ? independentError : ''}
         disableUnlock
       />
-      <OversizedPanel hideBottom>
-        <ExchangeRateWrapper
-          onClick={() => {
-            setInverted(inverted => !inverted)
-          }}
-        >
-          <ExchangeRate>{t('exchangeRate')}</ExchangeRate>
-          {inverted ? (
-            <span>
-              {exchangeRate
-                ? `1 ${inputSymbol} = ${amountFormatter(exchangeRate, 18, 4, false)} ${outputSymbol}`
-                : ' - '}
-            </span>
-          ) : (
-              <span>
-                {exchangeRate
-                  ? `1 ${outputSymbol} = ${amountFormatter(exchangeRateInverted, 18, 4, false)} ${inputSymbol}`
-                  : ' - '}
-              </span>
-            )}
-        </ExchangeRateWrapper>
-      </OversizedPanel>
       <Flex>
         <Button
           disabled={!account || !isValid || customSlippageError === 'invalid'}
