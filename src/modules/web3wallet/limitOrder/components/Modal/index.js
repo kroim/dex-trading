@@ -44,7 +44,7 @@ const StyledDialogContent = styled(FilteredDialogContent)`
       `}
     ${({ theme }) => theme.mediaWidth.upToMedium`max-height: 65vh;`}
     ${({ theme }) => theme.mediaWidth.upToSmall`max-height: 80vh;`}
-    display: flex;
+    display: flex !important;
     overflow: hidden;
     border-radius: 10px;
   }
