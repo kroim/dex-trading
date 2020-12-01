@@ -8,10 +8,10 @@ import styled from 'styled-components'
 
 import { Button } from '../../../theme'
 import CurrencyInputPanel from '../CurrencyInputPanel'
-import OversizedPanel from '../OversizedPanel'
-import ArrowDown from '../../assets/svg/SVGArrowDown'
-import SVGClose from '../../assets/svg/SVGClose'
-import SVGDiv from '../../assets/svg/SVGDiv'
+// import OversizedPanel from '../OversizedPanel'
+// import ArrowDown from '../../assets/svg/SVGArrowDown'
+// import SVGClose from '../../assets/svg/SVGClose'
+// import SVGDiv from '../../assets/svg/SVGDiv'
 import { amountFormatter } from '../../utils'
 import { useUniswapExContract } from '../../hooks'
 import { useTokenDetails } from '../../contexts/Tokens'
@@ -43,50 +43,50 @@ const EXECUTION_WARNING = '3' // [10+%
 const RATE_OP_MULT = 'x'
 const RATE_OP_DIV = '/'
 
-const DownArrowBackground = styled.div`
-  ${({ theme }) => theme.flexRowNoWrap}
-  justify-content: center;
-  align-items: center;
-`
+// const DownArrowBackground = styled.div`
+//   ${({ theme }) => theme.flexRowNoWrap}
+//   justify-content: center;
+//   align-items: center;
+// `
 
-const WrappedArrowDown = ({ clickable, active, ...rest }) => <ArrowDown {...rest} />
-const DownArrow = styled(WrappedArrowDown)`
-  color: ${({ theme, active }) => (active ? theme.royalGreen : theme.chaliceGray)};
-  width: 0.625rem;
-  height: 0.625rem;
-  position: relative;
-  padding: 0.875rem;
-  cursor: ${({ clickable }) => clickable && 'pointer'};
-`
+// const WrappedArrowDown = ({ clickable, active, ...rest }) => <ArrowDown {...rest} />
+// const DownArrow = styled(WrappedArrowDown)`
+//   color: ${({ theme, active }) => (active ? theme.royalGreen : theme.chaliceGray)};
+//   width: 0.625rem;
+//   height: 0.625rem;
+//   position: relative;
+//   padding: 0.875rem;
+//   cursor: ${({ clickable }) => clickable && 'pointer'};
+// `
 
-const WrappedRateIcon = ({ RateIconSVG, clickable, active, icon, ...rest }) => <RateIconSVG {...rest} />
+// const WrappedRateIcon = ({ RateIconSVG, clickable, active, icon, ...rest }) => <RateIconSVG {...rest} />
 
-const RateIcon = styled(WrappedRateIcon)`
-  stroke: ${({ theme, active }) => (active ? theme.royalGreen : theme.chaliceGray)};
-  width: 0.625rem;
-  height: 0.625rem;
-  position: relative;
-  padding: 0.875rem;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  cursor: ${({ clickable }) => clickable && 'pointer'};
-`
+// const RateIcon = styled(WrappedRateIcon)`
+//   stroke: ${({ theme, active }) => (active ? theme.royalGreen : theme.chaliceGray)};
+//   width: 0.625rem;
+//   height: 0.625rem;
+//   position: relative;
+//   padding: 0.875rem;
+//   -webkit-user-select: none;
+//   -moz-user-select: none;
+//   -ms-user-select: none;
+//   user-select: none;
+//   cursor: ${({ clickable }) => clickable && 'pointer'};
+// `
 
-const ExchangeRateWrapper = styled.div`
-  ${({ theme }) => theme.flexRowNoWrap};
-  align-items: center;
-  color: ${({ theme }) => theme.doveGray};
-  font-size: 0.75rem;
-  padding: 0.5rem 1rem;
-`
+// const ExchangeRateWrapper = styled.div`
+//   ${({ theme }) => theme.flexRowNoWrap};
+//   align-items: center;
+//   color: ${({ theme }) => theme.doveGray};
+//   font-size: 0.75rem;
+//   padding: 0.5rem 1rem;
+// `
 
-const ExchangeRate = styled.span`
-  flex: 1 1 auto;
-  width: 0;
-  color: ${({ theme }) => theme.doveGray};
-`
+// const ExchangeRate = styled.span`
+//   flex: 1 1 auto;
+//   width: 0;
+//   color: ${({ theme }) => theme.doveGray};
+// `
 
 const Flex = styled.div`
   display: flex;
@@ -479,7 +479,7 @@ export default function ExchangePage({ initialCurrency }) {
     }
   }, [independentField])
 
-  const [inverted, setInverted] = useState(false)
+  // const [inverted, setInverted] = useState(false)
 
   const marketRate = getExchangeRate(
     inputValueParsed,
