@@ -43,7 +43,7 @@ export function colors(darkMode: boolean): Colors {
     textColor: '#FFFFFF',
     backgroundColor: darkMode ? '#2b2b2b' : white,
     modalBackground: darkMode ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.3)',
-    inputBackground: darkMode ? '#171717' : white,
+    inputBackground: darkMode ? '#1e2841' : white,
     placeholderGray: darkMode ? '#5F5F5F' : '#E1E1E1',
     shadowColor: darkMode ? '#000' : '#2F80ED',
     concreteGray: darkMode ? '#222222' : '#FAFAFA',
