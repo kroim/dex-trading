@@ -108,6 +108,7 @@ const InputPanel = styled.div`
   border-radius: 1.25rem;
   background-color: ${({ theme }) => theme.inputBackground};
   z-index: 1;
+  margin-bottom: 0.5rem;
 `
 
 const Container = styled.div`
