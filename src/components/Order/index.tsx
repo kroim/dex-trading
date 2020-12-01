@@ -130,17 +130,6 @@ export class Order extends React.Component<OrderComponentProps, State> {
        
     }
 
-    public testtt() {
-           // const { account, chainId } = useActiveWeb3React()
-        // console.log(account, chainId);    
-        console.log("----test")
-        return <div>
-                testtt
-        </div>
-    } 
-    
-    
-
     public render() {
         const {
             width = defaultWidth,
@@ -177,7 +166,6 @@ export class Order extends React.Component<OrderComponentProps, State> {
                         currentTabIndex={this.state.index}
                     />
                 </div>
-                {/* {testtt()} */}
             </div>
         );
     }

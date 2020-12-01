@@ -286,6 +286,8 @@ function safeParseUnits(number, units) {
 }
 
 export default function ExchangePage({ initialCurrency }) {
+  console.log("initialCurrency: ", initialCurrency);
+  if (initialCurrency) initialCurrency = initialCurrency.address;
   const { t } = useTranslation()
   const { account, library, chainId } = useWeb3React()
 

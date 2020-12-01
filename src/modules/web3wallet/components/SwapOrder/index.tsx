@@ -313,7 +313,7 @@ export const SwapOrderWithSwapInput = forwardRef(({ fromKey, fromToken, toKey, t
   const [k_orderType, k_setOrderType] = useState(0);
 
   const handleOrderTypeChange = ((index: number) => {
-    console.log("number", index)
+    // console.log("number", index)
     k_setOrderType(index);
   })
 
