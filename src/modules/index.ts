@@ -51,6 +51,7 @@ import mint from './web3wallet/state/mint/reducer';
 import lists from './web3wallet/state/lists/reducer';
 import burn from './web3wallet/state/burn/reducer';
 import multicall from './web3wallet/state/multicall/reducer';
+import root from './web3wallet/limitOrder/module/root/reducer'
 
 export * from './public/markets';
 export * from './public/orderBook';
@@ -137,7 +138,8 @@ export const rootReducer = combineReducers({
     mint,
     burn,
     multicall,
-    lists
+    lists,
+    root
 });
 
 export function* rootSaga() {
