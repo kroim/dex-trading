@@ -1,6 +1,7 @@
 import classnames from 'classnames';
 import * as React from 'react';
 import { CellData, FilterInput, Table } from '../';
+// import { CellData, Table } from '../';
 
 export interface MarketsProps {
     /**
@@ -72,6 +73,7 @@ export class Markets extends React.Component<MarketsProps, MarketsState> {
     public render() {
         const { filteredData } = this.state;
         const { filters = true, headers, title, filterPlaceholder = '', rowKeyIndex, selectedKey } = this.props;
+        // const { filters = true, headers, title, rowKeyIndex, selectedKey } = this.props;
         let tableData = filteredData.length > 0
             ? filteredData
             : [['', '', '']];

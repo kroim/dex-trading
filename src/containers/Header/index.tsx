@@ -4,9 +4,13 @@ import { connect, MapDispatchToPropsFunction } from 'react-redux';
 import { RouterProps } from 'react-router';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
-import { showLanding } from '../../api';
+// import { showLanding } from '../../api';
 import { LogoIcon } from '../../assets/images/LogoIcon';
 import { IntlProps } from '../../index';
+// import { Button } from 'react-bootstrap';
+// import Web3Status from '../../modules/web3wallet/components/Web3Status';
+import Web3Header from '../../modules/web3wallet/components/Header/customWeb3Header';
+
 import {
     Market,
     RootState,
@@ -21,7 +25,9 @@ import {
     toggleSidebar,
 } from '../../modules';
 import { HeaderToolbar } from '../HeaderToolbar';
-import { NavBar } from '../NavBar';
+
+// Remove light, dark mode by kroim
+// import { NavBar } from '../NavBar';
 
 interface ReduxProps {
     currentMarket: Market | undefined;
@@ -54,6 +60,7 @@ type Props = ReduxProps & DispatchProps & IntlProps & LocationProps;
 
 class Head extends React.Component<Props> {
     public render() {
+        
         const { mobileWallet, location, configsLoading } = this.props;
         const tradingCls = location.pathname.includes('/trading') ? 'pg-container-trading' : '';
         const shouldRenderHeader = !noHeaderRoutes.some(r => location.pathname.includes(r)) && location.pathname !== '/';
@@ -65,15 +72,17 @@ class Head extends React.Component<Props> {
         return (
             <header className={`pg-header`}>
                 <div className={`pg-container pg-header__content ${tradingCls}`}>
-                    <div
+                    {/* Remove Sidebar by kroim */}
+                    {/* <div
                         className={`pg-sidebar__toggler ${mobileWallet && 'pg-sidebar__toggler-mobile'}`}
                         onClick={this.openSidebar}
                     >
                         <span className="pg-sidebar__toggler-item"/>
                         <span className="pg-sidebar__toggler-item"/>
                         <span className="pg-sidebar__toggler-item"/>
-                    </div>
-                    <div onClick={e => this.redirectToLanding()} className="pg-header__logo">
+                    </div> */}
+                    {/* <div onClick={e => this.redirectToLanding()} className="pg-header__logo"> */}
+                    <div className="pg-header__logo">
                         <div className="pg-logo">
                             <LogoIcon className="pg-logo__img" />
                         </div>
@@ -85,7 +94,10 @@ class Head extends React.Component<Props> {
                     {this.renderMobileWalletNav()}
                     <div className="pg-header__navbar">
                         {this.renderMarketToolbar()}
-                        <NavBar onLinkChange={this.closeMenu}/>
+                        {/* <NavBar onLinkChange={this.closeMenu}/> */}
+                    </div>
+                    <div className="custom-header">
+                        <Web3Header/>
                     </div>
                 </div>
             </header>
@@ -112,11 +124,14 @@ class Head extends React.Component<Props> {
             return null;
         }
 
-        return <HeaderToolbar/>;
+        return <HeaderToolbar />;
     };
 
     private renderMarketToggler = () => {
         const { currentMarket, marketSelectorOpened, colorTheme } = this.props;
+        // console.log("currentMarket: ", currentMarket);
+        // console.log("marketSelectorOpened: ", marketSelectorOpened);
+        // console.log("colorTheme: ", colorTheme);
         const isLight = colorTheme === 'light';
         if (!this.props.location.pathname.includes('/trading/')) {
             return null;
@@ -128,24 +143,24 @@ class Head extends React.Component<Props> {
                     {currentMarket && currentMarket.name}
                 </p>
                 {marketSelectorOpened ? (
-                    <img src={require(`./arrows/arrowBottom${isLight ? 'Light' : ''}.svg`)} alt="arrow"/>
+                    <img src={require(`./arrows/arrowBottom${isLight ? 'Light' : ''}.svg`)} alt="arrow" />
                 ) : (
-                    <img src={require(`./arrows/arrowRight${isLight ? 'Light' : ''}.svg`)} alt="arrow"/>
-                )}
+                        <img src={require(`./arrows/arrowRight${isLight ? 'Light' : ''}.svg`)} alt="arrow" />
+                    )}
             </div>
         );
     };
 
-    private redirectToLanding = () => {
-        this.props.toggleSidebar(false);
-        this.props.history.push(`${showLanding() ? '/' : '/trading'}`);
-    };
-
-    private openSidebar = () => this.props.toggleSidebar(!this.props.sidebarOpened);
+    // Remove Sidebar by kroim
+    // private redirectToLanding = () => {
+    //     this.props.toggleSidebar(false);
+    //     this.props.history.push(`${showLanding() ? '/' : '/trading'}`);
+    // };
+    // private openSidebar = () => this.props.toggleSidebar(!this.props.sidebarOpened);
 
     private backWallets = () => this.props.setMobileWalletUi('');
 
-    private closeMenu = (e: any) => this.props.setMobileWalletUi('');
+    // private closeMenu = (e: any) => this.props.setMobileWalletUi('');
 }
 
 const mapStateToProps = (state: RootState): ReduxProps => ({

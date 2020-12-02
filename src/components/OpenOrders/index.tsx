@@ -46,6 +46,7 @@ export class OpenOrders extends React.Component<OpenOrdersProps> {
                 <Table
                     header={headers}
                     data={tableData as CellData[][]}
+                    colSpan={7}
                 />
             </div>
         );

@@ -53,23 +53,31 @@ class RecentTradesComponent extends React.Component<RecentTradesProps, State> {
 
     public render() {
         const className = classnames({
-            'cr-table__noData' : !this.props.recentTrades.length,
+            'cr-table__noData': !this.props.recentTrades.length,
         });
 
         const cn = classnames('pg-recent-trades', {
-            'pg-recent-trades-unlogged' : !this.props.userLoggedIn,
+            'pg-recent-trades-unlogged': !this.props.userLoggedIn,
         });
 
         return (
-          <div className={className}>
-            <div className={cn}>
-                {this.renderContent()}
+            <div className={className}>
+                <div className={cn}>
+                    {this.renderContent()}
+                </div>
             </div>
-          </div>
         );
     }
 
     private renderContent = () => {
+        // return (
+        //     <div>
+        //         <div className="cr-table-header__content">
+        //             <div className="cr-title-component">{this.props.intl.formatMessage({id: 'page.body.trade.header.recentTrades'})}</div>
+        //         </div>
+        //         <RecentTradesMarket />
+        //     </div>
+        // )
         return this.props.userLoggedIn ?
         (
             <TabPanel
@@ -87,7 +95,6 @@ class RecentTradesComponent extends React.Component<RecentTradesProps, State> {
                 <RecentTradesMarket />
             </div>
         );
-
     };
 
     private renderTabs = () => {

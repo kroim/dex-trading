@@ -222,7 +222,7 @@ class RangerMock {
         console.log(`Ranger: connection accepted, url: ${request.url}`);
         this.subscribe(ws, Helpers.getStreamsFromUrl(request.url));
         ws.timers.push(setInterval(tickersMock(ws, this.markets), 3000));
-        ws.timers.push(setInterval(balancesMock(ws), 3000));
+        // ws.timers.push(setInterval(balancesMock(ws), 3000));
         this.markets.forEach((name) => {
             let { baseUnit, quoteUnit, marketId } = Helpers.getMarketInfos(name);
             ws.timers.push(setInterval(orderBookIncrementMock(ws, marketId), 200));

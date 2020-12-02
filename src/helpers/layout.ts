@@ -64,23 +64,36 @@ const getLayouts = () => {
         gridUnitsToPixels(minOpenOrdersHeight, rowHeight, margin) + margin * 3;
     const gridHeight = Math.max(minGridHeight, window.innerHeight - staticHeight - margin * 3);
 
-    const currentTradingChartHeight = pixelsToGridUnits(gridHeight - margin * 2 - gridUnitsToPixels(orderHeight, rowHeight, margin), rowHeight, margin);
+    // const currentTradingChartHeight = pixelsToGridUnits(gridHeight - margin * 2 - gridUnitsToPixels(orderHeight, rowHeight, margin), rowHeight, margin);
+    const currentTradingChartHeight = pixelsToGridUnits(gridHeight - margin * 2 - gridUnitsToPixels(orderHeight, rowHeight, margin) + gridUnitsToPixels(minMarketDepthsHeight, rowHeight, margin) / 2, rowHeight, margin);
     const tradingChartHeight = gridHeight >= minGridHeight ?
-        currentTradingChartHeight + margin * 0.6 : Math.floor(Math.max(currentTradingChartHeight, minTradingChartHeight));
+        currentTradingChartHeight + margin * 0.6: Math.floor(Math.max(currentTradingChartHeight, minTradingChartHeight));
+    // const openOrdersHeight = gridHeight >= minGridHeight ?
+    //     pixelsToGridUnits(gridHeight - gridUnitsToPixels(tradingChartHeight, rowHeight, margin) - gridUnitsToPixels(minMarketDepthsHeight, rowHeight, margin), rowHeight, margin) + 1.8 :
+    //     minOpenOrdersHeight;
     const openOrdersHeight = gridHeight >= minGridHeight ?
-        pixelsToGridUnits(gridHeight - gridUnitsToPixels(tradingChartHeight, rowHeight, margin) - gridUnitsToPixels(minMarketDepthsHeight, rowHeight, margin), rowHeight, margin) + 1.8 :
+        pixelsToGridUnits(gridHeight - gridUnitsToPixels(tradingChartHeight, rowHeight, margin), rowHeight, margin) + 4.1 :
         minOpenOrdersHeight;
 
+    // const orderBookHeight = gridHeight >= minGridHeight ?
+    //     pixelsToGridUnits(gridHeight - margin, rowHeight, margin) + margin - 3.3 :
+    //     minOrderBookHeight;
     const orderBookHeight = gridHeight >= minGridHeight ?
-        pixelsToGridUnits(gridHeight - margin, rowHeight, margin) + margin - 3.3 :
+        pixelsToGridUnits(gridHeight - margin, rowHeight, margin) + margin - 1.3 :
         minOrderBookHeight;
 
+    // const recentTradesHeight = gridHeight >= minGridHeight ?
+    //     pixelsToGridUnits(gridHeight - margin, rowHeight, margin) + margin - 3.3 :
+    //     minRecentTradesHeight;
     const recentTradesHeight = gridHeight >= minGridHeight ?
-        pixelsToGridUnits(gridHeight - margin, rowHeight, margin) + margin - 3.3 :
+        pixelsToGridUnits(gridHeight - margin, rowHeight, margin) + margin - 1.3 :
         minRecentTradesHeight;
 
+    // const marketsHeight = gridHeight >= minGridHeight ?
+    //     pixelsToGridUnits(gridHeight - margin, rowHeight, margin) - orderHeight + margin - 3.3 :
+    //     minMarketsHeight;
     const marketsHeight = gridHeight >= minGridHeight ?
-        pixelsToGridUnits(gridHeight - margin, rowHeight, margin) - orderHeight + margin - 3.3 :
+        pixelsToGridUnits(gridHeight - margin, rowHeight, margin) - orderHeight + margin - 1.3 :
         minMarketsHeight;
 
     return {

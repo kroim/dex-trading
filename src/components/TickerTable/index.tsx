@@ -21,7 +21,7 @@ export const TickerTable = (props: Props) => {
                 <li
                     key={i}
                     className={`navigation__item ${item === currentBidUnit && 'navigation__item--active'}`}
-                    onClick={() => props.setCurrentBidUnit(item)}
+                    onClick={() =>  { props.setCurrentBidUnit(item)}}
                 >
                     <span className="navigation__item__link">
                         {item ? item.toUpperCase() : intl.formatMessage({id: 'page.body.marketsTable.filter.all'})}
@@ -35,7 +35,7 @@ export const TickerTable = (props: Props) => {
         const marketChangeColor = +(market.change || 0) < 0 ? 'negative' : 'positive';
 
         return (
-            <tr key={index} onClick={() => props.redirectToTrading(market.id)}>
+            <tr key={index} onClick={() => {console.log("-------xxx"); props.redirectToTrading(market.id)}}>
                 <td>
                     <div>
                         {market && market.name}
@@ -71,7 +71,7 @@ export const TickerTable = (props: Props) => {
                             {market.volume}
                         </Decimal>
                     </span>
-                </td>
+                </td>                          
             </tr>
         );
     };

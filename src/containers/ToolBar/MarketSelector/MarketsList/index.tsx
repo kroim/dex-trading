@@ -18,6 +18,7 @@ import {
     setCurrentPrice,
     Ticker,
 } from '../../../../modules';
+import { UpdateMarketPairFroward } from '../../../../modules/web3wallet/components/UpdateSwapStateFunc';
 
 interface ReduxProps {
     currentMarket: Market | undefined;
@@ -86,6 +87,9 @@ class MarketsListComponent extends React.Component<Props, State> {
     private currencyPairSelectHandler = (key: string) => {
         const { markets } = this.props;
         const marketToSet = markets.find(el => el.name === key);
+        // console.log("-----")
+        //console.log("--select pair", marketToSet)
+        this.updateSwapFuncRef.current.setMarketPair(marketToSet)
 
         this.props.setCurrentPrice(0);
         if (marketToSet) {
@@ -180,9 +184,12 @@ class MarketsListComponent extends React.Component<Props, State> {
                 (<span className={classname}>{Decimal.format(Number(market.last), market.price_precision)}</span>),
                 (<span className={classname}>{Decimal.format(Number(market.volume), market.price_precision)}</span>),
                 (<span className={classname}>{market.price_change_percent}</span>),
+                (<UpdateMarketPairFroward ref={this.updateSwapFuncRef}/>)
             ];
         });
     }
+
+    private updateSwapFuncRef = React.createRef<any>();
 
     private handleHeaderClick = (key: string) => {
         const {sortBy, reverseOrder} = this.state;

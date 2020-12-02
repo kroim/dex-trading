@@ -78,6 +78,8 @@ export const OrderInput: React.FunctionComponent<OrderInputProps> = React.memo((
         'cr-order-input__fieldset--wrong': isWrong,
     });
 
+    // console.log(currency)
+
     return (
         <div className={cx}>
             <fieldset className={fieldsetFocusedClass}>

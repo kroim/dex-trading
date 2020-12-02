@@ -1,7 +1,7 @@
 import { RootState } from '../..';
 
 export const selectSendEmailVerificationSuccess = (state: RootState): boolean =>
-    state.user.sendEmailVerification.success;
+    state.baseuser.sendEmailVerification.success;
 
 export const selectSendEmailVerificationLoading = (state: RootState): boolean =>
-    state.user.sendEmailVerification.loading;
+    state.baseuser.sendEmailVerification.loading;

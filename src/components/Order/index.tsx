@@ -4,6 +4,13 @@ import { FilterPrice } from '../../filters';
 import { getAmount, getTotalPrice } from '../../helpers';
 import { Decimal, OrderForm } from '../index';
 
+
+/**
+ * from Swap page of swapliquidity */ 
+
+// import { useActiveWeb3React } from '../../modules/web3wallet/hooks'
+
+
 export type FormType = 'buy' | 'sell';
 
 export type DropdownElem = number | string | React.ReactNode;
@@ -120,6 +127,7 @@ export class Order extends React.Component<OrderComponentProps, State> {
         if (defaultTabIndex !== undefined) {
             this.handleChangeTab(defaultTabIndex);
         }
+       
     }
 
     public render() {
@@ -195,7 +203,9 @@ export class Order extends React.Component<OrderComponentProps, State> {
             translate('page.body.trade.header.newOrder.content.tabs.buy')
         );
         const label = this.isTypeSell(type) ? 'Sell' : 'Buy';
-
+        
+        console.log(from)
+        
         return {
             content: (
                 <OrderForm

@@ -37,6 +37,7 @@ const MarketsTableComponent = props => {
     const handleRedirectToTrading = (id: string) => {
         const currentMarket: Market | undefined = markets.find(item => item.id === id);
 
+        // console.log("---select handle trade pair", currentMarket)
         if (currentMarket) {
             props.handleChangeCurrentMarket && props.handleChangeCurrentMarket(currentMarket);
             dispatch(setCurrentMarket(currentMarket));
