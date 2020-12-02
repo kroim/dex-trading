@@ -8,10 +8,6 @@ import styled from 'styled-components'
 
 import { Button } from '../../../theme'
 import CurrencyInputPanel from '../CurrencyInputPanel'
-// import OversizedPanel from '../OversizedPanel'
-// import ArrowDown from '../../assets/svg/SVGArrowDown'
-// import SVGClose from '../../assets/svg/SVGClose'
-// import SVGDiv from '../../assets/svg/SVGDiv'
 import { amountFormatter } from '../../utils'
 import { useUniswapExContract } from '../../hooks'
 import { useTokenDetails } from '../../contexts/Tokens'
@@ -22,6 +18,8 @@ import { useTradeExactIn } from '../../hooks/trade'
 import { BNB_ADDRESS, LIMIT_ORDER_MODULE_ADDRESSES, GENERIC_GAS_LIMIT_ORDER_EXECUTE } from '../../constants'
 import { getExchangeRate } from '../../utils/rate'
 import { useGasPrice } from '../../contexts/GasPrice'
+import {useSwapState, useDerivedSwapInfo} from '../../../state/swap/hooks'
+import {Field} from '../../../state/swap/actions'
 
 import './ExchangePage.css'
 
@@ -42,51 +40,6 @@ const EXECUTION_WARNING = '3' // [10+%
 
 const RATE_OP_MULT = 'x'
 const RATE_OP_DIV = '/'
-
-// const DownArrowBackground = styled.div`
-//   ${({ theme }) => theme.flexRowNoWrap}
-//   justify-content: center;
-//   align-items: center;
-// `
-
-// const WrappedArrowDown = ({ clickable, active, ...rest }) => <ArrowDown {...rest} />
-// const DownArrow = styled(WrappedArrowDown)`
-//   color: ${({ theme, active }) => (active ? theme.royalGreen : theme.chaliceGray)};
-//   width: 0.625rem;
-//   height: 0.625rem;
-//   position: relative;
-//   padding: 0.875rem;
-//   cursor: ${({ clickable }) => clickable && 'pointer'};
-// `
-
-// const WrappedRateIcon = ({ RateIconSVG, clickable, active, icon, ...rest }) => <RateIconSVG {...rest} />
-
-// const RateIcon = styled(WrappedRateIcon)`
-//   stroke: ${({ theme, active }) => (active ? theme.royalGreen : theme.chaliceGray)};
-//   width: 0.625rem;
-//   height: 0.625rem;
-//   position: relative;
-//   padding: 0.875rem;
-//   -webkit-user-select: none;
-//   -moz-user-select: none;
-//   -ms-user-select: none;
-//   user-select: none;
-//   cursor: ${({ clickable }) => clickable && 'pointer'};
-// `
-
-// const ExchangeRateWrapper = styled.div`
-//   ${({ theme }) => theme.flexRowNoWrap};
-//   align-items: center;
-//   color: ${({ theme }) => theme.doveGray};
-//   font-size: 0.75rem;
-//   padding: 0.5rem 1rem;
-// `
-
-// const ExchangeRate = styled.span`
-//   flex: 1 1 auto;
-//   width: 0;
-//   color: ${({ theme }) => theme.doveGray};
-// `
 
 const Flex = styled.div`
   display: flex;
@@ -139,14 +92,14 @@ function getSwapType(inputCurrency, outputCurrency) {
   }
 }
 
-function getInitialSwapState(outputCurrency) {
+function getInitialSwapState(initialCurrency) {
   return {
     independentValue: '', // this is a user input
     dependentValue: '', // this is a calculated number
     independentField: INPUT,
     prevIndependentField: OUTPUT,
-    inputCurrency: 'BNB',
-    outputCurrency: outputCurrency ? outputCurrency : '',
+    inputCurrency: initialCurrency && initialCurrency['INPUT'] ? initialCurrency['INPUT'] : '',
+    outputCurrency: initialCurrency && initialCurrency['OUTPUT'] ? initialCurrency['OUTPUT'] : '',
     rateOp: RATE_OP_MULT,
     inputRateValue: ''
   }
@@ -286,16 +239,21 @@ function safeParseUnits(number, units) {
 }
 
 export default function ExchangePage({ initialCurrency }) {
-  console.log("initialCurrency: ", initialCurrency);
-  if (initialCurrency) initialCurrency = initialCurrency.address;
   const { t } = useTranslation()
   const { account, library, chainId } = useWeb3React()
-
+  const {
+    v1Trade,
+    v2Trade,
+    currencyBalances,
+    parsedAmount,
+    currencies,
+    inputError: swapInputError
+  } = useDerivedSwapInfo()
+  console.log(" --- currencies --- ", currencies)
   // core swap state
   const [swapState, dispatchSwapState] = useReducer(swapStateReducer, initialCurrency, getInitialSwapState)
 
   const { independentValue, independentField, inputCurrency, outputCurrency, rateOp, inputRateValue } = swapState
-
   const uniswapEXContract = useUniswapExContract()
   const [inputError, setInputError] = useState()
 
@@ -622,7 +580,8 @@ export default function ExchangePage({ initialCurrency }) {
           dispatchSwapState({ type: 'UPDATE_INDEPENDENT', payload: { value: inputValue, field: INPUT } })
         }}
         showUnlock={showUnlock}
-        selectedTokens={[inputCurrency, outputCurrency]}
+        // selectedTokens={[inputCurrency, outputCurrency]}
+        selectedTokens={[currencies, outputCurrency]}
         selectedTokenAddress={inputCurrency}
         value={inputValueFormatted}
         errorMessage={inputError ? inputError : independentField === INPUT ? independentError : ''}

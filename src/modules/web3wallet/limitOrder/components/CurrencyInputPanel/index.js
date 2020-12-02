@@ -12,7 +12,6 @@ import { isMobile } from 'react-device-detect'
 import { BorderlessInput } from '../../../theme'
 import { useTokenContract } from '../../hooks'
 import { isAddress, calculateGasMargin, formatToUsd, formatTokenBalance, formatEthBalance } from '../../utils'
-import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 import Modal from '../Modal'
 import TokenLogo from '../TokenLogo'
 import SearchIcon from '../../assets/images/magnifying-glass.svg'
@@ -90,15 +89,6 @@ export const Aligner = styled.span`
   display: flex;
   align-items: center;
   justify-content: space-between;
-`
-
-const StyledDropDown = styled(DropDown)`
-  margin: 0 0.5rem 0 0.5rem;
-  height: 35%;
-
-  path {
-    stroke: ${({ selected, theme }) => (selected ? theme.textColor : theme.royalGreen)};
-  }
 `
 
 const InputPanel = styled.div`
@@ -353,7 +343,7 @@ export default function CurrencyInputPanel({
             selected={!!selectedTokenAddress}
             onClick={() => {
               if (!disableTokenSelect) {
-                setModalIsOpen(true)
+                // setModalIsOpen(true)
               }
             }}
           >
@@ -364,7 +354,7 @@ export default function CurrencyInputPanel({
                   {(allTokens[selectedTokenAddress] && allTokens[selectedTokenAddress].symbol) || t('selectToken')}
                 </StyledTokenName>
               }
-              {!disableTokenSelect && <StyledDropDown selected={!!selectedTokenAddress} />}
+              {/* {!disableTokenSelect && <StyledDropDown selected={!!selectedTokenAddress} />} */}
             </Aligner>
           </CurrencySelect>
         ) : null}

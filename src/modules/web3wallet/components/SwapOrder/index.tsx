@@ -316,7 +316,8 @@ export const SwapOrderWithSwapInput = forwardRef(({ fromKey, fromToken, toKey, t
     // console.log("number", index)
     k_setOrderType(index);
   })
-
+  // console.log("Currencies ========= : ");
+  // console.log(currencies);
   return (
     <>
       <div className='cr-order-form'>
@@ -328,7 +329,8 @@ export const SwapOrderWithSwapInput = forwardRef(({ fromKey, fromToken, toKey, t
         </div>
         {k_orderType === 0 ? (
           <div>
-            <ExchangePage initialCurrency={currencies[Field.INPUT]}/>
+            {/* <ExchangePage inputCurrency={currencies[Field.INPUT]} outputCurrency={currencies[Field.OUTPUT]}/> */}
+            <ExchangePage initialCurrency={currencies} />
           </div>
         ) : (
             <div>
