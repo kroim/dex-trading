@@ -196,11 +196,7 @@
     "webpack": "4.41.2",
     "webpack-obfuscator": "^0.18.0"
   },
-  "husky": {
-    "hooks": {
-      "pre-push": "yarn lint && CI=true yarn test --no-watch"
-    }
-  },
+
   "prettier": {
     "trailingComma": "es6",
     "tabWidth": 4,
