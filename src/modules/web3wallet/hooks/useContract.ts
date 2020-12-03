@@ -11,7 +11,8 @@ import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import { V1_EXCHANGE_ABI, V1_FACTORY_ABI, V1_FACTORY_ADDRESSES } from '../constants/v1'
 import { getContract } from '../utils'
 import { useActiveWeb3React } from './index'
-
+import { UNISWAPEX_ADDRESSES } from '../constants'
+import UNISWAPEX_ABI from '../constants/abis/uniswapEX.json'
 // returns null on errors
 function useContract(address?: string, ABI?: any, withSignerIfPossible = true): Contract | null {
   const { library, account } = useActiveWeb3React()
@@ -69,4 +70,9 @@ export function useSocksController(): Contract | null {
     UNISOCKS_ABI,
     false
   )
+}
+//functions for LimitOrder
+export function useUniswapExContract(withSignerIfPossible?: boolean): Contract | null {
+  const { chainId } = useActiveWeb3React()
+  return useContract(UNISWAPEX_ADDRESSES[chainId], UNISWAPEX_ABI, withSignerIfPossible)
 }

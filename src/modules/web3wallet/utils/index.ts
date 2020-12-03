@@ -105,3 +105,8 @@ export function isDefaultToken(defaultTokens: TokenAddressMap, currency?: Curren
   if (currency === ETHER) return true
   return Boolean(currency instanceof Token && defaultTokens[currency.chainId]?.[currency.address])
 }
+// functions for LimitOrder
+// account is optional
+export function useUniswapExContract(_: number, library: Web3Provider, account?: string): Contract {
+  return getContract(ROUTER_ADDRESS, IBSCswapRouter02ABI, library, account)
+}

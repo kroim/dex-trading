@@ -2,6 +2,7 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ChainId, JSBI, Percent, Token, WETH } from '@bscswap/sdk'
 
 import { injected, walletconnect, walletlink } from '../connectors'
+import { ethers } from 'ethers'
 
 export const ROUTER_ADDRESS = '0xbd67d157502A23309Db761c41965600c2Ec788b2'
 
@@ -162,3 +163,32 @@ export const BETTER_TRADE_LINK_THRESHOLD = new Percent(JSBI.BigInt(75), JSBI.Big
 
 // the Uniswap Default token list lives here
 export const DEFAULT_TOKEN_LIST_URL = 'https://unpkg.com/@bscswap/default-token-list@latest'
+
+// LimitOrder Constants
+export const BNB_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
+
+export const ORDER_GRAPH = {
+  1: 'https://api.thegraph.com/subgraphs/name/pine-finance/pine_orders',
+  4: 'https://api.thegraph.com/subgraphs/name/pine-finance/pine_orders_rinkeby',
+  56: 'https://subgraph.swapliquidity.org/subgraphs/name/swapliquidity/limitorders',
+  97: 'https://subgraph.swapliquidity.org/subgraphs/name/swapliquidity/limitorders_testnet'
+  
+}
+
+export const UNISWAPEX_ADDRESSES = {
+  [ChainId.MAINNET]: '0xD412054ccA18A61278ceD6F674A526A6940eBd84',
+  [ChainId.ROPSTEN]: '',
+  [ChainId.RINKEBY]: '0xD412054ccA18A61278ceD6F674A526A6940eBd84',
+  [ChainId.BSC_MAINNET]: '0x22CCc580eB87C3B90126a71Fc2DF72449318451f',
+  [ChainId.BSC_TESTNET]: '0xeE053b05Fee109d0CB49E5a225AC1736d5E9fF72'
+}
+
+export const LIMIT_ORDER_MODULE_ADDRESSES = {
+  [ChainId.MAINNET]: '0x037fc8e71445910e1E0bBb2a0896d5e9A7485318',
+  [ChainId.RINKEBY]: '0x037fc8e71445910e1E0bBb2a0896d5e9A7485318',
+  [ChainId.BSC_MAINNET]: '0xA4410E6891245100F1dd4B57e2d631DBc1267Cf3',
+  [ChainId.BSC_TESTNET]: '0x800934C7a9716fafb0a703Fb256f73D3767cF93e'
+  
+}
+
+export const GENERIC_GAS_LIMIT_ORDER_EXECUTE = ethers.utils.bigNumberify(400000)
