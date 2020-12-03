@@ -1,4 +1,4 @@
-import { Currency, CurrencyAmount, Token, ETHER} from '@bscswap/sdk'
+import { Currency, CurrencyAmount, Token, ETHER/*, Trade*/} from '@bscswap/sdk'
 import React, { useCallback /*,useState*/} from 'react'
 import ReactGA from 'react-ga'
 import { AutoColumn } from '../../components/Column'
@@ -114,7 +114,20 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
       },
       [onUserInput]
     )
-    
+      // modal and loading
+  // const [{ showConfirm, tradeToConfirm, swapErrorMessage, attemptingTxn, txHash }, setSwapState] = useState<{
+  //   showConfirm: boolean
+  //   tradeToConfirm: Trade | undefined
+  //   attemptingTxn: boolean
+  //   swapErrorMessage: string | undefined
+  //   txHash: string | undefined
+  // }>({
+  //   showConfirm: false,
+  //   tradeToConfirm: undefined,
+  //   attemptingTxn: false,
+  //   swapErrorMessage: undefined,
+  //   txHash: undefined
+  // })
     const onPlace = useCallback(
       () => {
       let method, fromCurrency, toCurrency, inputAmount, minimumReturn, data
@@ -167,34 +180,44 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
             privateKey,
             inputAmount
             ))
+        data.then(function (result) {
         // const order = swapType === ETH_TO_TOKEN ? data : `0x${data.slice(267)}`
-        const order = {
-        inputAmount: inputAmount.toString(),
-        creationAmount: inputAmount.toString(),
-        inputToken: fromCurrency.toLowerCase(),
-        id: '???',
-        minReturn: minimumReturn.toString(),
-        module: LIMIT_ORDER_MODULE_ADDRESSES[chainId].toLowerCase(),
-        owner: account.toLowerCase(),
-        secret: privateKey,
-        status: 'open',
-        outputToken: toCurrency.toLowerCase(),
-        witness: address.toLowerCase()
-        }
-        // saveOrder(account, order, chainId)
-        let res
-        if (swapType === ETH_TO_TOKEN) {
-        res = uniswapEXContract.depositEth(data, { value: inputAmount })
-        } else {
-        const provider = new ethers.providers.Web3Provider(library.provider)
-        res = provider.getSigner().sendTransaction({
-            to: fromCurrency,
-            data: data
+          // const order = {
+          //   inputAmount: inputAmount.toString(),
+          //   creationAmount: inputAmount.toString(),
+          //   inputToken: fromCurrency.toLowerCase(),
+          //   id: '???',
+          //   minReturn: minimumReturn.toString(),
+          //   module: LIMIT_ORDER_MODULE_ADDRESSES[chainId].toLowerCase(),
+          //   owner: account.toLowerCase(),
+          //   secret: privateKey,
+          //   status: 'open',
+          //   outputToken: toCurrency.toLowerCase(),
+          //   witness: address.toLowerCase()
+          //   }
+            // saveOrder(account, order, chainId)
+          let res
+          if (swapType === ETH_TO_TOKEN) {
+          res = uniswapEXContract.depositEth(result, { value: inputAmount })
+          } else {
+          const provider = new ethers.providers.Web3Provider(library.provider)
+          res = provider.getSigner().sendTransaction({
+              to: fromCurrency,
+              data: result
+            })
+          }
+          res.then(function(response)
+          {
+            if (response.hash) {
+              addTransaction(response, { summary: "Place Limit Order transaction"+ {response}  })
+            }
+          }).catch(function(err){
+            console.log('transaction failed', err.message)
+          })
+        }).catch(function(err)
+        {
+          console.log('transaction failed', err.message)
         })
-        }
-        if (res.hash) {
-          addTransaction(res, { summary: "Place Limit Order transaction"+ {order}  })
-        }
       } catch (e) {
           console.log('Error on place order', e.message)
       }
