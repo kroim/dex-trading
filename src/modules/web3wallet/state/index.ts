@@ -5,6 +5,7 @@ import application from './application/reducer'
 import user from './user/reducer'
 import transactions from './transactions/reducer'
 import swap from './swap/reducer'
+import limit from './limit/reducer'
 import mint from './mint/reducer'
 import lists from './lists/reducer'
 import burn from './burn/reducer'
@@ -23,7 +24,8 @@ const web3_store = configureStore({
     mint,
     burn,
     multicall,
-    lists
+    lists,
+    limit
   },
   middleware: [...getDefaultMiddleware(), save({ states: PERSISTED_KEYS })],
   preloadedState: load({ states: PERSISTED_KEYS })

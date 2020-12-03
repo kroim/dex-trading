@@ -211,7 +211,7 @@ export class Order extends React.Component<OrderComponentProps, State> {
                     orderTypes={orderTypes || defaultOrderTypes}
                     orderTypesIndex={orderTypesIndex || defaultOrderTypes}
                     ref={this.swapInputAndOutputFuncRef}
-                     />
+                />
             ),
             label: preLabel || label,
         };

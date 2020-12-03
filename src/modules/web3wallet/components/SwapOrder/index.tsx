@@ -328,7 +328,9 @@ export const SwapOrderWithSwapInput = forwardRef(({ fromKey, fromToken, toKey, t
         </div>
         {k_orderType === 0 ? (
           <div>
-            <ExchangePage initialCurrency={currencies[Field.INPUT]}/>
+            <ExchangePage 
+              inputCurrency = {currencies[Field.INPUT]}
+              outputCurrency = {currencies[Field.OUTPUT]} />
           </div>
         ) : (
             <div>

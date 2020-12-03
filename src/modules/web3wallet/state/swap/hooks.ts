@@ -19,8 +19,8 @@ import useToggledVersion from '../../hooks/useToggledVersion'
 import { useUserSlippageTolerance } from '../user/hooks'
 import { computeSlippageAdjustedAmounts } from '../../utils/prices'
 
-export function useSwapState(): AppState['swap'] {
-  return useSelector<AppState, AppState['swap']>(state => state.swap)
+export function useSwapState(): AppState['limit'] {
+  return useSelector<AppState, AppState['limit']>(state => state.swap)
 }
 
 export function useSwapActionHandlers(): {

@@ -14,8 +14,8 @@ import {
   } from '../../state/limit/hooks'
 import useWrapCallback, { WrapType } from '../../hooks/useWrapCallback'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
-// import {/* ButtonError, ButtonLight, */ButtonError } from '../../components/Button'
-// import { useActiveWeb3React } from '../../hooks'
+import {/* ButtonError, ButtonLight, */ButtonError } from '../../components/Button'
+import { useActiveWeb3React } from '../../hooks'
 // import { useTradeExactIn } from '../../hooks/Trades'
 // Use to detach input from output
 // let inputValue
@@ -35,8 +35,9 @@ import { maxAmountSpend } from '../../utils/maxAmountSpend'
 //       return TOKEN_TO_TOKEN
 //     }
 //   }
-export function ExchangePage({ initialCurrency }: {initialCurrency: Currency})  {
-    // const { account } = useActiveWeb3React()
+export function ExchangePage({ inputCurrency, outputCurrency }: {inputCurrency: Currency, outputCurrency: Currency})  {
+
+    const { account } = useActiveWeb3React()
     const { independentField , typedValue} = useSwapState()
     // core swap state
     const {
@@ -46,6 +47,9 @@ export function ExchangePage({ initialCurrency }: {initialCurrency: Currency})  
         parsedAmount,
         currencies,
       } = useDerivedSwapInfo()
+      currencies[Field.INPUT] = inputCurrency
+      currencies[Field.OUTPUT] = outputCurrency
+      
     const dependentField: Field = independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT
     const { wrapType } = useWrapCallback(
         currencies[Field.INPUT],
@@ -97,7 +101,11 @@ export function ExchangePage({ initialCurrency }: {initialCurrency: Currency})  
         },
         [onUserInput]
       )
-    
+      const onPlace = useCallback(
+        () => {
+        },
+        []
+      )
 
 
     return (
@@ -140,7 +148,13 @@ export function ExchangePage({ initialCurrency }: {initialCurrency: Currency})  
                 otherCurrency={currencies[Field.INPUT]}
                 id="swap-currency-output"
             />
-
-        </AutoColumn>
+            <ButtonError
+            disabled={!account}
+            onClick={onPlace}
+            error={false}
+            >
+            {'place'}
+            </ButtonError>
+            </AutoColumn>
     )
 }
