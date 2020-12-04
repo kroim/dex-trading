@@ -15,8 +15,11 @@ export const replaceSwapState = createAction<{
   inputCurrencyId?: string
   outputCurrencyId?: string
   recipient: string | null
-  inputRateValue?: string
+  inputRateValue: string | null
 }>('replaceSwapState1')
 export const setRecipient = createAction<{ recipient: string | null }>('setRecipient')
+export const setInputRateValue = createAction<{ inputRateValue: string | null }>('setInputRateValue')
+
+
 
 export const testAction = createAction<{ id: string | null }>('testActionType')

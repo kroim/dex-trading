@@ -13,7 +13,7 @@ import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { AppDispatch, AppState } from '../index'
 import { useCurrencyBalances } from '../wallet/hooks'
-import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
+import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput, setInputRateValue } from './actions'
 import { SwapState } from './reducer'
 import useToggledVersion from '../../hooks/useToggledVersion'
 import { useUserSlippageTolerance } from '../user/hooks'
@@ -27,6 +27,7 @@ export function useSwapActionHandlers(): {
   onCurrencySelection: (field: Field, currency: Currency) => void
   onSwitchTokens: () => void
   onUserInput: (field: Field, typedValue: string) => void
+  onUserRateInput: (typedValue: string| null) => void
   onChangeRecipient: (recipient: string | null) => void
 } {
   const dispatch = useDispatch<AppDispatch>()
@@ -52,7 +53,12 @@ export function useSwapActionHandlers(): {
     },
     [dispatch]
   )
-
+  const onUserRateInput = useCallback(
+    (typedValue: string | null) => {
+      dispatch(setInputRateValue({ inputRateValue: typedValue }))
+    },
+    [dispatch]
+  )
   const onChangeRecipient = useCallback(
     (recipient: string | null) => {
       dispatch(setRecipient({ recipient }))
@@ -64,6 +70,7 @@ export function useSwapActionHandlers(): {
     onSwitchTokens,
     onCurrencySelection,
     onUserInput,
+    onUserRateInput,
     onChangeRecipient
   }
 }
@@ -106,6 +113,7 @@ export function useDerivedSwapInfo(): {
     typedValue,
     [Field.INPUT]: { currencyId: inputCurrencyId },
     [Field.OUTPUT]: { currencyId: outputCurrencyId },
+    // inputRateValue: inputRateValue ,
     recipient
   } = useSwapState()
 
@@ -222,6 +230,7 @@ function validatedRecipient(recipient: any): string | null {
 export function queryParametersToSwapState(parsedQs: ParsedQs): SwapState {
   let inputCurrency = parseCurrencyFromURLParameter(parsedQs.inputCurrency)
   let outputCurrency = parseCurrencyFromURLParameter(parsedQs.outputCurrency)
+  let inputRateValue = parseCurrencyFromURLParameter(parsedQs.inputRateValue)
   if (inputCurrency === outputCurrency) {
     if (typeof parsedQs.outputCurrency === 'string') {
       inputCurrency = ''
@@ -239,6 +248,7 @@ export function queryParametersToSwapState(parsedQs: ParsedQs): SwapState {
     [Field.OUTPUT]: {
       currencyId: outputCurrency
     },
+    inputRateValue: inputRateValue,
     typedValue: parseTokenAmountURLParameter(parsedQs.exactAmount),
     independentField: parseIndependentFieldURLParameter(parsedQs.exactField),
     recipient
@@ -261,6 +271,7 @@ export function useDefaultsFromURLSearch() {
         field: parsed.independentField,
         inputCurrencyId: parsed[Field.INPUT].currencyId,
         outputCurrencyId: parsed[Field.OUTPUT].currencyId,
+        inputRateValue: parsed.inputRateValue,
         recipient: parsed.recipient
       })
     )
@@ -269,7 +280,7 @@ export function useDefaultsFromURLSearch() {
 }
 
 // updates the swap state to use the defaults for a given network
-export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrency:string, field: Field) {
+export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrency:string, inputRateValue:string, field: Field) {
   const { chainId } = useActiveWeb3React()
   const dispatch = useDispatch<AppDispatch>()  
 
@@ -283,6 +294,7 @@ export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrenc
         field: field,
         inputCurrencyId: inputCurrency,
         outputCurrencyId: outputCurrency,
+        inputRateValue: inputRateValue,
         recipient: null
       })
     )
@@ -290,13 +302,14 @@ export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrenc
   }, [dispatch, chainId])
 }
 
-export function setSwapStateAny(inputCurrency:string, outputCurrency:string, field: Field) {
+export function setSwapStateAny(inputCurrency:string, outputCurrency:string, inputRateValue:string, field: Field) {
   console.log("--", inputCurrency)
       replaceSwapState({
         typedValue: "0",
         field: field,
         inputCurrencyId: inputCurrency,
         outputCurrencyId: outputCurrency,
+        inputRateValue: inputRateValue,
         recipient: null
       })    
 }
