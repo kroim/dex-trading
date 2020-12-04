@@ -63,6 +63,14 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
   const outputCurrency = outCurrency instanceof Token ? outCurrency.address : outCurrency === ETHER ? 'BNB' : ''
 
   const swapType = getSwapType(inputCurrency, outputCurrency)  
+    // get decimals and exchange address for each of the currency types
+    const  inputSymbol = inCurrency.symbol
+    const inputDecimal = inCurrency.decimals
+    const  outputSymbol = outCurrency.symbol
+    const outputDecimals = outCurrency.decimals
+  // rate info
+  const rateFormatted = independentField === Field.RATE ? inputRateValue : amountFormatter(rateRaw, 18, 4, false)
+
   const dependentField: Field = independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT
   const { wrapType } = useWrapCallback(
       currencies[Field.INPUT],
@@ -110,7 +118,7 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
     )
   const handleTypePrice = useCallback(
       (value: string) => {
-        onUserInput(Field.PRICE, value)
+        onUserInput(Field.RATE, value)
       },
       [onUserInput]
     )
@@ -244,7 +252,7 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
                 id="swap-currency-input"
             />
             <PriceInputPanel
-                value={formattedAmounts[Field.OUTPUT]}
+                value={rateFormatted || ''}
                 onUserInput={handleTypePrice}
                 label={'Price'}
                 // showMaxButton={false}
@@ -265,7 +273,7 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
                 id="swap-currency-output"
             />
             <ButtonError
-            disabled={!account}
+            disabled={!account || !isValid}
             onClick={onPlace}
             error={false}
             >
