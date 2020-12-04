@@ -47,10 +47,12 @@ import application from './web3wallet/state/application/reducer';
 import user from './web3wallet/state/user/reducer';
 import transactions from './web3wallet/state/transactions/reducer';
 import swap from './web3wallet/state/swap/reducer';
+import limit from './web3wallet/state/limit/reducer';
 import mint from './web3wallet/state/mint/reducer';
 import lists from './web3wallet/state/lists/reducer';
 import burn from './web3wallet/state/burn/reducer';
 import multicall from './web3wallet/state/multicall/reducer';
+// import root from './web3wallet/limitOrder/module/root/reducer'
 
 export * from './public/markets';
 export * from './public/orderBook';
@@ -137,7 +139,9 @@ export const rootReducer = combineReducers({
     mint,
     burn,
     multicall,
-    lists
+    lists,
+    limit
+    // root
 });
 
 export function* rootSaga() {

@@ -55,7 +55,7 @@ export function useInactiveListener(suppress: boolean = false) {
   useEffect((): any => {
     const { ethereum } = window as any
     if (ethereum && ethereum.on && !active && !error && !suppress) {
-      console.log(ethereum)
+      // console.log(ethereum)
       
       const handleConnect = () => {
         console.log("Handling 'connect' event")

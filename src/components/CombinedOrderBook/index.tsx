@@ -144,6 +144,9 @@ export class CombinedOrderBook extends React.PureComponent<CombinedOrderBookProp
           onSelectBids,
           lastPrice,
       } = this.props;
+      // console.log("small dataAsks: ", dataAsks);
+      // console.log("small dataBids: ", dataBids);
+      // console.log("small maxVolume: ", maxVolume);
       return (
           <React.Fragment>
               <div className="cr-combined-order-book__small">

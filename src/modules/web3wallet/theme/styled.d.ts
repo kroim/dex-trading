@@ -6,6 +6,32 @@ export interface Colors {
   white: Color
   black: Color
 
+  // kroim update
+  textColor: Color,
+  backgroundColor: Color,
+  modalBackground: Color,
+  inputBackground: Color,
+  placeholderGray: Color,
+  shadowColor: Color,
+  concreteGray: Color,
+  mercuryGray: Color,
+  silverGray: Color,
+  chaliceGray: Color,
+  doveGray: Color,
+  mineshaftGray: Color,
+  buttonOutlineGrey: Color,
+  tokenRowHover: Color,
+  charcoalBlack: Color,
+  zumthorBlue: Color,
+  malibuGreen: Color,
+  royalGreen: Color,
+  loadingBlue: Color,
+  wisteriaPurple: Color,
+  salmonRed: Color,
+  pizazzOrange: Color,
+  warningYellow: Color,
+  uniswapPink: Color,
+
   // text
   text1: Color
   text2: Color

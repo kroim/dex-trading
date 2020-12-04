@@ -21,7 +21,7 @@ const MEDIA_WIDTHS = {
 
 const mediaWidthTemplates: { [width in keyof typeof MEDIA_WIDTHS]: typeof css } = Object.keys(MEDIA_WIDTHS).reduce(
   (accumulator, size) => {
-    ;(accumulator as any)[size] = (a: any, b: any, c: any) => css`
+    ; (accumulator as any)[size] = (a: any, b: any, c: any) => css`
       @media (max-width: ${(MEDIA_WIDTHS as any)[size]}px) {
         ${css(a, b, c)}
       }
@@ -35,11 +35,37 @@ const white = '#FFFFFF'
 const black = '#000000'
 
 export function colors(darkMode: boolean): Colors {
+  darkMode = true;
   return {
     // base
     white,
     black,
-
+    // kroim update
+    textColor: '#FFFFFF',
+    backgroundColor: darkMode ? '#2b2b2b' : white,
+    modalBackground: darkMode ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.3)',
+    inputBackground: darkMode ? '#1e2841' : white,
+    placeholderGray: darkMode ? '#5F5F5F' : '#E1E1E1',
+    shadowColor: darkMode ? '#000' : '#2F80ED',
+    concreteGray: darkMode ? '#222222' : '#FAFAFA',
+    mercuryGray: darkMode ? '#333333' : '#E1E1E1',
+    silverGray: darkMode ? '#737373' : '#C4C4C4',
+    chaliceGray: darkMode ? '#7B7B7B' : '#AEAEAE',
+    doveGray: darkMode ? '#C4C4C4' : '#737373',
+    mineshaftGray: darkMode ? '#E1E1E1' : '#2B2B2B',
+    buttonOutlineGrey: darkMode ? '#FAFAFA' : '#F2F2F2',
+    tokenRowHover: darkMode ? '#404040' : '#F2F2F2',
+    charcoalBlack: darkMode ? '#F2F2F2' : '#404040',
+    zumthorBlue: darkMode ? '#262626' : '#eeffeb',
+    malibuGreen: darkMode ? '#8c0a0a' : '#01796f',
+    royalGreen: darkMode ? '#8c0a0a' : '#01796f',
+    loadingBlue: darkMode ? '#e4f0ff' : '#e4f0ff',
+    wisteriaPurple: darkMode ? '#8c0a0a' : '#01796f',
+    salmonRed: '#FF6871',
+    pizazzOrange: '#FF8F05',
+    warningYellow: '#FFE270',
+    uniswapPink: darkMode ? '#8c0a0a' : '#01796f',
+    // connectedGreen: '#27AE60',
     // text
     text1: darkMode ? '#FFFFFF' : '#000000',
     text2: darkMode ? '#C3C5CB' : '#565A69',
@@ -129,7 +155,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
   return <StyledComponentsThemeProvider theme={themeObject}>{children}</StyledComponentsThemeProvider>
 }
 
-const TextWrapper = styled(Text)<{ color: keyof Colors }>`
+const TextWrapper = styled(Text) <{ color: keyof Colors }>`
   color: ${({ color, theme }) => (theme as any)[color]};
 `
 
@@ -226,4 +252,27 @@ body {
       theme.bg1
     )} 100%)`};
 }
+`
+// kroim update
+export const BorderlessInput = styled.input`
+  color: ${({ theme }) => theme.white};
+  font-size: 1rem;
+  outline: none;
+  border: none;
+  flex: 1 1 auto;
+  width: 0;
+  background-color: '#2b2b2b';
+
+  [type='number'] {
+    -moz-appearance: textfield;
+  }
+
+  ::-webkit-outer-spin-button,
+  ::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  ::placeholder {
+    color: ${({ theme }) => theme.green1};
+  }
 `
