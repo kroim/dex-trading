@@ -13,20 +13,20 @@ import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { AppDispatch, AppState } from '../index'
 import { useCurrencyBalances } from '../wallet/hooks'
-import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput, setInputRateValue } from './actions'
-import { SwapState } from './reducer'
+import { Field,EditField, replaceLimitState, selectCurrency, setRecipient, switchCurrencies, typeInput, setInputRateValue } from './actions'
+import { LimitState } from './reducer'
 import useToggledVersion from '../../hooks/useToggledVersion'
 import { useUserSlippageTolerance } from '../user/hooks'
 import { computeSlippageAdjustedAmounts } from '../../utils/prices'
 
-export function useSwapState(): AppState['limit'] {
+export function useLimitState(): AppState['limit'] {
   return useSelector<AppState, AppState['limit']>(state => state.limit)
 }
 
 export function useSwapActionHandlers(): {
   onCurrencySelection: (field: Field, currency: Currency) => void
   onSwitchTokens: () => void
-  onUserInput: (field: Field, typedValue: string) => void
+  onUserInput: (field: EditField, typedValue: string) => void
   onUserRateInput: (typedValue: string| null) => void
   onChangeRecipient: (recipient: string | null) => void
 } {
@@ -48,7 +48,7 @@ export function useSwapActionHandlers(): {
   }, [dispatch])
 
   const onUserInput = useCallback(
-    (field: Field, typedValue: string) => {
+    (field: EditField, typedValue: string) => {
       dispatch(typeInput({ field, typedValue }))
     },
     [dispatch]
@@ -103,6 +103,7 @@ export function useDerivedSwapInfo(): {
   v2Trade: Trade | undefined
   inputError?: string
   v1Trade: Trade | undefined
+  inputRateValue?: string
 } {
   const { account } = useActiveWeb3React()
 
@@ -115,7 +116,7 @@ export function useDerivedSwapInfo(): {
     [Field.OUTPUT]: { currencyId: outputCurrencyId },
     // inputRateValue: inputRateValue ,
     recipient
-  } = useSwapState()
+  } = useLimitState()
 
   const inputCurrency = useCurrency(inputCurrencyId)
   const outputCurrency = useCurrency(outputCurrencyId)
@@ -127,7 +128,8 @@ export function useDerivedSwapInfo(): {
     outputCurrency ?? undefined
   ])
 
-  const isExactIn: boolean = independentField === Field.INPUT
+  const isExactIn: boolean = independentField === EditField.INPUT
+
   const parsedAmount = tryParseAmount(typedValue, (isExactIn ? inputCurrency : outputCurrency) ?? undefined)
 
   const bestTradeExactIn = useTradeExactIn(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined)
@@ -212,8 +214,12 @@ function parseTokenAmountURLParameter(urlParam: any): string {
   return typeof urlParam === 'string' && !isNaN(parseFloat(urlParam)) ? urlParam : ''
 }
 
-function parseIndependentFieldURLParameter(urlParam: any): Field {
-  return typeof urlParam === 'string' && urlParam.toLowerCase() === 'output' ? Field.OUTPUT : Field.INPUT
+function parseIndependentFieldURLParameter(urlParam: any): EditField {
+  if(typeof urlParam === 'string' && urlParam.toLowerCase() === 'output')
+  return  EditField.OUTPUT
+  else if(typeof urlParam === 'string' && urlParam.toLowerCase() === 'rate')
+  return EditField.RATE
+  return EditField.INPUT
 }
 
 const ENS_NAME_REGEX = /^[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)?$/
@@ -227,7 +233,7 @@ function validatedRecipient(recipient: any): string | null {
   return null
 }
 
-export function queryParametersToSwapState(parsedQs: ParsedQs): SwapState {
+export function queryParametersToLimitState(parsedQs: ParsedQs): LimitState {
   let inputCurrency = parseCurrencyFromURLParameter(parsedQs.inputCurrency)
   let outputCurrency = parseCurrencyFromURLParameter(parsedQs.outputCurrency)
   let inputRateValue = parseCurrencyFromURLParameter(parsedQs.inputRateValue)
@@ -263,10 +269,10 @@ export function useDefaultsFromURLSearch() {
 
   useEffect(() => {
     if (!chainId) return
-    const parsed = queryParametersToSwapState(parsedQs)
+    const parsed = queryParametersToLimitState(parsedQs)
 
     dispatch(
-      replaceSwapState({
+      replaceLimitState({
         typedValue: parsed.typedValue,
         field: parsed.independentField,
         inputCurrencyId: parsed[Field.INPUT].currencyId,
@@ -280,7 +286,7 @@ export function useDefaultsFromURLSearch() {
 }
 
 // updates the swap state to use the defaults for a given network
-export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrency:string, inputRateValue:string, field: Field) {
+export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrency:string, inputRateValue:string, field: EditField) {
   const { chainId } = useActiveWeb3React()
   const dispatch = useDispatch<AppDispatch>()  
 
@@ -289,7 +295,7 @@ export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrenc
     // console.log("--", inputCurrency)
 
     dispatch(
-      replaceSwapState({
+      replaceLimitState({
         typedValue: "0",
         field: field,
         inputCurrencyId: inputCurrency,
@@ -302,9 +308,9 @@ export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrenc
   }, [dispatch, chainId])
 }
 
-export function setSwapStateAny(inputCurrency:string, outputCurrency:string, inputRateValue:string, field: Field) {
+export function setLimitStateAny(inputCurrency:string, outputCurrency:string, inputRateValue:string, field: EditField) {
   console.log("--", inputCurrency)
-      replaceSwapState({
+      replaceLimitState({
         typedValue: "0",
         field: field,
         inputCurrencyId: inputCurrency,

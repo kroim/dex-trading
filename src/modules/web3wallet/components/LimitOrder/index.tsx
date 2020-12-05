@@ -5,13 +5,13 @@ import { AutoColumn } from '../../components/Column'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
 import PriceInputPanel from '../../components/PriceInputPanel'
 
-import { Field } from '../../state/limit/actions'
+import { Field, EditField } from '../../state/limit/actions'
 import useToggledVersion, { Version } from '../../hooks/useToggledVersion'
 import {
     useDerivedSwapInfo,
     useSwapActionHandlers,
-    useSwapState,
-    // setSwapStateAny
+    useLimitState,
+    // setLimitStateAny
   } from '../../state/limit/hooks'
 import useWrapCallback, { WrapType } from '../../hooks/useWrapCallback'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
@@ -106,7 +106,7 @@ function safeParseUnits(number, units) {
 export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency, outCurrency: Currency})  {
 
   const { account, chainId, library } = useActiveWeb3React()
-  const { independentField , typedValue,inputRateValue} = useSwapState()
+  const { independentField , typedValue,inputRateValue} = useLimitState()
   const uniswapEXContract = useUniswapExContract()
   const addTransaction = useTransactionAdder()
   // core swap state
@@ -131,9 +131,9 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
     // const  outputSymbol = outCurrency.symbol
     const outputDecimals = outCurrency?.decimals
   // rate info
-  const rateFormatted =  inputRateValue;
 
-  const dependentField: Field = independentField === Field.INPUT ? Field.OUTPUT :Field.INPUT
+
+  const dependentField: EditField = independentField === EditField.INPUT ? EditField.OUTPUT :EditField.INPUT
   const { wrapType } = useWrapCallback(
       currencies[Field.INPUT],
       currencies[Field.OUTPUT],
@@ -154,8 +154,8 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
     [Field.OUTPUT]: parsedAmount
   }
   : {
-    [Field.INPUT]: independentField === Field.INPUT ? parsedAmount : trade?.inputAmount,
-    [Field.OUTPUT]: independentField === Field.OUTPUT ? parsedAmount : trade?.outputAmount
+    [Field.INPUT]: independentField === EditField.INPUT ? parsedAmount : trade?.inputAmount,
+    [Field.OUTPUT]: independentField === EditField.OUTPUT ? parsedAmount : trade?.outputAmount
   }
   const formattedAmounts = {
       [independentField]: typedValue,
@@ -178,10 +178,10 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
   )
   // compute useful transforms of the data above
   // const independentDecimals = independentField === INPUT || independentField === RATE ? inputDecimals : outputDecimals
-  const dependentDecimals = independentField === Field.OUTPUT ? inputDecimals : outputDecimals
+  const dependentDecimals = independentField === EditField.OUTPUT ? inputDecimals : outputDecimals
 
   switch (independentField) {
-    case Field.OUTPUT:
+    case EditField.OUTPUT:
       outputValueParsed = parsedAmounts[Field.OUTPUT]?.raw.toString()
       outputValueFormatted = formattedAmounts[Field.OUTPUT]
       rateRaw = getExchangeRate(
@@ -192,7 +192,7 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
         rateOp === RATE_OP_DIV
       )
       break
-    case Field.RATE:
+    case EditField.RATE:
       if (!inputRateValue || Number(inputRateValue) === 0) {
         outputValueParsed = ''
         outputValueFormatted = ''
@@ -213,7 +213,7 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
         )
       }
       break
-    case Field.INPUT:
+    case EditField.INPUT:
       outputValueParsed = bestTradeExactIn
         ? ethers.utils.parseUnits(bestTradeExactIn.outputAmount.toExact(), dependentDecimals)
         : null
@@ -230,16 +230,17 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
       break
   }
   console.log(outputValueFormatted);
+  const rateFormatted = independentField === EditField.RATE ? inputRateValue : amountFormatter(rateRaw, 18, 4, false)
   const { onCurrencySelection, onUserInput, onUserRateInput } = useSwapActionHandlers()
   const handleTypeInput = useCallback(
       (value: string) => {
-        onUserInput(Field.INPUT, value)
+        onUserInput(EditField.INPUT, value)
       },
       [onUserInput]
   )
   const handleTypeOutput = useCallback(
       (value: string) => {
-        onUserInput(Field.OUTPUT, value)
+        onUserInput(EditField.OUTPUT, value)
       },
       [onUserInput]
     )
@@ -250,7 +251,7 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
       [onUserRateInput]
     )
       // modal and loading
-  // const [{ showConfirm, tradeToConfirm, swapErrorMessage, attemptingTxn, txHash }, setSwapState] = useState<{
+  // const [{ showConfirm, tradeToConfirm, swapErrorMessage, attemptingTxn, txHash }, setLimitState] = useState<{
   //   showConfirm: boolean
   //   tradeToConfirm: Trade | undefined
   //   attemptingTxn: boolean
@@ -316,7 +317,7 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
             inputAmount
             ))
         data.then(function (result) {
-        // const order = swapType === ETH_TO_TOKEN ? data : `0x${data.slice(267)}`
+          // const order = swapType === ETH_TO_TOKEN ? data : `0x${data.slice(267)}`
           // const order = {
           //   inputAmount: inputAmount.toString(),
           //   creationAmount: inputAmount.toString(),
@@ -330,7 +331,7 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
           //   outputToken: toCurrency.toLowerCase(),
           //   witness: address.toLowerCase()
           //   }
-            // saveOrder(account, order, chainId)
+          // saveOrder(account, order, chainId)
           let res
           if (swapType === ETH_TO_TOKEN) {
           res = uniswapEXContract.depositEth(result, { value: inputAmount })
@@ -362,14 +363,14 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
     return (
         <AutoColumn gap={'md'}>
             <CurrencyInputPanel
-                label={independentField === Field.OUTPUT && !showWrap ? 'From' : 'From'}
+                label={independentField === EditField.OUTPUT && !showWrap ? 'From' : 'From'}
                 value={formattedAmounts[Field.INPUT]}
                 showMaxButton={!atMaxAmountInput}
                 currency={currencies[Field.INPUT]}
                 disableCurrencySelect={true}
                 onUserInput={handleTypeInput}
                 onMax={() => {
-                maxAmountInput && onUserInput(Field.INPUT, maxAmountInput.toExact())
+                maxAmountInput && onUserInput(EditField.INPUT, maxAmountInput.toExact())
                 }}
                 onCurrencySelect={currency => {
                 // setApprovalSubmitted(false) // reset 2 step UI for approvals
@@ -391,7 +392,7 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
             <CurrencyInputPanel
                 value={formattedAmounts[Field.OUTPUT]}
                 onUserInput={handleTypeOutput}
-                label={independentField === Field.INPUT && !showWrap ? 'To' : 'To'}
+                label={independentField === EditField.INPUT && !showWrap ? 'To' : 'To'}
                 showMaxButton={false}
                 currency={currencies[Field.OUTPUT]}
                 disableCurrencySelect={true}
