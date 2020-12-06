@@ -102,9 +102,14 @@ function safeParseUnits(number, units) {
   try {
     return ethers.utils.parseUnits(number, units)
   } catch {
+    try {
     const margin = units * 8
     const decimals = ethers.utils.parseUnits(number, margin)
     return decimals.div(ethers.utils.bigNumberify(10).pow(margin - units))
+    }
+    catch {
+      return undefined
+    }
   }
 }
 function applyExchangeRateTo(inputValue, exchangeRate, inputDecimals, outputDecimals, invert = false) {
@@ -180,10 +185,10 @@ export function useDerivedSwapInfo(): {
   let outputValueFormatted, inputValueFormatted
   let outputValueParsed
   let rateRaw
-  let parsedAmount = tryParseAmount(inputValue,inputCurrency) ?? undefined
-  const inputAmount = parsedAmount
+  let parsedAmount
+  const inputAmount = tryParseAmount(inputValue,inputCurrency) ?? undefined
   const bestTradeExactIn = useTradeExactIn(
-    parsedAmount,
+    inputAmount,
     outputCurrency
   )
   // compute useful transforms of the data above
@@ -206,6 +211,7 @@ export function useDerivedSwapInfo(): {
       )
       break
     case EditField.RATE:
+      parsedAmount = tryParseAmount(typedValue,outputCurrency) ?? undefined
       if (!inputRateValue || Number(inputRateValue) === 0) {
         outputValueParsed = ''
         outputValueFormatted = ''
@@ -225,10 +231,11 @@ export function useDerivedSwapInfo(): {
           Math.min(4, dependentDecimals),
           false
         )
-        outputAmount = tryParseAmount(outputValueParsed, outputCurrency)
+        outputAmount = tryParseAmount(outputValueFormatted, outputCurrency)
       }
       break
     case EditField.INPUT:
+      parsedAmount = tryParseAmount(typedValue,inputCurrency) ?? undefined
       outputValueParsed = bestTradeExactIn
         ? ethers.utils.parseUnits(bestTradeExactIn.outputAmount.toExact(), outputDecimals)
         : null
@@ -240,7 +247,7 @@ export function useDerivedSwapInfo(): {
         outputDecimals,
         false     // rateOp === RATE_OP_DIV
       )
-      outputAmount = tryParseAmount(outputValueParsed, outputCurrency)
+      outputAmount = tryParseAmount(outputValueFormatted, outputCurrency)
       
       break
     default:

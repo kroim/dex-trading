@@ -29,7 +29,7 @@ import { useTransactionAdder } from '../../state/transactions/hooks'
 const ETH_TO_TOKEN = 0
 const TOKEN_TO_ETH = 1
 const TOKEN_TO_TOKEN = 2
-// const RATE_OP_MULT = 'x'
+
 
 function getSwapType(inputCurrency, outputCurrency) {
     if (!inputCurrency || !outputCurrency) {

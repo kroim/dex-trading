@@ -151,7 +151,7 @@ export default function CurrencyInputPanel({
   showSendWithSwap = false,
   otherCurrency = null,
   id,
-  showCommonBases
+  showCommonBases,
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
 
