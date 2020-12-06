@@ -19,6 +19,7 @@ export const replaceLimitState = createAction<{
   outputCurrencyId?: string
   recipient: string | null
   inputRateValue: string | null
+  inputValue: string | null
 
 }>('replaceLimitState')
 export const setRecipient = createAction<{ recipient: string | null }>('setRecipient')

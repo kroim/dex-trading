@@ -11,6 +11,7 @@ export interface LimitState {
     readonly currencyId: string | undefined
   }
   readonly inputRateValue: string | undefined
+  readonly inputValue: string | undefined
 
   // the typed recipient address or ENS name, or null if swap should go to sender
   readonly recipient: string | null
@@ -26,14 +27,15 @@ const initialState: LimitState = {
     currencyId: ''
   },
   inputRateValue: '',
-  recipient: null
+  recipient: null,
+  inputValue: ''
 }
 
 export default createReducer<LimitState>(initialState, builder =>
   builder
     .addCase(
       replaceLimitState,
-      (state, { payload: { typedValue, recipient, field, inputCurrencyId, outputCurrencyId, inputRateValue } }) => {
+      (state, { payload: { typedValue, recipient, field, inputCurrencyId, outputCurrencyId, inputRateValue, inputValue } }) => {
         return {
           [Field.INPUT]: {
             currencyId: inputCurrencyId
@@ -44,7 +46,8 @@ export default createReducer<LimitState>(initialState, builder =>
           inputRateValue: inputRateValue,
           independentField: field,
           typedValue: typedValue,
-          recipient
+          recipient,
+          inputValue: ''
         }
       }
     )
@@ -79,17 +82,19 @@ export default createReducer<LimitState>(initialState, builder =>
       }
     })
     .addCase(typeInput, (state, { payload: { field, typedValue } }) => {
-      return {
-        ...state,
-        independentField: field,
-        typedValue
+      state.independentField = field
+      if(field === EditField.INPUT)
+      {
+        state.inputValue = typedValue
       }
+      state.typedValue = typedValue
     })
     .addCase(setRecipient, (state, { payload: { recipient } }) => {
       state.recipient = recipient
     })
     .addCase(setInputRateValue, (state, { payload: { inputRateValue } }) => {
       state.inputRateValue = inputRateValue
+      state.independentField = EditField.RATE
     })
 
 )
