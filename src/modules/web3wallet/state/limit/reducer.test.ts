@@ -1,16 +1,16 @@
 import { createStore, Store } from 'redux'
-import { Field, selectCurrency } from './actions'
-import reducer, { SwapState } from './reducer'
+import { Field,EditField, selectCurrency } from './actions'
+import reducer, { LimitState } from './reducer'
 
 describe('swap reducer', () => {
-  let store: Store<SwapState>
+  let store: Store<LimitState>
 
   beforeEach(() => {
     store = createStore(reducer, {
       [Field.OUTPUT]: { currencyId: '' },
       [Field.INPUT]: { currencyId: '' },
       typedValue: '',
-      independentField: Field.INPUT,
+      independentField: EditField.INPUT,
       recipient: null
     })
   })

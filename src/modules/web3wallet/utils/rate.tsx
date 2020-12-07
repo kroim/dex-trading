@@ -9,7 +9,9 @@ export function getExchangeRate(inputValue, inputDecimals, outputValue, outputDe
       (outputDecimals || outputDecimals === 0)
     ) {
       const factor = ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(18))
-
+      console.log('input = ', inputValue.toString());
+      console.log('output = ', outputValue.toString());
+      
       if (invert) {
         return inputValue
           .mul(factor)

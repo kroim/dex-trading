@@ -1,32 +1,36 @@
 import useENS from '../../hooks/useENS'
-import { Version } from '../../hooks/useToggledVersion'
+// import { Version } from '../../hooks/useToggledVersion'
 import { parseUnits } from '@ethersproject/units'
-import { Currency, CurrencyAmount, ETHER, JSBI, Token, TokenAmount, Trade } from '@bscswap/sdk'
+import { Currency, CurrencyAmount, ETHER, JSBI, Token, TokenAmount/*, Trade */} from '@bscswap/sdk'
 import { ParsedQs } from 'qs'
 import { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useV1Trade } from '../../data/V1'
+// import { useV1Trade } from '../../data/V1'
 import { useActiveWeb3React } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
-import { useTradeExactIn, useTradeExactOut } from '../../hooks/Trades'
+import { useTradeExactIn/*, useTradeExactOut */} from '../../hooks/Trades'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { AppDispatch, AppState } from '../index'
 import { useCurrencyBalances } from '../wallet/hooks'
-import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput, setInputRateValue } from './actions'
-import { SwapState } from './reducer'
-import useToggledVersion from '../../hooks/useToggledVersion'
-import { useUserSlippageTolerance } from '../user/hooks'
-import { computeSlippageAdjustedAmounts } from '../../utils/prices'
-
-export function useSwapState(): AppState['limit'] {
+import { Field,EditField, replaceLimitState, selectCurrency, setRecipient, switchCurrencies, typeInput, setInputRateValue } from './actions'
+import { LimitState } from './reducer'
+// import useToggledVersion from '../../hooks/useToggledVersion'
+// import { useUserSlippageTolerance } from '../user/hooks'
+// import { computeSlippageAdjustedAmounts } from '../../utils/prices'
+import { getExchangeRate } from '../../utils/rate'
+import { ethers } from 'ethers'
+import { amountFormatter } from '../../utils'
+// const RATE_OP_DIV = '/'
+// const RATE_OP_MULT = 'x'
+export function useLimitState(): AppState['limit'] {
   return useSelector<AppState, AppState['limit']>(state => state.limit)
 }
 
 export function useSwapActionHandlers(): {
   onCurrencySelection: (field: Field, currency: Currency) => void
   onSwitchTokens: () => void
-  onUserInput: (field: Field, typedValue: string) => void
+  onUserInput: (field: EditField, typedValue: string) => void
   onUserRateInput: (typedValue: string| null) => void
   onChangeRecipient: (recipient: string | null) => void
 } {
@@ -48,7 +52,7 @@ export function useSwapActionHandlers(): {
   }, [dispatch])
 
   const onUserInput = useCallback(
-    (field: Field, typedValue: string) => {
+    (field: EditField, typedValue: string) => {
       dispatch(typeInput({ field, typedValue }))
     },
     [dispatch]
@@ -94,28 +98,74 @@ export function tryParseAmount(value?: string, currency?: Currency): CurrencyAmo
   // necessary for all paths to return a value
   return
 }
+function safeParseUnits(number, units) {
+  try {
+    return ethers.utils.parseUnits(number, units)
+  } catch {
+    try {
+    const margin = units * 8
+    const decimals = ethers.utils.parseUnits(number, margin)
+    return decimals.div(ethers.utils.bigNumberify(10).pow(margin - units))
+    }
+    catch {
+      return undefined
+    }
+  }
+}
+function applyExchangeRateTo(inputValue, exchangeRate, inputDecimals, outputDecimals, invert = false) {
+  try {
+    if (
+      inputValue &&
+      exchangeRate &&
+      (inputDecimals || inputDecimals === 0) &&
+      (outputDecimals || outputDecimals === 0)
+    ) {
+      const factor = ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(18))
 
+      if (invert) {
+        return inputValue
+          .mul(factor)
+          .div(exchangeRate)
+          .mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(outputDecimals)))
+          .div(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(inputDecimals)))
+      } else {
+        return exchangeRate
+          .mul(inputValue)
+          .div(factor)
+          .mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(outputDecimals)))
+          .div(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(inputDecimals)))
+      }
+    }
+  } catch {}
+}
 // from the current swap inputs, compute the best trade and return it.
 export function useDerivedSwapInfo(): {
   currencies: { [field in Field]?: Currency }
   currencyBalances: { [field in Field]?: CurrencyAmount }
   parsedAmount: CurrencyAmount | undefined
-  v2Trade: Trade | undefined
+  // v2Trade: Trade | undefined
   inputError?: string
-  v1Trade: Trade | undefined
+  // v1Trade: Trade | undefined
+  inputRateValue?: string
+  inputAmount: CurrencyAmount | undefined
+  outputAmount: CurrencyAmount | undefined
+  rateFormatted: string,
+  outputValueFormatted: string,
+  inputValueFormatted: string
 } {
   const { account } = useActiveWeb3React()
 
-  const toggledVersion = useToggledVersion()
+  // const toggledVersion = useToggledVersion()
 
   const {
     independentField,
     typedValue,
     [Field.INPUT]: { currencyId: inputCurrencyId },
     [Field.OUTPUT]: { currencyId: outputCurrencyId },
-    // inputRateValue: inputRateValue ,
-    recipient
-  } = useSwapState()
+    recipient,
+    inputValue,
+    inputRateValue
+  } = useLimitState()
 
   const inputCurrency = useCurrency(inputCurrencyId)
   const outputCurrency = useCurrency(outputCurrencyId)
@@ -126,15 +176,85 @@ export function useDerivedSwapInfo(): {
     inputCurrency ?? undefined,
     outputCurrency ?? undefined
   ])
-
-  const isExactIn: boolean = independentField === Field.INPUT
-  const parsedAmount = tryParseAmount(typedValue, (isExactIn ? inputCurrency : outputCurrency) ?? undefined)
-
-  const bestTradeExactIn = useTradeExactIn(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined)
-  const bestTradeExactOut = useTradeExactOut(inputCurrency ?? undefined, !isExactIn ? parsedAmount : undefined)
-
-  const v2Trade = isExactIn ? bestTradeExactIn : bestTradeExactOut
-
+  const inputDecimals = inputCurrency?.decimals
+  // const  outputSymbol = outCurrency.symbol
+  const outputDecimals = outputCurrency?.decimals
+  // const rateOp = "x"
+  // declare/get parsed and formatted versions of input/output values
+  const inputValueParsed = inputValue ? ethers.utils.parseUnits(inputValue, inputDecimals): undefined;
+  let outputValueFormatted, inputValueFormatted
+  let outputValueParsed
+  let rateRaw
+  let parsedAmount
+  const inputAmount = tryParseAmount(inputValue,inputCurrency) ?? undefined
+  const bestTradeExactIn = useTradeExactIn(
+    inputAmount,
+    outputCurrency
+  )
+  // compute useful transforms of the data above
+  // const independentDecimals = independentField === INPUT || independentField === RATE ? inputDecimals : outputDecimals
+  const dependentDecimals = independentField === EditField.OUTPUT ? inputDecimals : outputDecimals
+  let outputAmount
+  inputValueFormatted = inputValue
+  switch (independentField) {
+    case EditField.OUTPUT:
+      outputValueParsed = typedValue? safeParseUnits(typedValue, outputDecimals) : undefined
+      parsedAmount = tryParseAmount(typedValue,outputCurrency) ?? undefined
+      outputAmount = parsedAmount
+      outputValueFormatted = parsedAmount?.toSignificant(6) ?? ''
+      rateRaw = getExchangeRate(
+        inputValueParsed,
+        inputDecimals,
+        outputValueParsed,
+        outputDecimals,
+        false     // rateOp === RATE_OP_DIV
+      )
+      break
+    case EditField.RATE:
+      parsedAmount = tryParseAmount(typedValue,outputCurrency) ?? undefined
+      if (!inputRateValue || Number(inputRateValue) === 0) {
+        outputValueParsed = ''
+        outputValueFormatted = ''
+        outputAmount = undefined
+      } else {
+        rateRaw = safeParseUnits(inputRateValue, 18)
+        outputValueParsed = applyExchangeRateTo(
+          inputValueParsed,
+          rateRaw,
+          inputDecimals,
+          outputDecimals,
+          false     // rateOp === RATE_OP_DIV
+        )
+        outputValueFormatted = amountFormatter(
+          outputValueParsed,
+          dependentDecimals,
+          Math.min(4, dependentDecimals),
+          false
+        )
+        outputAmount = tryParseAmount(outputValueFormatted, outputCurrency)
+      }
+      break
+    case EditField.INPUT:
+      parsedAmount = tryParseAmount(typedValue,inputCurrency) ?? undefined
+      outputValueParsed = bestTradeExactIn
+        ? ethers.utils.parseUnits(bestTradeExactIn.outputAmount.toExact(), outputDecimals)
+        : null
+      outputValueFormatted = bestTradeExactIn ? bestTradeExactIn.outputAmount.toSignificant(6) : ''
+      rateRaw = getExchangeRate(
+        inputValueParsed,
+        inputDecimals,
+        outputValueParsed,
+        outputDecimals,
+        false     // rateOp === RATE_OP_DIV
+      )
+      outputAmount = tryParseAmount(outputValueFormatted, outputCurrency)
+      
+      break
+    default:
+      break
+  }
+  const rateFormatted = independentField === EditField.RATE ? inputRateValue : amountFormatter(rateRaw, 18, 4, false)
+  console.log("rate = ", rateFormatted)
   const currencyBalances = {
     [Field.INPUT]: relevantTokenBalances[0],
     [Field.OUTPUT]: relevantTokenBalances[1]
@@ -146,7 +266,7 @@ export function useDerivedSwapInfo(): {
   }
 
   // get link to trade on v1, if a better rate exists
-  const v1Trade = useV1Trade(isExactIn, currencies[Field.INPUT], currencies[Field.OUTPUT], parsedAmount)
+  // const v1Trade = useV1Trade(isExactIn, currencies[Field.INPUT], currencies[Field.OUTPUT], parsedAmount)
 
   let inputError: string | undefined
   if (!account) {
@@ -165,36 +285,19 @@ export function useDerivedSwapInfo(): {
     inputError = inputError ?? 'Enter a recipient'
   }
 
-  const [allowedSlippage] = useUserSlippageTolerance()
-
-  const slippageAdjustedAmounts = v2Trade && allowedSlippage && computeSlippageAdjustedAmounts(v2Trade, allowedSlippage)
-
-  const slippageAdjustedAmountsV1 =
-    v1Trade && allowedSlippage && computeSlippageAdjustedAmounts(v1Trade, allowedSlippage)
-
-  // compare input balance to max input based on version
-  const [balanceIn, amountIn] = [
-    currencyBalances[Field.INPUT],
-    toggledVersion === Version.v1
-      ? slippageAdjustedAmountsV1
-        ? slippageAdjustedAmountsV1[Field.INPUT]
-        : null
-      : slippageAdjustedAmounts
-      ? slippageAdjustedAmounts[Field.INPUT]
-      : null
-  ]
-
-  if (balanceIn && amountIn && balanceIn.lessThan(amountIn)) {
-    inputError = 'Insufficient ' + amountIn.currency.symbol + ' balance'
-  }
-
   return {
     currencies,
     currencyBalances,
     parsedAmount,
-    v2Trade: v2Trade ?? undefined,
+    // v2Trade: v2Trade ?? undefined,
     inputError,
-    v1Trade
+    // v1Trade,
+    inputRateValue: inputRateValue,
+    inputAmount: inputAmount,
+    outputAmount: outputAmount,
+    rateFormatted,
+    outputValueFormatted,
+    inputValueFormatted
   }
 }
 
@@ -212,8 +315,12 @@ function parseTokenAmountURLParameter(urlParam: any): string {
   return typeof urlParam === 'string' && !isNaN(parseFloat(urlParam)) ? urlParam : ''
 }
 
-function parseIndependentFieldURLParameter(urlParam: any): Field {
-  return typeof urlParam === 'string' && urlParam.toLowerCase() === 'output' ? Field.OUTPUT : Field.INPUT
+function parseIndependentFieldURLParameter(urlParam: any): EditField {
+  if(typeof urlParam === 'string' && urlParam.toLowerCase() === 'output')
+  return  EditField.OUTPUT
+  else if(typeof urlParam === 'string' && urlParam.toLowerCase() === 'rate')
+  return EditField.RATE
+  return EditField.INPUT
 }
 
 const ENS_NAME_REGEX = /^[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)?$/
@@ -227,7 +334,7 @@ function validatedRecipient(recipient: any): string | null {
   return null
 }
 
-export function queryParametersToSwapState(parsedQs: ParsedQs): SwapState {
+export function queryParametersToLimitState(parsedQs: ParsedQs): LimitState {
   let inputCurrency = parseCurrencyFromURLParameter(parsedQs.inputCurrency)
   let outputCurrency = parseCurrencyFromURLParameter(parsedQs.outputCurrency)
   let inputRateValue = parseCurrencyFromURLParameter(parsedQs.inputRateValue)
@@ -251,7 +358,8 @@ export function queryParametersToSwapState(parsedQs: ParsedQs): SwapState {
     inputRateValue: inputRateValue,
     typedValue: parseTokenAmountURLParameter(parsedQs.exactAmount),
     independentField: parseIndependentFieldURLParameter(parsedQs.exactField),
-    recipient
+    recipient,
+    inputValue: ''
   }
 }
 
@@ -263,16 +371,17 @@ export function useDefaultsFromURLSearch() {
 
   useEffect(() => {
     if (!chainId) return
-    const parsed = queryParametersToSwapState(parsedQs)
+    const parsed = queryParametersToLimitState(parsedQs)
 
     dispatch(
-      replaceSwapState({
+      replaceLimitState({
         typedValue: parsed.typedValue,
         field: parsed.independentField,
         inputCurrencyId: parsed[Field.INPUT].currencyId,
         outputCurrencyId: parsed[Field.OUTPUT].currencyId,
         inputRateValue: parsed.inputRateValue,
-        recipient: parsed.recipient
+        recipient: parsed.recipient,
+        inputValue: ''
       })
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -280,7 +389,7 @@ export function useDefaultsFromURLSearch() {
 }
 
 // updates the swap state to use the defaults for a given network
-export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrency:string, inputRateValue:string, field: Field) {
+export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrency:string, inputRateValue:string, field: EditField) {
   const { chainId } = useActiveWeb3React()
   const dispatch = useDispatch<AppDispatch>()  
 
@@ -289,27 +398,29 @@ export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrenc
     // console.log("--", inputCurrency)
 
     dispatch(
-      replaceSwapState({
+      replaceLimitState({
         typedValue: "0",
         field: field,
         inputCurrencyId: inputCurrency,
         outputCurrencyId: outputCurrency,
         inputRateValue: inputRateValue,
-        recipient: null
+        recipient: null,
+        inputValue: ''
       })
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, chainId])
 }
 
-export function setSwapStateAny(inputCurrency:string, outputCurrency:string, inputRateValue:string, field: Field) {
+export function setLimitStateAny(inputCurrency:string, outputCurrency:string, inputRateValue:string, field: EditField) {
   console.log("--", inputCurrency)
-      replaceSwapState({
+      replaceLimitState({
         typedValue: "0",
         field: field,
         inputCurrencyId: inputCurrency,
         outputCurrencyId: outputCurrency,
         inputRateValue: inputRateValue,
-        recipient: null
+        recipient: null,
+        inputValue: ''
       })    
 }
