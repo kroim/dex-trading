@@ -275,13 +275,14 @@ export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrenc
 
   useEffect(() => {
     if (!chainId) return
-    // console.log("--", inputCurrency)
-
+     console.log("--input", inputCurrency, outputCurrency)
+    // if(inputCurrency==="0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c")
+     
     dispatch(
       replaceSwapState({
         typedValue: "0",
         field: field,
-        inputCurrencyId: inputCurrency,
+        inputCurrencyId:  inputCurrency==="0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"?"BNB":inputCurrency,
         outputCurrencyId: outputCurrency,
         recipient: null
       })

@@ -10,6 +10,7 @@ import {
     useDerivedSwapInfo,
     useSwapActionHandlers,
     useLimitState,
+    useDefaultsFromCurrentMarket
     // setLimitStateAny
   } from '../../state/limit/hooks'
 import useWrapCallback, { WrapType } from '../../hooks/useWrapCallback'
@@ -20,6 +21,7 @@ import { BNB_ADDRESS, LIMIT_ORDER_MODULE_ADDRESSES} from '../../constants'
 import { useUniswapExContract } from '../../hooks/useContract'
 import { ethers } from 'ethers'
 import { useTransactionAdder } from '../../state/transactions/hooks'
+
 
 // import {currencyId} from '../../utils/currencyId'
 // import { useTradeExactIn } from '../../hooks/Trades'
@@ -110,6 +112,10 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
   const atMaxAmountInput = Boolean(maxAmountInput && inputAmount?.equalTo(maxAmountInput))
   const { onCurrencySelection, onUserInput, onUserRateInput } = useSwapActionHandlers()
 
+  //----- default pair ---------//
+  useDefaultsFromCurrentMarket("BNB" , "0x32dffc3fe8e3ef3571bf8a72c0d0015c5373f41d" , "0.0" ,  EditField.INPUT)
+  //----------------------------//
+  
   const handleTypeInput = useCallback(
       (value: string) => {
         onUserInput(EditField.INPUT, value)

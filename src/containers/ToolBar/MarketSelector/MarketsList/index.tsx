@@ -66,6 +66,13 @@ class MarketsListComponent extends React.Component<Props, State> {
             sortBy: 'none',
             reverseOrder: false,
         };
+        
+
+    }
+
+    public componentDidMount()
+    {
+        console.log("----current market", this.props.currentMarket);
     }
 
     public render() {

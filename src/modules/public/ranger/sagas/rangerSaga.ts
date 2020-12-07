@@ -329,7 +329,8 @@ const switchMarket = (subscribeOnInitOnly: boolean) => {
             // window.console.log("---web3", active, account);
             const owner = store.getState().user.currentAddress;
             // window.console.log("----store", store.getState())
-            yield put(rangerSubscribeMyOrders(owner));            
+            if(owner && owner!="")
+                yield put(rangerSubscribeMyOrders(owner));            
         }
     };
 };

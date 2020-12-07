@@ -396,7 +396,7 @@ export function useDefaultsFromCurrentMarket(inputCurrency:string, outputCurrenc
   useEffect(() => {
     if (!chainId) return
     // console.log("--", inputCurrency)
-
+    console.log("----input limit", inputCurrency, outputCurrency)
     dispatch(
       replaceLimitState({
         typedValue: "0",
