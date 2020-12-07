@@ -23,6 +23,22 @@ import {
 } from '../../modules';
 import { OrderCommon } from '../../modules/types';
 
+import * as actions from '../../modules/user/openOrders/actions';
+import {    
+    rangerUserOrderUpdate,    
+} from '../../modules/public/ranger/actions';
+// import {
+//     convertOrderEvent,
+//     insertOrUpdate,
+// } from '../../modules/user/openOrders/helpers';
+import {  OrderEvent}  from '../../modules/types';
+
+// import {
+//     initialOpenOrdersState,
+//     openOrdersReducer,
+//     // OpenOrdersState,
+// } from '../../modules/user/openOrders/reducer';
+
 interface ReduxProps {
     currentMarket: Market | undefined;
     list: OrderCommon[];
@@ -39,6 +55,8 @@ interface DispatchProps {
 
 type Props = ReduxProps & DispatchProps & IntlProps;
 
+
+
 export class OpenOrdersContainer extends React.Component<Props> {
 
     public state = { tab: 'openOrders', index: 0, disable: false };
@@ -50,6 +68,37 @@ export class OpenOrdersContainer extends React.Component<Props> {
         if (userLoggedIn && currentMarket) {
             this.props.userOpenOrdersFetch({ market: currentMarket });
         }
+        const newOrderEvent: OrderEvent = {
+            id: "162",
+            at: 1550180631,
+            market: 'ethusd',
+            side: 'buy',
+            kind: 'bid',
+            price: '0.3',
+            state: 'wait',
+            remaining_volume: '123.1234',
+            origin_volume: '123.1234',
+        };
+        const newOrderData: OrderCommon = {
+            id: "162",          
+            market: 'ethusd',
+            side: 'buy',
+            kind: 'bid',
+            price: '0.3',
+            state: 'wait',
+            remaining_volume: '123.1234',
+            origin_volume: '123.1234',
+        }
+        const orders = []; orders.push(newOrderData);
+        // const list = insertOrUpdate([], convertOrderEvent(newOrderEvent));
+        console.log("------open order ---")
+        // const expectedState: OpenOrdersState = { ...initialOpenOrdersState, list };
+        actions.userOpenOrdersUpdate(newOrderEvent);
+        const actions1 = actions.userOpenOrdersData(orders);
+        console.log(actions1);
+        
+        rangerUserOrderUpdate(newOrderEvent);
+
     }
 
     public componentWillReceiveProps(next: Props) {
@@ -236,7 +285,7 @@ export class OpenOrdersContainer extends React.Component<Props> {
             // return [[[''], [''], this.translate('page.noDataToShow')]];
             return [[[this.translate('page.noDataToShow')]]];
         }
-
+        console.log("---list", list);
         return list.map((item: OrderCommon) => {
             const { id, price, created_at, remaining_volume, origin_volume, side } = item;
             const executedVolume = Number(origin_volume) - Number(remaining_volume);
@@ -271,9 +320,25 @@ export class OpenOrdersContainer extends React.Component<Props> {
     // };
 }
 
+const openOrdersData: OrderCommon[] = [
+    {
+        id: "131",
+        side: 'sell',
+        price: '104.4313',
+        created_at: '2019-01-31T21:14:04+01:00',
+        remaining_volume: '0',
+        origin_volume: '10',
+        executed_volume: '10',
+        state: 'wait',
+        market: 'ethusd',
+    },
+];
+console.log(openOrdersData);
+
 const mapStateToProps = (state: RootState): ReduxProps => ({
     currentMarket: selectCurrentMarket(state),
     list: selectOpenOrdersList(state),
+    // list: openOrdersData,
     fetching: selectOpenOrdersFetching(state),
     cancelFetching: selectCancelOpenOrdersFetching(state),
     userLoggedIn: selectUserLoggedIn(state),

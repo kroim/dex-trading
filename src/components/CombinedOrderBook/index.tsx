@@ -96,9 +96,10 @@ export class CombinedOrderBook extends React.PureComponent<CombinedOrderBookProp
           onSelectBids,
           lastPrice,
       } = this.props;
-      console.log("dataAsks: ", dataAsks);
-      console.log("dataBids: ", dataBids);
-      console.log("maxVolume: ", maxVolume);
+      // console.log("dataAsks: ", dataAsks);
+      // console.log("dataBids: ", dataBids);
+      // console.log("maxVolume: ", maxVolume);
+      // console.log("----test--");
       const reverseHead = headers.slice(0).reverse();
 
       return (

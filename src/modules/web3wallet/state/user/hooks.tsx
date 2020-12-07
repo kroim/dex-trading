@@ -17,10 +17,12 @@ import {
   updateUserDarkMode,
   updateUserDeadline,
   updateUserExpertMode,
-  updateUserSlippageTolerance
+  updateUserSlippageTolerance,
+  updateCurrentAddress
 } from './actions'
 import { useDefaultTokenList } from '../lists/hooks'
 import { isDefaultToken } from '../../utils'
+// import { useWeb3React } from '@web3-react/core'
 
 function serializeToken(token: Token): SerializedToken {
   return {
@@ -269,4 +271,18 @@ export function useTrackedTokenPairs(): [Token, Token][] {
 
     return Object.keys(keyed).map(key => keyed[key])
   }, [combinedList])
+}
+
+
+export function useCurrentAddressManager(): [ (address) => void] {
+  const dispatch = useDispatch<AppDispatch>()
+  const { active, account } = useActiveWeb3React();
+  const setCurrentAddress = useCallback((address ) => {
+    let owner = ""
+    if(active) owner = account.toLocaleLowerCase();
+    console.log("-- owner", owner);
+    dispatch(updateCurrentAddress({ currentAddress: owner }))   
+  }, [dispatch])
+
+  return [setCurrentAddress]
 }

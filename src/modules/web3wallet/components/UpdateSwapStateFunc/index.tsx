@@ -12,6 +12,11 @@ import {
 import { ETHER } from '@bscswap/sdk';
 
 
+
+import {useCurrentAddressManager } from '../../state/user/hooks'
+
+
+
 export declare const enum OrderType {
 	Limit = 1,
 	Market = 2,
@@ -34,6 +39,7 @@ const { forwardRef, useImperativeHandle  } = React;
 export const UpdateMarketPairFroward = forwardRef((props, ref) => {
 
   const { onCurrencySelection } = useSwapActionHandlers()
+  const [setCurrentAddress] =  useCurrentAddressManager();
   const allTokens = useAllTokens()
   
   const objSetter = (prop, obj)=>{ 
@@ -54,6 +60,8 @@ export const UpdateMarketPairFroward = forwardRef((props, ref) => {
       // console.log(onCurrencySelection)
       // onCurrencySelection(Field.INPUT, market.baseContract )
       console.log(market)
+      
+      setCurrentAddress("");
       if(market.quote_unit.toLowerCase()==="bnb") onCurrencySelection(Field.INPUT, ETHER)
        else  onCurrencySelection(Field.INPUT, objSetter(market.quote_contract, allTokens))
 

@@ -40,7 +40,7 @@ export class OpenOrders extends React.Component<OpenOrdersProps> {
         if (headersKeys[orderIndex] === 'Order Type'){
            headers[orderIndex] = <span onClick={this.props.function}>Order Type</span>;
         }
-
+        
         return (
             <div className="cr-open-orders">
                 <Table

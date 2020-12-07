@@ -38,6 +38,7 @@ export const openOrdersReducer = (
     action: OpenOrdersAction,
 ): OpenOrdersState => {
     switch (action.type) {
+        
         case OPEN_ORDERS_FETCH:
             return { ...state, fetching: true };
         case OPEN_ORDERS_DATA:

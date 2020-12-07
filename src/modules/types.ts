@@ -27,7 +27,7 @@ export interface OrderCommon {
     updated_at?: string;
     confirmed?: boolean;
     uuid?: string;
-    id?: number;
+    id?: string;
     kind?: OrderKind;
     trades_count?: number;
 }
