@@ -7,14 +7,15 @@ import { OpenOrders } from '../../index';
 
 const CreateOrderComponent = props => {
     const userLoggedIn = useSelector(selectUserLoggedIn);
-
+    console.log("---", userLoggedIn);
     return (
         <div className="pg-mobile-create-order">
             <div className="pg-mobile-create-order__row-double">
                 {/* <OrderBook /> */}
                 <OrderComponent defaultTabIndex={props.currentOrderTypeIndex} />
             </div>
-            {userLoggedIn ? <OpenOrders /> : null}
+            {/* {userLoggedIn ? <OpenOrders /> : null} */}
+            { <OpenOrders />}
         </div>
     );
 };

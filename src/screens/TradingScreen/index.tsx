@@ -102,10 +102,11 @@ const TradingWrapper = props => {
             // {
             //     i: 4,
             //     render: () => <MarketDepthsComponent />,
-            // },
+            // },`
             {
                 i: 5,
                 render: () => <OpenOrdersComponent/>,
+                // render: () => <OrderBook size={orderBookComponentResized}/>,
             },
             {
                 i: 6,
@@ -149,7 +150,7 @@ class Trading extends React.Component<Props, StateProps> {
     public componentDidMount() {
         setDocumentTitle('Trading');
         const { markets, currentMarket, userLoggedIn, rangerState: { connected, withAuth } } = this.props;
-
+        
         if (markets.length < 1) {
             this.props.marketsFetch();
         }

@@ -3,7 +3,7 @@ import { all, call, cancel, delay, fork, put, race, select, take, takeEvery } fr
 import { isFinexEnabled, rangerUrl } from '../../../../api';
 import { store } from '../../../../store';
 import { pushHistoryEmit } from '../../../user/history';
-import { selectOpenOrdersList, userOpenOrdersUpdate } from '../../../user/openOrders';
+import { selectOpenOrdersList, userOpenOrdersUpdate /*, userOpenOrdersReset*/ } from '../../../user/openOrders';
 import { userOrdersHistoryRangerData} from '../../../user/ordersHistory';
 import { updateWalletsDataByRanger, walletsAddressDataWS } from '../../../user/wallets';
 import { alertPush } from '../../alert';
@@ -17,6 +17,7 @@ import {
     rangerDisconnectData,
     rangerDisconnectFetch,
     rangerSubscribeMarket,
+    rangerSubscribeMyOrders,
     rangerUnsubscribeMarket,
     rangerUserOrderUpdate,
     subscriptionsUpdate,
@@ -33,6 +34,11 @@ import {
 import { formatTicker, generateSocketURI, streamsBuilder } from '../helpers';
 import { selectSubscriptions } from '../selectors';
 
+import { OrderEvent } from '../../../types';
+
+// import {useWeb3React} from '@web3-react/core';
+
+
 interface RangerBuffer {
     messages: object[];
 }
@@ -44,14 +50,17 @@ const initRanger = (
     buffer: RangerBuffer,
 ): [EventChannel<any>, WebSocket] => {
     const baseUrl = `${rangerUrl()}/${withAuth ? 'private' : 'public'}`;
+    window.console.log(prevSubs, market)
     const streams = streamsBuilder(withAuth, prevSubs, market);
-
+    window.console.log("--------------", streams)
+    // console.log("--streams", streams)
     const ws = new WebSocket(generateSocketURI(baseUrl, streams));
     const channel = eventChannel(emitter => {
         ws.onopen = () => {
             emitter({ type: RANGER_CONNECT_DATA });
             while (buffer.messages.length > 0) {
                 const message = buffer.messages.shift();
+                // console.log("----message", message)
                 ws.send(JSON.stringify(message));
             }
         };
@@ -71,6 +80,7 @@ const initRanger = (
             } catch (e) {
                 window.console.error(`Error parsing : ${e.data}`);
             }
+            // window.console.log(payload);
 
             for (const routingKey in payload) {
                 if (payload.hasOwnProperty(routingKey)) {
@@ -150,17 +160,16 @@ const initRanger = (
                     switch (routingKey) {
                         // public
                         case 'global.tickers':
-                            emitter(marketsTickersData(formatTicker(event)));
-
+                            emitter(marketsTickersData(formatTicker(event)));                            
                             return;
 
                         // public
                         case 'success':
-                            switch (event.message) {
+                            switch (event.message) {                                
                                 case 'subscribed':
                                 case 'unsubscribed':
                                     emitter(subscriptionsUpdate({ subscriptions: event.streams }));
-
+                                    // emitter(subscriptionsUpdate({ subscriptions: ["-----xxxxx----"] }));
                                     return;
                                 default:
                             }
@@ -208,10 +217,65 @@ const initRanger = (
 
                         // private
                         case 'deposit_address':
-                            emitter(walletsAddressDataWS(event));
+                            if(!event.myOrderOpen.empty) emitter(walletsAddressDataWS(event.myOrderOpen));
 
                             return;
-
+                        case 'private.orders':
+                            // window.console.log("---private orders", event)
+                            const newOrderEvent: OrderEvent = {
+                                id: "162",
+                                at: 1550180631,
+                                market: 'julbbusd',
+                                side: 'buy',
+                                // kind: 'bid',
+                                price: '0.3',
+                                state: 'wait',
+                                remaining_volume: '123.1234',
+                                origin_volume: '123.1234',
+                            };
+                            // let newOrderEvent2: OrderEvent = {
+                            //     id: "163",
+                            //     at: 1550180631,
+                            //     market: 'julbbusd',
+                            //     side: 'buy',
+                            //     // kind: 'bid',
+                            //     price: '0.3',
+                            //     state: 'wait',
+                            //     remaining_volume: '123.1234',
+                            //     origin_volume: '123.1234',
+                            // };
+                            const payload=[];
+                            payload.push(newOrderEvent);
+                            // emitter(alertPush({ message: ['success.order.created'], type: 'success'}));
+                            const myOrderOpen= event.myOrderOpen;
+                            // const myOrderHistory = event.myOrderHistory;                            
+                            // emitter(rangerUserOrderUpdate(newOrderEvent));
+                            if(myOrderOpen)
+                            myOrderOpen.forEach(myOrder => {                                
+                                emitter(rangerUserOrderUpdate(myOrder));    
+                            });
+                            // if(myOrderHistory)
+                            // myOrderHistory.forEach(myOrder => {         
+                             
+                            //     let tempOrder : OrderEvent = {
+                            //             id: myOrder.id,
+                            //             at:  myOrder.at,
+                            //             market: myOrder.market,
+                            //             side: myOrder.side,
+                            //             // kind: 'bid',
+                            //             price: myOrder.price,
+                            //             state: myOrder.state,
+                            //             remaining_volume: ,
+                            //             origin_volume: '123.1234',
+                            //         };
+                            //         console.log(tempOrder);
+                            //     // tempOrder.id = myOrder.id;
+                            //     // tempOrder.at = myOrder.at;                                
+                            //     emitter(rangerUserOrderUpdate(tempOrder));    
+                            // });
+                            // emitter(rangerUserOrderUpdate(newOrderEvent2));
+                            // console.log(store.getState())
+                            return;
                         default:
                     }
                     window.console.log(`Unhandeled websocket channel: ${routingKey}`);
@@ -259,6 +323,13 @@ const switchMarket = (subscribeOnInitOnly: boolean) => {
         previousMarket = action.payload;
         if (action.payload) {
             yield put(rangerSubscribeMarket(action.payload));
+            //--- when market is changed, reset open orders of users
+            // yield put(userOpenOrdersReset());            
+            // const { active, account  } = useWeb3React();
+            // window.console.log("---web3", active, account);
+            const owner = store.getState().user.currentAddress;
+            // window.console.log("----store", store.getState())
+            yield put(rangerSubscribeMyOrders(owner));            
         }
     };
 };

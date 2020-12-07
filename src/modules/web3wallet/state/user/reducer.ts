@@ -13,7 +13,8 @@ import {
   updateVersion,
   updateUserExpertMode,
   updateUserSlippageTolerance,
-  updateUserDeadline
+  updateUserDeadline,
+  updateCurrentAddress
 } from './actions'
 
 const currentTimestamp = () => new Date().getTime()
@@ -54,6 +55,9 @@ export interface UserState {
   }
 
   timestamp: number
+
+  // current account
+  currentAddress: string
 }
 
 function pairKey(token0Address: string, token1Address: string) {
@@ -68,7 +72,8 @@ export const initialState: UserState = {
   userDeadline: DEFAULT_DEADLINE_FROM_NOW,
   tokens: {},
   pairs: {},
-  timestamp: currentTimestamp()
+  timestamp: currentTimestamp(),
+  currentAddress: ""
 }
 
 export default createReducer(initialState, builder =>
@@ -138,6 +143,10 @@ export default createReducer(initialState, builder =>
         delete state.pairs[chainId][pairKey(tokenAAddress, tokenBAddress)]
         delete state.pairs[chainId][pairKey(tokenBAddress, tokenAAddress)]
       }
+      state.timestamp = currentTimestamp()
+    })
+    .addCase(updateCurrentAddress, (state, action) => {
+      state.currentAddress = action.payload.currentAddress
       state.timestamp = currentTimestamp()
     })
 )
