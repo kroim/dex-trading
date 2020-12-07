@@ -3,7 +3,7 @@ import { all, call, cancel, delay, fork, put, race, select, take, takeEvery } fr
 import { isFinexEnabled, rangerUrl } from '../../../../api';
 import { store } from '../../../../store';
 import { pushHistoryEmit } from '../../../user/history';
-import { selectOpenOrdersList, userOpenOrdersUpdate } from '../../../user/openOrders';
+import { selectOpenOrdersList, userOpenOrdersUpdate /*, userOpenOrdersReset*/ } from '../../../user/openOrders';
 import { userOrdersHistoryRangerData} from '../../../user/ordersHistory';
 import { updateWalletsDataByRanger, walletsAddressDataWS } from '../../../user/wallets';
 import { alertPush } from '../../alert';
@@ -322,7 +322,9 @@ const switchMarket = (subscribeOnInitOnly: boolean) => {
         }
         previousMarket = action.payload;
         if (action.payload) {
-            yield put(rangerSubscribeMarket(action.payload));            
+            yield put(rangerSubscribeMarket(action.payload));
+            //--- when market is changed, reset open orders of users
+            // yield put(userOpenOrdersReset());            
             // const { active, account  } = useWeb3React();
             // window.console.log("---web3", active, account);
             const owner = store.getState().user.currentAddress;

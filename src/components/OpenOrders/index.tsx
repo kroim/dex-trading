@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import * as React from 'react';
 import { CellData, Table } from '../';
 import { CloseIcon } from '../../assets/images/CloseIcon';
-
+// import { useWeb3React } from '@web3-react/core';
 export interface OpenOrdersProps {
     /**
      * List of open orders, takes order side ('buy' | 'sell') as last element of a row
@@ -30,11 +30,27 @@ export interface OpenOrdersProps {
 export class OpenOrders extends React.Component<OpenOrdersProps> {
     private defaultHeaders = ['Date', 'Action', 'Price', 'Amount', ''];
     private defaultHeadersKeys = ['Date', 'Action', 'Price', 'Amount', ''];
+    
 
+    componentDidMount() {
+        // console.log(this.props.data);   
+        // const { active } = useWeb3React();
+         const { ethereum } = window as any
+    if (ethereum && ethereum.on  ) {
+      // console.log(ethereum)     
+ 
+      const handleAccountsChanged = (accounts: string[]) => {
+        console.log("-----Handling 'accountsChanged' event with payload", accounts)       
+      }
+      ethereum.on('accountsChanged', handleAccountsChanged)
+    } 
+    }
     public render() {
         const { headers = this.defaultHeaders } = this.props;
         const { headersKeys = this.defaultHeadersKeys } = this.props;
+        
         const tableData = this.props.data.map(this.renderRow);
+        console.log(tableData);
         const orderIndex = headersKeys.findIndex(header => header === 'Order Type');
 
         if (headersKeys[orderIndex] === 'Order Type'){
@@ -56,7 +72,19 @@ export class OpenOrders extends React.Component<OpenOrdersProps> {
         const { headersKeys = this.defaultHeadersKeys } = this.props;
         const actionIndex = headersKeys.findIndex(header => header === 'Action');
         const orderIndex = headersKeys.findIndex(header => header === 'Order Type');
-        const buySellIndex = headersKeys.findIndex(header => header === '');
+        const buySellIndex = headersKeys.findIndex(header => header === 'Cancel');
+        const priceIndex = headersKeys.findIndex(header => header === "Price");
+        const buyIndex = headersKeys.findIndex(header => header === "Buy");
+        const sellIndex = headersKeys.findIndex(header => header === "Sell");
+        const pairIndex = headersKeys.findIndex(header => header === "Pair");
+        const oldPriceIndex = 1;
+        const oldPairIndex = 6;
+        // console.log(row[5]);
+        // console.log(pairIndex);
+        // console.log(actionI)        
+        const oldVoulmeIndex = 2;
+        const oldOrderTypeIndex = 5;
+
         switch (index) {
             case actionIndex:
                 return this.renderAction(row[actionIndex] as string, row[buySellIndex] as string);
@@ -64,12 +92,27 @@ export class OpenOrders extends React.Component<OpenOrdersProps> {
                 return this.renderOrder(row[buySellIndex] as string);
             case buySellIndex:
                 return this.renderCancelButton(rowIndex);
+            case priceIndex:
+                return row[oldPriceIndex] as string;
+            case buyIndex:
+                if(row[oldOrderTypeIndex] as string ==="buy")
+                    return row[oldVoulmeIndex] as string;
+                else
+                    return "0";
+            case sellIndex:
+                if(row[oldOrderTypeIndex] as string ==="sell")
+                    return row[oldVoulmeIndex] as string;
+                else
+                    return "0";
+            case pairIndex:
+                return row[oldPairIndex] as string
             default:
                 return cell;
         }
     };
 
     public renderRow = (row: CellData[], index: number) => {
+    //  console.log("row", index,  row);
         return row.map(this.renderCell(index)); // format cells and remove first column of order side
     };
 

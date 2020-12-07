@@ -16,22 +16,25 @@ import {
     RootState,
     selectCancelOpenOrdersFetching,
     selectCurrentMarket,
+    selectMarkets,
     selectOpenOrdersFetching,
     selectOpenOrdersList,
     selectUserLoggedIn,
     userOpenOrdersFetch,
+    // selectMarkets
 } from '../../modules';
 import { OrderCommon } from '../../modules/types';
+// import {  useSelector } from 'react-redux';
 
-import * as actions from '../../modules/user/openOrders/actions';
-import {    
-    rangerUserOrderUpdate,    
-} from '../../modules/public/ranger/actions';
+// import * as actions from '../../modules/user/openOrders/actions';
+// import {    
+//     rangerUserOrderUpdate,    
+// } from '../../modules/public/ranger/actions';
 // import {
 //     convertOrderEvent,
 //     insertOrUpdate,
 // } from '../../modules/user/openOrders/helpers';
-import {  OrderEvent}  from '../../modules/types';
+// import {  OrderEvent}  from '../../modules/types';
 
 // import {
 //     initialOpenOrdersState,
@@ -45,6 +48,7 @@ interface ReduxProps {
     fetching: boolean;
     cancelFetching: boolean;
     userLoggedIn: boolean;
+    marketList : Market[] | undefined;
 }
 
 interface DispatchProps {
@@ -62,48 +66,51 @@ export class OpenOrdersContainer extends React.Component<Props> {
     public state = { tab: 'openOrders', index: 0, disable: false };
 
     public tabMapping = ['openOrders', 'orderHistory', 'tradeHistory', 'funds'];
-
+    // markets = useSelector(selectMarkets);
+    // console.log("----")
     public componentDidMount() {
-        const { currentMarket, userLoggedIn } = this.props;
+        const { currentMarket, userLoggedIn, marketList } = this.props;
+        console.log(marketList);
         if (userLoggedIn && currentMarket) {
             this.props.userOpenOrdersFetch({ market: currentMarket });
         }
-        const newOrderEvent: OrderEvent = {
-            id: "162",
-            at: 1550180631,
-            market: 'ethusd',
-            side: 'buy',
-            kind: 'bid',
-            price: '0.3',
-            state: 'wait',
-            remaining_volume: '123.1234',
-            origin_volume: '123.1234',
-        };
-        const newOrderData: OrderCommon = {
-            id: "162",          
-            market: 'ethusd',
-            side: 'buy',
-            kind: 'bid',
-            price: '0.3',
-            state: 'wait',
-            remaining_volume: '123.1234',
-            origin_volume: '123.1234',
-        }
-        const orders = []; orders.push(newOrderData);
-        // const list = insertOrUpdate([], convertOrderEvent(newOrderEvent));
-        console.log("------open order ---")
-        // const expectedState: OpenOrdersState = { ...initialOpenOrdersState, list };
-        actions.userOpenOrdersUpdate(newOrderEvent);
-        const actions1 = actions.userOpenOrdersData(orders);
-        console.log(actions1);
+        // const newOrderEvent: OrderEvent = {
+        //     id: "162",
+        //     at: 1550180631,
+        //     market: 'ethusd',
+        //     side: 'buy',
+        //     kind: 'bid',
+        //     price: '0.3',
+        //     state: 'wait',
+        //     remaining_volume: '123.1234',
+        //     origin_volume: '123.1234',
+        // };
+        // const newOrderData: OrderCommon = {
+        //     id: "162",          
+        //     market: 'ethusd',
+        //     side: 'buy',
+        //     kind: 'bid',
+        //     price: '0.3',
+        //     state: 'wait',
+        //     remaining_volume: '123.1234',
+        //     origin_volume: '123.1234',
+        // }
+        // const orders = []; orders.push(newOrderData);
+        // // const list = insertOrUpdate([], convertOrderEvent(newOrderEvent));
+        // console.log("------open order ---")
+        // // const expectedState: OpenOrdersState = { ...initialOpenOrdersState, list };
+        // actions.userOpenOrdersUpdate(newOrderEvent);
+        // const actions1 = actions.userOpenOrdersData(orders);
+        // console.log(actions1);
         
-        rangerUserOrderUpdate(newOrderEvent);
-
+        // rangerUserOrderUpdate(newOrderEvent);
+        // console.log(this.markets)
     }
 
     public componentWillReceiveProps(next: Props) {
         const { userLoggedIn, currentMarket } = next;
         const { userLoggedIn: prevUserLoggedIn, currentMarket: prevCurrentMarket } = this.props;
+        // console.log("markets", marketList);
 
         if (!prevUserLoggedIn && userLoggedIn && currentMarket) {
             this.props.userOpenOrdersFetch({ market: currentMarket });
@@ -279,22 +286,22 @@ export class OpenOrdersContainer extends React.Component<Props> {
     };
 
     private renderData = () => {
-        const { list, currentMarket } = this.props;
+        const { list, currentMarket, marketList } = this.props;
 
         if (list.length === 0) {
             // return [[[''], [''], this.translate('page.noDataToShow')]];
             return [[[this.translate('page.noDataToShow')]]];
         }
-        console.log("---list", list);
+        // console.log("---list", list);
         return list.map((item: OrderCommon) => {
-            const { id, price, created_at, remaining_volume, origin_volume, side } = item;
+            const { id, price, created_at, remaining_volume, origin_volume, side, market } = item;
             const executedVolume = Number(origin_volume) - Number(remaining_volume);
             const remainingAmount = Number(remaining_volume);
             const total = Number(origin_volume) * Number(price);
             const filled = ((executedVolume / Number(origin_volume)) * 100).toFixed(2);
             const priceFixed = currentMarket ? currentMarket.price_precision : 0;
-            const amountFixed = currentMarket ? currentMarket.amount_precision : 0;
-
+            const amountFixed = currentMarket ? currentMarket.amount_precision : 0;            
+            // console.log();
             return [
                 localeDate(created_at, 'fullDate'),
                 <span style={{ color: setTradeColor(side).color }} key={id}>{preciseData(price, priceFixed)}</span>,
@@ -302,6 +309,7 @@ export class OpenOrdersContainer extends React.Component<Props> {
                 <span style={{ color: setTradeColor(side).color }} key={id}>{preciseData(total, amountFixed)}</span>,
                 <span style={{ color: setTradeColor(side).color }} key={id}>{filled}%</span>,
                 side,
+                marketList.find(x=>x.id === market).name
             ];
         });
     };
@@ -311,7 +319,9 @@ export class OpenOrdersContainer extends React.Component<Props> {
     private handleCancel = (index: number) => {
         const { list } = this.props;
         const orderToDelete = list[index];
-        this.props.openOrdersCancelFetch({ order: orderToDelete, list });
+        console.log("----delete order", orderToDelete);
+        
+        // this.props.openOrdersCancelFetch({ order: orderToDelete, list });
     };
 
     // private handleCancelAll = () => {
@@ -320,20 +330,20 @@ export class OpenOrdersContainer extends React.Component<Props> {
     // };
 }
 
-const openOrdersData: OrderCommon[] = [
-    {
-        id: "131",
-        side: 'sell',
-        price: '104.4313',
-        created_at: '2019-01-31T21:14:04+01:00',
-        remaining_volume: '0',
-        origin_volume: '10',
-        executed_volume: '10',
-        state: 'wait',
-        market: 'ethusd',
-    },
-];
-console.log(openOrdersData);
+// const openOrdersData: OrderCommon[] = [
+//     {
+//         id: "131",
+//         side: 'sell',
+//         price: '104.4313',
+//         created_at: '2019-01-31T21:14:04+01:00',
+//         remaining_volume: '0',
+//         origin_volume: '10',
+//         executed_volume: '10',
+//         state: 'wait',
+//         market: 'ethusd',
+//     },
+// ];
+// console.log(openOrdersData);
 
 const mapStateToProps = (state: RootState): ReduxProps => ({
     currentMarket: selectCurrentMarket(state),
@@ -342,6 +352,7 @@ const mapStateToProps = (state: RootState): ReduxProps => ({
     fetching: selectOpenOrdersFetching(state),
     cancelFetching: selectCancelOpenOrdersFetching(state),
     userLoggedIn: selectUserLoggedIn(state),
+    marketList : selectMarkets(state)
 });
 
 const mapDispatchToProps: MapDispatchToPropsFunction<DispatchProps, {}> = dispatch => ({

@@ -32,6 +32,14 @@ export default function Web3ReactManager({ children }) {
     if (triedEager && !networkActive && !networkError && !active) {
       activateNetwork(network)
     }
+    const { ethereum } = window as any
+    if (ethereum && ethereum.on && !active ) {
+      // console.log(ethereum)  
+      const handleAccountsChanged = (accounts: string[]) => {
+        console.log("---yyyy--Handling 'accountsChanged' event with payload", accounts)       
+      }
+      ethereum.on('accountsChanged', handleAccountsChanged)
+    } 
   }, [triedEager, networkActive, networkError, activateNetwork, active])
 
   // when there's no account connected, react to logins (broadly speaking) on the injected provider, if it exists
