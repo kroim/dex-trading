@@ -50,7 +50,7 @@ export class OpenOrders extends React.Component<OpenOrdersProps> {
         const { headersKeys = this.defaultHeadersKeys } = this.props;
         
         const tableData = this.props.data.map(this.renderRow);
-        console.log(tableData);
+        // console.log(tableData);
         const orderIndex = headersKeys.findIndex(header => header === 'Order Type');
 
         if (headersKeys[orderIndex] === 'Order Type'){

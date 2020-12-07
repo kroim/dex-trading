@@ -147,6 +147,7 @@ export const rangerUnsubscribeMarket = (market: Market): RangerDirectMessage => 
 export const rangerSubscribeKlineMarket = (marketId: string, periodString: string): RangerDirectMessage => rangerSubscribe(marketKlineStreams(marketId, periodString));
 export const rangerUnsubscribeKlineMarket = (marketId: string, periodString: string): RangerDirectMessage => rangerUnsubscribe(marketKlineStreams(marketId, periodString));
 
+//---- add owner address  to stream -----//
 export const rangerSubscribeMyOrders = (owner: string ): RangerDirectMessage => rangerSubscribe({ channels: [ owner + ".myorders"]});
 
 export const rangerDisconnectFetch = (): RangerDisconnectFetch => ({

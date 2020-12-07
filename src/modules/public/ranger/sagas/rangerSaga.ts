@@ -327,10 +327,16 @@ const switchMarket = (subscribeOnInitOnly: boolean) => {
             // yield put(userOpenOrdersReset());            
             // const { active, account  } = useWeb3React();
             // window.console.log("---web3", active, account);
-            const owner = store.getState().user.currentAddress;
+            // const owner = store.getState().user.currentAddress;
             // window.console.log("----store", store.getState())
-            if(owner && owner!="")
-                yield put(rangerSubscribeMyOrders(owner));            
+            // console.log("-------window ", window.ethereum);
+            const {ethereum} = window as any;
+            if(ethereum && ethereum.selectedAddress)
+             {
+                yield put(rangerSubscribeMyOrders(ethereum.selectedAddress));                            
+             } 
+            //  if(owner && owner!="")
+            //     yield put(rangerSubscribeMyOrders(owner));            
         }
     };
 };
