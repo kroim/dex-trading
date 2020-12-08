@@ -1,5 +1,5 @@
 import { Currency, CurrencyAmount, Token, ETHER/*, Trade*/} from '@bscswap/sdk'
-import React, { useCallback /*,useState*/} from 'react'
+import React, { useCallback /*,useState,useEffect */} from 'react'
 import ReactGA from 'react-ga'
 import { AutoColumn } from '../../components/Column'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
@@ -62,7 +62,8 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
       outputAmount,
       rateFormatted,
       outputValueFormatted,
-      inputValueFormatted
+      inputValueFormatted,
+      inputError: inputLimitError
     } = useDerivedSwapInfo()
     currencies[Field.INPUT] = inCurrency
     currencies[Field.OUTPUT] = outCurrency
@@ -110,6 +111,11 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
   //   }
   const maxAmountInput: CurrencyAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
   const atMaxAmountInput = Boolean(maxAmountInput && inputAmount?.equalTo(maxAmountInput))
+
+  // useEffect(() => {
+  //   inputAmount currencyBalances[Field.INPUT]
+  // });
+
   const { onCurrencySelection, onUserInput, onUserRateInput } = useSwapActionHandlers()
 
   //----- default pair ---------//
@@ -262,6 +268,7 @@ export function ExchangePage({ inCurrency, outCurrency }: {inCurrency: Currency,
                 }}
                 otherCurrency={currencies[Field.OUTPUT]}
                 id="swap-currency-input"
+                error={!!inputLimitError}
             />
             <PriceInputPanel
                 value={rateFormatted || ''}

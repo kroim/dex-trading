@@ -134,6 +134,7 @@ interface CurrencyInputPanelProps {
   otherCurrency?: Currency | null
   id: string
   showCommonBases?: boolean
+  error?:boolean
 }
 
 export default function CurrencyInputPanel({
@@ -152,6 +153,7 @@ export default function CurrencyInputPanel({
   otherCurrency = null,
   id,
   showCommonBases,
+  error = false
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
 
@@ -198,6 +200,7 @@ export default function CurrencyInputPanel({
                 onUserInput={val => {
                   onUserInput(val)
                 }}
+                error={error}
               />
               {account && currency && showMaxButton && label !== 'To' && (
                 <StyledBalanceMax onClick={onMax}>MAX</StyledBalanceMax>
