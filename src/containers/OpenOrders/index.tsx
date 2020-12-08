@@ -292,9 +292,9 @@ export class OpenOrdersContainer extends React.Component<Props> {
             // return [[[''], [''], this.translate('page.noDataToShow')]];
             return [[[this.translate('page.noDataToShow')]]];
         }
-        // console.log("---list", list);
+        console.log("---list", list);
         return list.map((item: OrderCommon) => {
-            const { id, price, created_at, remaining_volume, origin_volume, side, market } = item;
+            const { id, price, remaining_volume, origin_volume, side, market, updated_at } = item;
             const executedVolume = Number(origin_volume) - Number(remaining_volume);
             const remainingAmount = Number(remaining_volume);
             const total = Number(origin_volume) * Number(price);
@@ -303,7 +303,7 @@ export class OpenOrdersContainer extends React.Component<Props> {
             const amountFixed = currentMarket ? currentMarket.amount_precision : 0;            
             // console.log();
             return [
-                localeDate(created_at, 'fullDate'),
+                localeDate(updated_at, 'fullDate'),
                 <span style={{ color: setTradeColor(side).color }} key={id}>{preciseData(price, priceFixed)}</span>,
                 <span style={{ color: setTradeColor(side).color }} key={id}>{preciseData(remainingAmount, amountFixed)}</span>,
                 <span style={{ color: setTradeColor(side).color }} key={id}>{preciseData(total, amountFixed)}</span>,
