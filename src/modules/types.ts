@@ -26,10 +26,11 @@ export interface OrderCommon {
     created_at?: string;
     updated_at?: string;
     confirmed?: boolean;
-    uuid?: string;
+    uuid?: string;   
     id?: string;
     kind?: OrderKind;
-    trades_count?: number;
+    trades_count?: number;            
+    tx_hash? : string;
 }
 
 export interface OrderEvent extends OrderCommon {

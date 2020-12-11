@@ -77,14 +77,16 @@ export class OpenOrders extends React.Component<OpenOrdersProps> {
         const buyIndex = headersKeys.findIndex(header => header === "Buy");
         const sellIndex = headersKeys.findIndex(header => header === "Sell");
         const pairIndex = headersKeys.findIndex(header => header === "Pair");
+        const amountIndex = headersKeys.findIndex(header => header === "Amount");
 
         const oldPriceIndex = 1;
         const oldPairIndex = 6;
-        // console.log(row[5]);
+        // console.log(row);
         // console.log(pairIndex);
         // console.log(actionI)        
         const oldVoulmeIndex = 2;
         const oldOrderTypeIndex = 5;
+        const oldAmountIndex =  3;       
         switch (index) {
             case actionIndex:
                 return this.renderAction(row[actionIndex] as string, row[buySellIndex] as string);
@@ -106,7 +108,9 @@ export class OpenOrders extends React.Component<OpenOrdersProps> {
                     return "0";
             case pairIndex:
                 return row[oldPairIndex] as string;            
-           
+            case amountIndex:
+                return row[oldAmountIndex] as string;                
+
             default:
                 return cell;
         }

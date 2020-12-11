@@ -247,34 +247,48 @@ const initRanger = (
                             const payload=[];
                             payload.push(newOrderEvent);
                             // emitter(alertPush({ message: ['success.order.created'], type: 'success'}));
-                            const myOrderOpen= event.myOrderOpen;
-                            // const myOrderHistory = event.myOrderHistory;                            
-                            // emitter(rangerUserOrderUpdate(newOrderEvent));
-                            if(myOrderOpen)
-                            myOrderOpen.forEach(myOrder => {                                
+                            // const myOrderOpen= event.myOrderOpen;
+                            // // const myOrderHistory = event.myOrderHistory;                            
+                            // // emitter(rangerUserOrderUpdate(newOrderEvent));
+                            // if(myOrderOpen)
+                            // myOrderOpen.forEach(myOrder => {                                
+                            //     emitter(rangerUserOrderUpdate(myOrder));    
+                            // });
+                            const myOrderHistory = event;  
+                            
+                                                                
+                            myOrderHistory.forEach(myOrder => { 
+                                // myOrder.state= "wait";
+                                const curTime = Date.now();
+                                const diff = curTime- myOrder.updated_at*1000;                                
+                                if (isFinexEnabled() && myOrder && diff<1000*60*3) {                                    
+                                    switch (myOrder.state) {
+                                        case 'wait':
+                                        case 'pending':
+                                            const orders = selectOpenOrdersList(store.getState());
+                                            const updatedOrder = orders.length && orders.find(order => myOrder.id && myOrder.id === myOrder.id);                                            
+                                            // window.console.log(curTime);
+                                            if (!updatedOrder) {                                                
+                                                // emitter(alertPush({ message: ['success.order.created'], type: 'success'}));
+                                                emitter(alertPush({ message: ['success.order.created'], type: 'success'}));
+                                            }
+                                            break;
+                                        case 'done':
+                                            emitter(alertPush({ message: ['success.order.done'], type: 'success'}));
+                                            break;
+                                        case 'reject':
+                                            emitter(alertPush({ message: ['error.order.rejected'], type: 'error'}));
+                                            break;
+                                        case 'cancel':
+                                            emitter(alertPush({ message: ['success.order.cancel'], type: 'success'}));
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }  
+                                // myOrder.state ="wait";
                                 emitter(rangerUserOrderUpdate(myOrder));    
                             });
-                            // if(myOrderHistory)
-                            // myOrderHistory.forEach(myOrder => {         
-                             
-                            //     let tempOrder : OrderEvent = {
-                            //             id: myOrder.id,
-                            //             at:  myOrder.at,
-                            //             market: myOrder.market,
-                            //             side: myOrder.side,
-                            //             // kind: 'bid',
-                            //             price: myOrder.price,
-                            //             state: myOrder.state,
-                            //             remaining_volume: ,
-                            //             origin_volume: '123.1234',
-                            //         };
-                            //         console.log(tempOrder);
-                            //     // tempOrder.id = myOrder.id;
-                            //     // tempOrder.at = myOrder.at;                                
-                            //     emitter(rangerUserOrderUpdate(tempOrder));    
-                            // });
-                            // emitter(rangerUserOrderUpdate(newOrderEvent2));
-                            // console.log(store.getState())
                             return;
                         default:
                     }

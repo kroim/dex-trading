@@ -130,9 +130,23 @@
 
 /* Style by Kroim */
 .custom-open-header-tab-container {
+  height:100%;
+  display:block;
   .cr-tab-panel {
+    height:100%;
+    display:block;
     .cr-tab-panel__navigation-container {
       margin-bottom: 0;
+      position: sticky;
+      top: 0;
+      display: block;
+      z-index: 100; 
+    }
+  }
+  .cr-tab-panel {
+    &__navigation-container {
+      display: inline-block;
+      width: 100%;
     }
   }
 }

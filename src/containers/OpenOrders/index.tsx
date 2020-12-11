@@ -8,7 +8,7 @@ import { connect, MapDispatchToPropsFunction } from 'react-redux';
 import { OpenOrders, TabPanel } from '../../components';
 import { localeDate, preciseData, setTradeColor } from '../../helpers';
 import { IntlProps } from '../../index';
-import { Table } from '../../components';
+import { Table,CellData } from '../../components';
 import {
     Market,
     openOrdersCancelFetch,
@@ -19,12 +19,15 @@ import {
     selectMarkets,
     selectOpenOrdersFetching,
     selectOpenOrdersList,
+    selectOrdersHistory,
     selectUserLoggedIn,
     userOpenOrdersFetch,
     // selectMarkets
 } from '../../modules';
+import classnames from 'classnames';
 import { OrderCommon } from '../../modules/types';
 // import {  useSelector } from 'react-redux';
+import { getEtherscanLink } from '../../modules/web3wallet/utils';
 
 // import * as actions from '../../modules/user/openOrders/actions';
 // import {    
@@ -44,7 +47,8 @@ import { OrderCommon } from '../../modules/types';
 
 interface ReduxProps {
     currentMarket: Market | undefined;
-    list: OrderCommon[];
+    list: OrderCommon[];    
+    historyList: OrderCommon[];    
     fetching: boolean;
     cancelFetching: boolean;
     userLoggedIn: boolean;
@@ -65,7 +69,7 @@ export class OpenOrdersContainer extends React.Component<Props> {
 
     public state = { tab: 'openOrders', index: 0, disable: false };
 
-    public tabMapping = ['openOrders', 'orderHistory', 'tradeHistory', 'funds'];
+    public tabMapping = ['openOrders', 'orderHistory', 'tradeHistory'/*, 'funds'*/];
     // markets = useSelector(selectMarkets);
     // console.log("----")
     public componentDidMount() {
@@ -73,50 +77,21 @@ export class OpenOrdersContainer extends React.Component<Props> {
         console.log(marketList);
         if (userLoggedIn && currentMarket) {
             this.props.userOpenOrdersFetch({ market: currentMarket });
-        }
-        // const newOrderEvent: OrderEvent = {
-        //     id: "162",
-        //     at: 1550180631,
-        //     market: 'ethusd',
-        //     side: 'buy',
-        //     kind: 'bid',
-        //     price: '0.3',
-        //     state: 'wait',
-        //     remaining_volume: '123.1234',
-        //     origin_volume: '123.1234',
-        // };
-        // const newOrderData: OrderCommon = {
-        //     id: "162",          
-        //     market: 'ethusd',
-        //     side: 'buy',
-        //     kind: 'bid',
-        //     price: '0.3',
-        //     state: 'wait',
-        //     remaining_volume: '123.1234',
-        //     origin_volume: '123.1234',
-        // }
-        // const orders = []; orders.push(newOrderData);
-        // // const list = insertOrUpdate([], convertOrderEvent(newOrderEvent));
-        // console.log("------open order ---")
-        // // const expectedState: OpenOrdersState = { ...initialOpenOrdersState, list };
-        // actions.userOpenOrdersUpdate(newOrderEvent);
-        // const actions1 = actions.userOpenOrdersData(orders);
-        // console.log(actions1);
+        }        
         
-        // rangerUserOrderUpdate(newOrderEvent);
-        // console.log(this.markets)
     }
 
     public componentWillReceiveProps(next: Props) {
         const { userLoggedIn, currentMarket } = next;
-        const { userLoggedIn: prevUserLoggedIn, currentMarket: prevCurrentMarket } = this.props;
-        // console.log("markets", marketList);
+        const { userLoggedIn: prevUserLoggedIn, currentMarket: prevCurrentMarket } = this.props;        
 
         if (!prevUserLoggedIn && userLoggedIn && currentMarket) {
             this.props.userOpenOrdersFetch({ market: currentMarket });
         } else if (userLoggedIn && currentMarket && prevCurrentMarket !== currentMarket) {
             this.props.userOpenOrdersFetch({ market: currentMarket });
         }
+        // const {historyList} = this.props;
+        // console.log(historyList);
     }
 
     public render() {
@@ -133,6 +108,7 @@ export class OpenOrdersContainer extends React.Component<Props> {
                     panels={this.renderTabs()}
                     onTabChange={this.handleChangeTab}
                     currentTabIndex={this.state.index}
+                    //Style={overflow:"scroll"}                    
                 />
             </div>
         );
@@ -157,6 +133,7 @@ export class OpenOrdersContainer extends React.Component<Props> {
     }
 
     private renderCustomOrderHistory = () => {
+        
         const headers = [
             this.translate('custom.openOrders.type'),
             this.translate('custom.openOrders.date'),
@@ -167,20 +144,95 @@ export class OpenOrdersContainer extends React.Component<Props> {
             this.translate('custom.openOrders.price'),
             this.translate('custom.openOrders.txHash')
         ]
-        const tableData = [[[this.translate('page.noDataToShow')]]]
+        // const tableData = [[[this.translate('page.noDataToShow')]]]
+         const tableData = this.renderOrderHistoryData()
+        // const {historyList} = this.props;
+        // const tableData = this.props.data.map(this.renderRow);
+
         return (
-            <div className="cr-open-orders">
-                <Table
-                    header={headers}
-                    data={tableData}
-                    colSpan={8}
-                />
-            </div>
+            <div>
+                <div className="cr-open-orders">
+                    <Table
+                        header={headers}
+                        data={tableData}
+                        colSpan={8}
+                    />
+                </div>
+            </div>            
         )
+    }
+
+    public renderHistoryCell = (rowIndex: number) => (cell: CellData, index: number, row: CellData[]) => {  
+        const headersKeys = [
+            this.translate('custom.openOrders.type'),
+            this.translate('custom.openOrders.date'),
+            this.translate('custom.openOrders.pair'),
+            this.translate('custom.openOrders.sell'),
+            this.translate('custom.openOrders.buy'),
+            this.translate('custom.openOrders.total'),
+            this.translate('custom.openOrders.price'),
+            this.translate('custom.openOrders.txHash')
+        ]           
+        const orderIndex = headersKeys.findIndex(header => header === 'Order Type');
+        const buySellIndex = headersKeys.findIndex(header => header === 'Cancel');
+        const priceIndex = headersKeys.findIndex(header => header === "Price");
+        const buyIndex = headersKeys.findIndex(header => header === "Buy");
+        const sellIndex = headersKeys.findIndex(header => header === "Sell");
+        const pairIndex = headersKeys.findIndex(header => header === "Pair");
+        const amountIndex = headersKeys.findIndex(header => header === "Amount");
+
+        const oldPriceIndex = 1;
+        const oldPairIndex = 6;
+        // console.log(row);
+        // console.log(pairIndex);
+        // console.log(actionI)        
+        const oldVoulmeIndex = 2;
+        const oldOrderTypeIndex = 5;
+        const oldAmountIndex =  3;       
+        switch (index) {          
+            case orderIndex:
+                return this.renderOrder(row[buySellIndex] as string); 
+            case priceIndex:
+                return row[oldPriceIndex] as string;
+            case buyIndex:
+                if(row[oldOrderTypeIndex] as string ==="buy")
+                    return row[oldVoulmeIndex] as string;
+                else
+                    return "0";
+            case sellIndex:
+                if(row[oldOrderTypeIndex] as string ==="sell")
+                    return row[oldVoulmeIndex] as string;
+                else
+                    return "0";
+            case pairIndex:
+                return row[oldPairIndex] as string;            
+            case amountIndex:
+                return row[oldAmountIndex] as string;                
+
+            default:
+                return cell;
+        }
+    };
+
+    public renderHistoryRow = (row: CellData[], index: number) => {
+    //  console.log("row", index,  row);
+        return row.map(this.renderHistoryCell(index)); // format cells and remove first column of order side
+    };
+
+    public renderOrder(orderType: string) {
+        // tslint:disable-next-line:no-magic-numbers
+        const type = orderType ? orderType.toLowerCase().slice(0,3) : orderType;
+        const classNames = classnames('cr-open-orders__order', {
+            'cr-open-orders__order--buy': type === 'buy',
+            'cr-open-orders__order--sell': type === 'sel',
+        });
+
+        return <span className={classNames}>{orderType}</span>;
     }
 
     private renderCustomTradeHistory = () => {
         const headers = [
+            this.translate('custom.openOrders.type'),
             this.translate('custom.openOrders.date'),
             this.translate('custom.openOrders.pair'),
             this.translate('custom.openOrders.sell'),
@@ -189,8 +241,10 @@ export class OpenOrdersContainer extends React.Component<Props> {
             this.translate('custom.openOrders.price'),
             this.translate('custom.openOrders.marker'),
             this.translate('custom.openOrders.txHash')
-        ]
-        const tableData = [[[this.translate('page.noDataToShow')]]]
+        ]        
+        
+        const tableData = this.renderTradeHistoryData();  //[[[this.translate('page.noDataToShow')]]]
+
         return (
             <div className="cr-open-orders">
                 <Table
@@ -202,19 +256,19 @@ export class OpenOrdersContainer extends React.Component<Props> {
         )
     }
 
-    private renderCustomFunds = () => {
-        const headers = ['Token Name', 'Balance Amount']
-        const tableData = [[[this.translate('page.noDataToShow')]]]
-        return (
-            <div className="cr-open-orders">
-                <Table
-                    header={headers}
-                    data={tableData}
-                    colSpan={2}
-                />
-            </div>
-        )
-    }
+    // private renderCustomFunds = () => {
+    //     const headers = ['Token Name', 'Balance Amount']
+    //     const tableData = [[[this.translate('page.noDataToShow')]]]
+    //     return (
+    //         <div className="cr-open-orders">
+    //             <Table
+    //                 header={headers}
+    //                 data={tableData}
+    //                 colSpan={2}
+    //             />
+    //         </div>
+    //     )
+    // }
 
     private renderTabs = () => {
         const { tab, index } = this.state;
@@ -232,10 +286,10 @@ export class OpenOrdersContainer extends React.Component<Props> {
                 content: tab === 'tradeHistory' ? this.renderCustomTradeHistory() : null,
                 label: this.props.intl.formatMessage({ id: 'custom.openOrders.tradeHistory' }),
             },
-            {
-                content: tab === 'funds' ? this.renderCustomFunds() : null,
-                label: this.props.intl.formatMessage({ id: 'custom.openOrders.funds' }),
-            },
+            // {
+            //     content: tab === 'funds' ? this.renderCustomFunds() : null,
+            //     label: this.props.intl.formatMessage({ id: 'custom.openOrders.funds' }),
+            // },
         ];
     };
 
@@ -256,7 +310,7 @@ export class OpenOrdersContainer extends React.Component<Props> {
             'Pair',
             'Sell',
             'Buy',
-            'Total',
+            'Amount',
             'Price',
             'Cancel'
         ];
@@ -268,7 +322,7 @@ export class OpenOrdersContainer extends React.Component<Props> {
             this.translate('custom.openOrders.pair'),
             this.translate('custom.openOrders.sell'),
             this.translate('custom.openOrders.buy'),
-            this.translate('custom.openOrders.total'),
+            this.translate('custom.openOrders.amount'),
             this.translate('custom.openOrders.price'),
             this.translate('custom.openOrders.cancel')
         ];
@@ -292,15 +346,15 @@ export class OpenOrdersContainer extends React.Component<Props> {
             // return [[[''], [''], this.translate('page.noDataToShow')]];
             return [[[this.translate('page.noDataToShow')]]];
         }
-        console.log("---list", list);
+        // console.log("---list", list);
         return list.map((item: OrderCommon) => {
             const { id, price, remaining_volume, origin_volume, side, market, updated_at } = item;
             const executedVolume = Number(origin_volume) - Number(remaining_volume);
             const remainingAmount = Number(remaining_volume);
-            const total = Number(origin_volume) * Number(price);
+            const total = Number(origin_volume) * Number(price)//:Number(origin_volume) / Number(price);
             const filled = ((executedVolume / Number(origin_volume)) * 100).toFixed(2);
             const priceFixed = currentMarket ? currentMarket.price_precision : 0;
-            const amountFixed = currentMarket ? currentMarket.amount_precision : 0;            
+            const amountFixed = currentMarket ? currentMarket.amount_precision : 0;                        
             // console.log();
             return [
                 localeDate(updated_at, 'fullDate'),
@@ -310,6 +364,85 @@ export class OpenOrdersContainer extends React.Component<Props> {
                 <span style={{ color: setTradeColor(side).color }} key={id}>{filled}%</span>,
                 side,
                 marketList.find(x=>x.id === market).name
+            ];
+        });
+    };
+
+    private renderOrderHistoryData = () => {
+        const { historyList, currentMarket, marketList } = this.props;
+
+        if (!historyList ||  historyList.length <1 ) {            
+            return [[[this.translate('page.noDataToShow')]]];
+        }
+        const historyListArray = historyList.sort((a,b) => Number(b.updated_at)-Number(a.updated_at));;//.filter(x=>x.state!=="wait");
+        // console.log("---list", historyList);
+        
+        return historyListArray.map((item: OrderCommon) => {
+            const { id, price,  origin_volume, side, market, updated_at,tx_hash,state,ord_type } = item;
+            // const executedVolume = Number(origin_volume) - Number(remaining_volume);
+            // const remainingAmount = Number(remaining_volume);
+            const explorerLink = tx_hash ? getEtherscanLink(56, tx_hash, 'transaction') : undefined
+            const total = Number(origin_volume) * Number(price);            
+            // const total = side==="buy"? Number(origin_volume) / Number(price):Number(origin_volume) * Number(price);            
+            // const total = origin_volume;            
+            // const filled = ((executedVolume / Number(origin_volume)) * 100).toFixed(2);
+            const priceFixed = currentMarket ? currentMarket.price_precision : 0;
+            const amountFixed = currentMarket ? currentMarket.amount_precision : 0;                        
+            const mapStateText = { "cancel" : "Cancelled", "wait" : "Open", "done" :"Executed" };
+            // if(state==="wait") return undefined;
+            const stateText = mapStateText[state];
+            // console.log();
+            return [
+            <span style={{ color: setTradeColor(side).color }}>{ord_type} {side}</span>,
+                localeDate(updated_at, 'fullDate'),
+                marketList.find(x=>x.id === market).name,                                
+                side==="sell"?<span style={{ color: setTradeColor(side).color }} key={id}>{preciseData(origin_volume, amountFixed)}</span>:"0",                                
+                side==="buy"?<span style={{ color: setTradeColor(side).color }} key={id}>{preciseData(origin_volume, amountFixed)}</span>:"0",                                
+                <span style={{ color: setTradeColor(side).color }} key={id}>{preciseData(total, amountFixed)}</span>,
+                <span style={{ color: setTradeColor(side).color }} key={id}>{preciseData(price, priceFixed)}</span>,
+                <a rel="noopener noreferrer" target="_blank" href={explorerLink} className="order-link">
+                    {stateText}
+                </a>
+            ];
+        });
+    };
+
+    private renderTradeHistoryData = () => {
+        const { historyList, currentMarket, marketList } = this.props;
+
+        if (!historyList ||  historyList.length <1 ) {            
+            return [[[this.translate('page.noDataToShow')]]];
+        }
+        const historyListArray = historyList.filter(x=>x.state=="done").sort((a,b) => Number(b.updated_at)-Number(a.updated_at));
+        // console.log("---list", historyList);
+        
+        return historyListArray.map((item: OrderCommon) => {
+            const { id, price,  origin_volume, side, market, updated_at,tx_hash,state,ord_type } = item;
+            // const executedVolume = Number(origin_volume) - Number(remaining_volume);
+            // const remainingAmount = Number(remaining_volume);
+            const explorerLink = tx_hash ? getEtherscanLink(56, tx_hash, 'transaction') : undefined
+            const total = Number(origin_volume) * Number(price);            
+            // const total = side==="buy"? Number(origin_volume) / Number(price):Number(origin_volume) * Number(price);            
+            // const total = origin_volume;            
+            // const filled = ((executedVolume / Number(origin_volume)) * 100).toFixed(2);
+            const priceFixed = currentMarket ? currentMarket.price_precision : 0;
+            const amountFixed = currentMarket ? currentMarket.amount_precision : 0;                        
+            const mapStateText = { "cancel" : "Cancelled", "wait" : "Open", "done" :"Executed" };
+            // if(state==="wait") return undefined;
+            const stateText = mapStateText[state];
+            // console.log();
+            return [
+            <span style={{ color: setTradeColor(side).color }}>{ord_type} {side}</span>,
+                localeDate(updated_at, 'fullDate'),
+                marketList.find(x=>x.id === market).name,                                
+                side==="sell"?<span style={{ color: setTradeColor(side).color }} key={id}>{preciseData(origin_volume, amountFixed)}</span>:"0",                                
+                side==="buy"?<span style={{ color: setTradeColor(side).color }} key={id}>{preciseData(origin_volume, amountFixed)}</span>:"0",                                
+                <span style={{ color: setTradeColor(side).color }} key={id}>{preciseData(total, amountFixed)}</span>,
+                <span style={{ color: setTradeColor(side).color }} key={id}>{preciseData(price, priceFixed)}</span>,
+                '',
+                <a rel="noopener noreferrer" target="_blank" href={explorerLink} className="order-link">
+                    {stateText}
+                </a>
             ];
         });
     };
@@ -348,6 +481,7 @@ export class OpenOrdersContainer extends React.Component<Props> {
 const mapStateToProps = (state: RootState): ReduxProps => ({
     currentMarket: selectCurrentMarket(state),
     list: selectOpenOrdersList(state),
+    historyList: selectOrdersHistory(state),
     // list: openOrdersData,
     fetching: selectOpenOrdersFetching(state),
     cancelFetching: selectCancelOpenOrdersFetching(state),

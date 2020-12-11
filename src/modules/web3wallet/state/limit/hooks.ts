@@ -254,7 +254,7 @@ export function useDerivedSwapInfo(): {
       break
   }
   const rateFormatted = independentField === EditField.RATE ? inputRateValue : amountFormatter(rateRaw, 18, 4, false)
-  console.log("rate = ", rateFormatted)
+  // console.log("rate = ", rateFormatted)
   const currencyBalances = {
     [Field.INPUT]: relevantTokenBalances[0],
     [Field.OUTPUT]: relevantTokenBalances[1]
